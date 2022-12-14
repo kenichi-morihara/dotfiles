@@ -1,0 +1,1 @@
+/Users/kenichi.morihara/.zprezto/runcoms/zshrc
