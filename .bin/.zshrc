@@ -1,3 +1,5 @@
+# Fig pre block. Keep at the top of this file.
+[[ -f "$HOME/.fig/shell/zshrc.pre.zsh" ]] && builtin source "$HOME/.fig/shell/zshrc.pre.zsh"
 #
 # Executes commands at the start of an interactive session.
 #
@@ -11,12 +13,14 @@ if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
 fi
 
 # export PATH="$HOME/.nodenv/bin:$PATH"
-export PATH=$PATH:~/Library/Python/3.8/bin
-export PATH=$PATH:~/repos/42tokyo
 
 # Customize to your needs...
 eval "$(starship init zsh)"
 eval "$(fnm env --use-on-cd)"
+
+# rbenv
+export PATH="~/.rbenv/shims:/usr/local/bin:$PATH"
+eval "$(rbenv init -)"
 # eval "$(nodenv init -)"
 
 ## alias
