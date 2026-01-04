@@ -1,0 +1,100 @@
+snippets:
+  # 基本コマンド
+  - name: vim
+    keyword: v
+    snippet: vim
+  
+  - name: git
+    keyword: g
+    snippet: git
+  
+  - name: bat
+    keyword: b
+    snippet: bat
+  
+  - name: grep
+    keyword: gr
+    snippet: grep
+  
+  # ディレクトリ移動・リロード
+  - name: goto ghq repository
+    keyword: goto
+    snippet: cd "$(ghq list --full-path | peco)"
+  
+  - name: reload shell
+    keyword: reload
+    snippet: exec $SHELL -l
+  
+  # docker
+  - name: docker
+    keyword: d
+    snippet: docker
+  
+  - name: docker ps
+    keyword: dps
+    snippet: docker container ls
+  
+  - name: docker images
+    keyword: dimgs
+    snippet: docker image ls
+  
+  - name: docker run
+    keyword: drun
+    snippet: docker container run
+  
+  - name: docker compose down
+    keyword: dcd
+    snippet: docker compose -d
+  
+  # git
+  - name: git add
+    keyword: ga
+    snippet: git add
+  
+  - name: git add all and commit
+    keyword: gacm
+    snippet: git add -A && git commit
+  
+  - name: git status
+    keyword: gst
+    snippet: git status
+  
+  - name: git branch
+    keyword: gbr
+    snippet: git branch
+  
+  - name: git commit
+    keyword: gcm
+    snippet: git commit
+  
+  - name: git checkout
+    keyword: gco
+    snippet: git checkout
+  
+  - name: git diff
+    keyword: gdf
+    snippet: git diff
+  
+  - name: git log
+    keyword: gl
+    snippet: git log
+  
+  - name: git grep
+    keyword: ggr
+    snippet: git grep
+  
+  - name: git pull
+    keyword: gul
+    snippet: git pull
+  
+  - name: git switch
+    keyword: gsw
+    snippet: git switch
+  
+  - name: git push
+    keyword: gush
+    snippet: git push
+  
+  - name: ghq get
+    keyword: gget
+    snippet: ghq get
