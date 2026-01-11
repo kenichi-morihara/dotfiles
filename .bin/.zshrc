@@ -62,6 +62,9 @@ zinit snippet OMZ::plugins/extract/extract.plugin.zsh
 zinit ice wait lucid
 zinit light junegunn/fzf
 
+# fzfのデフォルトオプション（中央表示、ボーダー、レイアウト）
+export FZF_DEFAULT_OPTS='--height 80% --border --layout=reverse --info=inline'
+
 # fzf-tab（タブ補完をfzfで表示）
 # zeno-completionを使用する場合はコメントアウト（zenoの補完と競合する可能性がある）
 zinit ice wait lucid
@@ -76,7 +79,7 @@ zinit light Aloxaf/fzf-tab
 
 # Customize to your needs...
 eval "$(starship init zsh)"
-eval "$(fnm env --use-on-cd)"
+eval "$(mise activate zsh)"
 
 # Keybindings
 # 文節単位で採用（Alt+→）
@@ -149,6 +152,26 @@ if [[ -n $ZENO_LOADED ]]; then
   # (default: fzf-compdletion if exists; otherwise expand-or-complete)
   # export ZENO_COMPLETION_FALLBACK=expand-or-complete
 fi
+
+# reload shell with ctrl+r (outside zeno block to ensure it's bound)
+# remove default history search binding first
+bindkey -r '^r'
+reload-shell() {
+  source ${ZDOTDIR:-$HOME}/.zshrc 
+  zle reset-prompt
+}
+zle -N reload-shell
+bindkey '^r' reload-shell
+
+# rangerをctrl+eで起動
+ranger-cd() {
+  ranger --choosedir=$HOME/.rangerdir < $TTY
+  LASTDIR=$(cat $HOME/.rangerdir)
+  cd "$LASTDIR"
+  zle reset-prompt
+}
+zle -N ranger-cd
+bindkey '^e' ranger-cd
 
 # fzf-tabはzeno-completionと競合するため無効化
 # zsh-autocompleteと組み合わせる場合、いい感じに補完をするために以下の設定を追加
