@@ -16,6 +16,10 @@ snippets:
     keyword: gr
     snippet: grep
   
+  - name: ranger
+    keyword: rr
+    snippet: ranger
+  
   # ディレクトリ移動・リロード
   - name: goto ghq repository
     keyword: goto
