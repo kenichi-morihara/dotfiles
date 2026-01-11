@@ -2,6 +2,7 @@ from ranger.api.commands import Command
 import subprocess
 import shlex
 import os
+import platform
 
 class openwithfzf(Command):
     """:openwithfzf
@@ -10,6 +11,11 @@ class openwithfzf(Command):
     """
 
     def execute(self):
+        # macOSでのみ動作
+        if platform.system() != 'Darwin':
+            self.fm.notify("This command is only available on macOS", bad=True)
+            return
+
         file = self.fm.thisfile.path
 
         # /Applications と ~/Applications を対象にする
