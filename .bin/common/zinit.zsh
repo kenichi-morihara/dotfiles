@@ -12,8 +12,11 @@ case "$(uname -s)" in
     fi
     ;;
   Linux)
-    # Linux: 標準的なインストールパス
-    if [[ -f ~/.local/share/zinit/zinit.git/zinit.zsh ]]; then
+    # Linux: パッケージマネージャー（yay/pacman）でインストールした場合
+    if [[ -f /usr/share/zinit/zinit.zsh ]]; then
+      source /usr/share/zinit/zinit.zsh
+    # 標準的なインストールパス
+    elif [[ -f ~/.local/share/zinit/zinit.git/zinit.zsh ]]; then
       source ~/.local/share/zinit/zinit.git/zinit.zsh
     elif [[ -f ~/.zinit/bin/zinit.zsh ]]; then
       source ~/.zinit/bin/zinit.zsh
