@@ -1,7 +1,26 @@
 # ============================================
 # zinit プラグイン管理
 # ============================================
-source /opt/homebrew/opt/zinit/zinit.zsh
+# OS別のzinitパスを設定
+case "$(uname -s)" in
+  Darwin)
+    # macOS: Homebrewでインストールした場合
+    if [[ -f /opt/homebrew/opt/zinit/zinit.zsh ]]; then
+      source /opt/homebrew/opt/zinit/zinit.zsh
+    elif [[ -f /usr/local/opt/zinit/zinit.zsh ]]; then
+      source /usr/local/opt/zinit/zinit.zsh
+    fi
+    ;;
+  Linux)
+    # Linux: 標準的なインストールパス
+    if [[ -f ~/.local/share/zinit/zinit.git/zinit.zsh ]]; then
+      source ~/.local/share/zinit/zinit.git/zinit.zsh
+    elif [[ -f ~/.zinit/bin/zinit.zsh ]]; then
+      source ~/.zinit/bin/zinit.zsh
+    fi
+    ;;
+esac
+
 autoload -Uz _zinit
 (( ${+_comps} )) && _comps[zinit]=_zinit
 

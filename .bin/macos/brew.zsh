@@ -1,14 +1,15 @@
 # --- brew install/uninstall後に自動でBrewfileを更新 ---
-# dotfilesディレクトリの.binディレクトリのパスを取得
+# dotfilesディレクトリの.bin/macosディレクトリのパスを取得
 # .zshrcがシンボリックリンクの場合、実パスを取得
 if [[ -n "${(%):-%x}" ]]; then
-  _DOTFILES_BIN_DIR="${${(%):-%x}:A:h}"
+  _DOTFILES_MACOS_DIR="${${(%):-%x}:A:h}"
+  _DOTFILES_BIN_DIR="${_DOTFILES_MACOS_DIR:h}"
   _DOTFILES_DIR="${_DOTFILES_BIN_DIR:h}"
-  BREWFILE_PATH="$_DOTFILES_BIN_DIR/.Brewfile"
+  BREWFILE_PATH="$_DOTFILES_MACOS_DIR/.Brewfile"
 else
   # フォールバック: 環境変数や固定パスを使用
   _DOTFILES_DIR="${DOTFILES_DIR:-$HOME/ghq/github.com/kenichi-morihara/dotfiles}"
-  BREWFILE_PATH="${_DOTFILES_DIR}/.bin/.Brewfile"
+  BREWFILE_PATH="${_DOTFILES_DIR}/.bin/macos/.Brewfile"
 fi
 
 # brewコマンドをラップする関数
@@ -27,7 +28,7 @@ brew() {
   
   # install, uninstall, tap, untap の後にBrewfileを更新
   if [[ $exit_code -eq 0 ]] && [[ "$1" =~ ^(install|uninstall|tap|untap)$ ]]; then
-    local brewfile_path="${BREWFILE_PATH:-${_DOTFILES_BIN_DIR}/.Brewfile}"
+    local brewfile_path="${BREWFILE_PATH:-${_DOTFILES_MACOS_DIR}/.Brewfile}"
     local dotfiles_dir="${_DOTFILES_DIR:-$(dirname "$(dirname "$brewfile_path")")}"
     
     # ディレクトリが存在する場合のみ実行
@@ -45,19 +46,19 @@ brew() {
           cd "$dotfiles_dir" || return 1
           
           # git diffで変更があるか確認
-          if ! git diff --quiet -- ".bin/.Brewfile" 2>/dev/null; then
+          if ! git diff --quiet -- ".bin/macos/.Brewfile" 2>/dev/null; then
             # カラフルなdiffを表示
             echo ""
             echo "📦 Brewfile updated! Changes:"
             echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-            git diff --color=always -- ".bin/.Brewfile" || true
+            git diff --color=always -- ".bin/macos/.Brewfile" || true
             echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
             echo ""
             
             # git add, commit, push
             local current_branch=$(git branch --show-current 2>/dev/null || echo "master")
             if [[ "$current_branch" == "master" ]] || [[ "$current_branch" == "main" ]]; then
-              git add ".bin/.Brewfile" 2>/dev/null || true
+              git add ".bin/macos/.Brewfile" 2>/dev/null || true
               local commit_msg="chore: update Brewfile [auto-commit]"
               if git commit -m "$commit_msg" 2>/dev/null; then
                 echo "✅ Committed to $current_branch"
