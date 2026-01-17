@@ -172,5 +172,7 @@ xournalpp
 yaru-icon-theme
 yay
 yq
+zinit
 zoxide
 zram-generator
+zsh
