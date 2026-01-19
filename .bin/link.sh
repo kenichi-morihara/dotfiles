@@ -55,3 +55,8 @@ if [ -d "${DOTFILES_DIR}/.config" ]; then
             ;;
     esac
 fi
+
+# Link .tool-versions to home directory
+if [ -f "${DOTFILES_DIR}/.tool-versions" ]; then
+    ln -fnsv "${DOTFILES_DIR}/.tool-versions" "$HOME/.tool-versions"
+fi
