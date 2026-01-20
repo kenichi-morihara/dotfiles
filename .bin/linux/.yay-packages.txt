@@ -93,6 +93,7 @@ luarocks
 mako
 man-db
 mariadb-libs
+meson
 mise
 mpv
 nautilus
