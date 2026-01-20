@@ -28,6 +28,27 @@ ranger-cd() {
 zle -N ranger-cd
 bindkey '^e' ranger-cd
 
+# Alacrittyの透過度をトグル
+# 透過度の状態を保持する変数（デフォルトは1.0）
+typeset -g _ALACRITTY_OPACITY=${_ALACRITTY_OPACITY:-1.0}
+
+toggle-alacritty-opacity() {
+  # 透過度を0.9と1.0でトグル（文字列比較で確実に）
+  if [[ "$_ALACRITTY_OPACITY" == "1.0" ]]; then
+    _ALACRITTY_OPACITY=0.6
+  else
+    _ALACRITTY_OPACITY=1.0
+  fi
+  
+  # Alacrittyの透過度を変更
+  alacritty msg config "window.opacity=$_ALACRITTY_OPACITY" 2>/dev/null
+  
+  zle reset-prompt
+}
+zle -N toggle-alacritty-opacity
+# Alt+Oで透過度をトグル
+bindkey '\eo' toggle-alacritty-opacity  # Alt+O
+
 # fzf-tabはzeno-completionと競合するため無効化
 # zsh-autocompleteと組み合わせる場合、いい感じに補完をするために以下の設定を追加
 # my-fzf-tab() {
