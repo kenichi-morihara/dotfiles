@@ -37,6 +37,18 @@ if [[ -n $ZENO_LOADED ]]; then
   # bindkey '^m' zeno-auto-snippet-and-accept-line
 
   bindkey '^g' zeno-ghq-cd
+  # Ctrl+Shift+G: ghqでcdしてcursorで開く（fzf使用）
+  ghq-cd-cursor() {
+    local selected_dir
+    selected_dir=$(ghq list --full-path | fzf)
+    if [ -n "$selected_dir" ]; then
+      cd "$selected_dir"
+      cursor .
+      zle reset-prompt
+    fi
+  }
+  zle -N ghq-cd-cursor
+  bindkey '^G' ghq-cd-cursor  # Ctrl+Shift+G (Escape + G)
   bindkey '^i' zeno-completion
 
   bindkey '^xx' zeno-insert-snippet           # open snippet picker (fzf) and insert at cursor

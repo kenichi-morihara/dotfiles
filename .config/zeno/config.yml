@@ -29,6 +29,10 @@ snippets:
     keyword: reload
     snippet: exec $SHELL -l
   
+  - name: open current directory in cursor
+    keyword: c
+    snippet: cursor .
+  
   # docker
   - name: docker
     keyword: d
