@@ -10,6 +10,17 @@ _ZSH_CONFIG_DIR="${${(%):-%x}:A:h}"
 _DOTFILES_BIN_DIR="${_ZSH_CONFIG_DIR:h}"
 
 # === 共通設定 ===
+# 履歴設定
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=10000
+SAVEHIST=10000
+setopt SHARE_HISTORY          # 複数のzshセッション間で履歴を共有
+setopt APPEND_HISTORY         # 履歴を追記モードで保存
+# setopt HIST_IGNORE_DUPS       # 重複する履歴を無視
+setopt HIST_IGNORE_SPACE      # スペースで始まるコマンドを履歴に保存しない
+setopt HIST_VERIFY            # 履歴展開時にコマンドを実行せずに表示
+setopt HIST_REDUCE_BLANKS     # 余分な空白を削除して履歴に保存
+
 # zinitプラグイン管理
 source "$_ZSH_CONFIG_DIR/zinit.zsh"
 
