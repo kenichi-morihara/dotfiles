@@ -109,6 +109,8 @@ cask "alt-tab"
 cask "android-platform-tools"
 # Terminal-based AI coding assistant
 cask "claude-code"
+# Column-oriented database management system
+cask "clickhouse"
 # Clipboard extension app
 cask "clipy"
 # Universal database tool and SQL client
