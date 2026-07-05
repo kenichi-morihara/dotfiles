@@ -37,6 +37,8 @@ brew "gping"
 brew "graphviz"
 # Smarter Dockerfile linter to validate best practices
 brew "hadolint"
+# Agent multiplexer that lives in your terminal
+brew "herdr"
 # Lightweight and flexible command-line JSON processor
 brew "jq"
 # Modern load testing tool, using Go and JavaScript
