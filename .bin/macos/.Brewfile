@@ -1,4 +1,4 @@
-tap "felixkratz/formulae"
+tap "felixkratz/formulae", "https://github.com/FelixKratz/homebrew-formulae"
 tap "hashicorp/tap"
 tap "homebrew/bundle"
 tap "nektos/tap"
@@ -156,6 +156,8 @@ cask "sf-symbols"
 cask "slack"
 # Open-source code editor
 cask "visual-studio-code"
+# Multiplayer code editor
+cask "zed"
 # Video communication and virtual meeting platform
 cask "zoom"
 vscode "42crunch.vscode-openapi"
