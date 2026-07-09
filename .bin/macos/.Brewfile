@@ -1,6 +1,7 @@
 tap "felixkratz/formulae", "https://github.com/FelixKratz/homebrew-formulae"
 tap "hashicorp/tap"
 tap "homebrew/bundle"
+tap "modem-dev/tap"
 tap "nektos/tap"
 tap "olets/tap"
 # Run your GitHub Actions locally
@@ -103,6 +104,8 @@ brew "yarn"
 brew "zinit"
 # Terraform
 brew "hashicorp/tap/terraform", trusted: true
+# Desktop-inspired terminal diff viewer for agent-authored changesets
+brew "modem-dev/tap/hunk", trusted: true
 # Password manager that keeps all passwords secure behind one password
 cask "1password"
 # Enable Windows-like alt-tab
@@ -165,6 +168,7 @@ cask "zoom"
 vscode "42crunch.vscode-openapi"
 vscode "aaron-bond.better-comments"
 vscode "amadeusitgroup.ssh-key-generator"
+vscode "anthropic.claude-code"
 vscode "arjun.swagger-viewer"
 vscode "be5invis.vscode-custom-css"
 vscode "bierner.markdown-mermaid"
