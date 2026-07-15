@@ -118,6 +118,8 @@ cask "claude-code"
 cask "clickhouse"
 # Clipboard extension app
 cask "clipy"
+# OpenAI's coding agent that runs in your terminal
+cask "codex"
 # Universal database tool and SQL client
 cask "dbeaver-community"
 # Voice and text chat software
