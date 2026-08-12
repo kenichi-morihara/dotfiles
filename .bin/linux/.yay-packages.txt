@@ -14,6 +14,7 @@ brightnessctl
 btop
 btrfs-progs
 clang
+claude-code
 cmake
 cpio
 ctop
