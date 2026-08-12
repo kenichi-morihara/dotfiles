@@ -48,7 +48,7 @@ if [[ -n $ZENO_LOADED ]]; then
     fi
   }
   zle -N ghq-cd-cursor
-  bindkey '^G' ghq-cd-cursor  # Ctrl+Shift+G (Escape + G)
+  # bindkey '^G' ghq-cd-cursor  # Ctrl+Shift+G (Escape + G)
   bindkey '^i' zeno-completion
 
   bindkey '^xx' zeno-insert-snippet           # open snippet picker (fzf) and insert at cursor
