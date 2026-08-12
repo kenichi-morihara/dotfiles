@@ -46,3 +46,7 @@ esac
 # starshipとmiseの初期化
 eval "$(starship init zsh)"
 eval "$(mise activate zsh)"
+
+# 端末固有・秘密情報（git 管理外）
+[[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
+
