@@ -26,6 +26,10 @@
   macos/           # macOS固有
     karabiner/
   linux/           # Linux固有（必要に応じて追加）
+
+.cursor/
+  rules/           # Cursor ユーザー rules（全プロジェクト共通）
+    tdd.mdc        # TDD（Red-Green-Refactor）必須
 ```
 
 ## セットアップ手順
@@ -47,6 +51,7 @@ cd ~/dotfiles
 - `.bin/common/.zshrc` を `~/.zshrc` にリンク
 - `.config/` 内の共通設定を `~/.config/` にリンク
 - OS固有の設定（macOSの場合は `.config/macos/`、Linuxの場合は `.config/linux/`）を `~/.config/` にリンク
+- `.cursor/rules/` を `~/.cursor/rules/` にマージリンク（Cursor 全プロジェクト共通の User file rules）
 
 ### 3. zshのセットアップ
 
@@ -128,6 +133,12 @@ Linux固有の設定は `.bin/linux/` と `.config/linux/` に配置されてい
 - **yay.sh**: Arch Linuxのyayパッケージマネージャー用スクリプト
 - **hypr/hypridle.conf**: Omarchy の idle（スクリーンセーバー／自動ロック）を無効化
 - **omarchy/hooks/post-boot.d/00-idle-off**: 起動時に screensaver / suspend トグルをオフに維持
+
+## Cursor
+
+- **User file rules**: `.cursor/rules/*.mdc` → `~/.cursor/rules/`（`alwaysApply: true` なら全チャットに載る）
+- 別端末: このリポジトリを clone して `.bin/link.sh` を再実行すれば入る
+- プロジェクト固有の置き場・テストコマンドは、各リポジトリの `.cursor/rules/` で上書き・補足する
 
 ## カスタマイズ
 

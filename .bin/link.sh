@@ -79,3 +79,9 @@ if [ -d "${DOTFILES_DIR}/.config" ]; then
             ;;
     esac
 fi
+
+# Link Cursor user rules into ~/.cursor/rules (merge; do not replace ~/.cursor)
+# Cursor loads user file rules from ~/.cursor/rules/*.mdc across all projects.
+if [ -d "${DOTFILES_DIR}/.cursor/rules" ]; then
+    link_config_tree "${DOTFILES_DIR}/.cursor/rules" "$HOME/.cursor/rules"
+fi
