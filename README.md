@@ -126,6 +126,8 @@ macOS固有の設定は `.bin/macos/` と `.config/macos/` に配置されてい
 Linux固有の設定は `.bin/linux/` と `.config/linux/` に配置されています：
 
 - **yay.sh**: Arch Linuxのyayパッケージマネージャー用スクリプト
+- **hypr/hypridle.conf**: Omarchy の idle（スクリーンセーバー／自動ロック）を無効化
+- **omarchy/hooks/post-boot.d/00-idle-off**: 起動時に screensaver / suspend トグルをオフに維持
 
 ## カスタマイズ
 
