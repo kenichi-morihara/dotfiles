@@ -30,6 +30,7 @@
   linux/           # Linux固有（必要に応じて追加）
   windows/         # Windows固有
     gamedvr.dsc.yaml
+    desired-state.json
 
 .cursor/
   rules/           # Cursor ユーザー rules（全プロジェクト共通）
@@ -143,13 +144,16 @@ Linux固有の設定は `.bin/linux/` と `.config/linux/` に配置されてい
 Windows固有の設定は `.bin/windows/` と `.config/windows/` に配置されています。
 
 - **gamedvr.dsc.yaml**: Xbox Game Bar / Game DVR を無効化（ゲーム起動時の `ms-gamingoverlay` ダイアログ対策）
-- **configure.ps1**: 上記 YAML をこのマシンのレジストリへ適用する
+- **desired-state.json**: NVIDIA ゲーム内オーバーレイ無効化、Armoury Crate 常駐の停止
+- **configure.ps1**: 上記をこのマシンへ適用する
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .bin/windows/configure.ps1
 ```
 
-HKCU のユーザー設定は管理者なしで入ります。マシンポリシー（`AllowGameDVR`）は管理者で再実行すると入ります。
+HKCU のユーザー設定（Game DVR / NVIDIA Overlay）は管理者なしで入ります。Armoury Crate のサービス・タスク無効化と `AllowGameDVR` は管理者で再実行すると入ります。
+
+Armoury Crate を止めると、ASUS の RGB / ファン制御 UI と ROG マウスのバッテリー常駐も止まります。BIOS のファン設定はそのままです。
 
 ## Cursor
 

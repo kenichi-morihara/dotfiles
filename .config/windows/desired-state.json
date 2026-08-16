@@ -1,0 +1,66 @@
+{
+  "description": "Windows desired state beyond Game DVR. Applied by .bin/windows/configure.ps1.",
+  "registryBinary": [
+    {
+      "keyPath": "HKCU\\SOFTWARE\\NVIDIA Corporation\\Global\\ShadowPlay\\NVSPCAPS",
+      "valueName": "IsShadowPlayEnabled",
+      "value": [0, 0, 0, 0]
+    },
+    {
+      "keyPath": "HKCU\\SOFTWARE\\NVIDIA Corporation\\Global\\ShadowPlay\\NVSPCAPS",
+      "valueName": "IsShadowPlayEnabledUser",
+      "value": [0, 0, 0, 0]
+    },
+    {
+      "keyPath": "HKCU\\SOFTWARE\\NVIDIA Corporation\\Global\\ShadowPlay\\NVSPCAPS",
+      "valueName": "DwmEnabled",
+      "value": [0, 0, 0, 0]
+    },
+    {
+      "keyPath": "HKCU\\SOFTWARE\\NVIDIA Corporation\\Global\\ShadowPlay\\NVSPCAPS",
+      "valueName": "DwmEnabledUser",
+      "value": [0, 0, 0, 0]
+    },
+    {
+      "keyPath": "HKCU\\SOFTWARE\\NVIDIA Corporation\\Global\\ShadowPlay\\NVSPCAPS",
+      "valueName": "RecEnabled",
+      "value": [0, 0, 0, 0]
+    },
+    {
+      "keyPath": "HKCU\\SOFTWARE\\NVIDIA Corporation\\Global\\ShadowPlay\\NVSPCAPS",
+      "valueName": "DwmDvrEnabledV1",
+      "value": [0, 0, 0, 0]
+    },
+    {
+      "keyPath": "HKCU\\SOFTWARE\\NVIDIA Corporation\\Global\\ShadowPlay\\NVSPCAPS",
+      "valueName": "HLEnabled",
+      "value": [0, 0, 0, 0]
+    }
+  ],
+  "services": [
+    { "name": "ArmouryCrateService", "startType": "Disabled", "state": "Stopped" },
+    { "name": "ROG Live Service", "startType": "Disabled", "state": "Stopped" },
+    { "name": "AsusCertService", "startType": "Disabled", "state": "Stopped" },
+    { "name": "asus", "startType": "Disabled", "state": "Stopped" },
+    { "name": "AsusUpdateCheck", "startType": "Disabled", "state": "Stopped" }
+  ],
+  "scheduledTasks": [
+    { "taskPath": "\\ASUS\\", "taskName": "AcPowerNotification", "state": "Disabled" },
+    { "taskPath": "\\ASUS\\", "taskName": "ArmourySocketServer", "state": "Disabled" },
+    { "taskPath": "\\ASUS\\", "taskName": "P508PowerAgent_sdk", "state": "Disabled" }
+  ],
+  "stopProcesses": [
+    "NVIDIA Overlay",
+    "nvsphelper64",
+    "asus_framework",
+    "AcPowerNotification",
+    "ArmouryCrate.UserSessionHelper",
+    "ArmourySocketServer"
+  ],
+  "stopProcessCommandLines": [
+    {
+      "name": "nvcontainer",
+      "commandLineMatch": "SPUser"
+    }
+  ]
+}
