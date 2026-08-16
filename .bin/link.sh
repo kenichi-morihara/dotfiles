@@ -32,9 +32,9 @@ if [ -d "${DOTFILES_DIR}/.config" ]; then
     mkdir -p "$HOME/.config"
     
     for config_item in "${CONFIG_SOURCE_DIR}"/*; do
-        # Skip OS-specific directories (macos, linux)
+        # Skip OS-specific directories (macos, linux, windows)
         config_name=$(basename "$config_item")
-        if [[ "$config_name" == "macos" ]] || [[ "$config_name" == "linux" ]]; then
+        if [[ "$config_name" == "macos" ]] || [[ "$config_name" == "linux" ]] || [[ "$config_name" == "windows" ]]; then
             continue
         fi
         
@@ -75,6 +75,11 @@ if [ -d "${DOTFILES_DIR}/.config" ]; then
                         ln -fnsv "$config_item" "$target_path"
                     fi
                 done
+            fi
+            ;;
+        MINGW*|MSYS*|CYGWIN*)
+            if [ -d "${CONFIG_SOURCE_DIR}/windows" ]; then
+                link_config_tree "${CONFIG_SOURCE_DIR}/windows" "$HOME/.config/windows"
             fi
             ;;
     esac

@@ -1,6 +1,6 @@
 # Dotfiles
 
-このリポジトリは、macOSとLinuxの両方に対応したdotfilesです。
+このリポジトリは、macOS・Linux・Windows に対応したdotfilesです。
 
 ## ディレクトリ構造
 
@@ -20,12 +20,16 @@
   linux/           # Linux固有設定
     yay.sh
     .yay-packages.txt
+  windows/         # Windows固有設定
+    configure.ps1  # 宣言的設定の適用
 
 .config/
   (共通設定: ranger, zeno)
   macos/           # macOS固有
     karabiner/
   linux/           # Linux固有（必要に応じて追加）
+  windows/         # Windows固有
+    gamedvr.dsc.yaml
 
 .cursor/
   rules/           # Cursor ユーザー rules（全プロジェクト共通）
@@ -50,7 +54,7 @@ cd ~/dotfiles
 このスクリプトは以下を実行します：
 - `.bin/common/.zshrc` を `~/.zshrc` にリンク
 - `.config/` 内の共通設定を `~/.config/` にリンク
-- OS固有の設定（macOSの場合は `.config/macos/`、Linuxの場合は `.config/linux/`）を `~/.config/` にリンク
+- OS固有の設定（macOSの場合は `.config/macos/`、Linuxの場合は `.config/linux/`、Windowsの場合は `.config/windows/`）を `~/.config/` にリンク
 - `.cursor/rules/` を `~/.cursor/rules/` にマージリンク（Cursor 全プロジェクト共通の User file rules）
 
 ### 3. zshのセットアップ
@@ -134,6 +138,19 @@ Linux固有の設定は `.bin/linux/` と `.config/linux/` に配置されてい
 - **hypr/hypridle.conf**: Omarchy の idle（スクリーンセーバー／自動ロック）を無効化
 - **omarchy/hooks/post-boot.d/00-idle-off**: 起動時に screensaver / suspend トグルをオフに維持
 
+### Windows
+
+Windows固有の設定は `.bin/windows/` と `.config/windows/` に配置されています。
+
+- **gamedvr.dsc.yaml**: Xbox Game Bar / Game DVR を無効化（ゲーム起動時の `ms-gamingoverlay` ダイアログ対策）
+- **configure.ps1**: 上記 YAML をこのマシンのレジストリへ適用する
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .bin/windows/configure.ps1
+```
+
+HKCU のユーザー設定は管理者なしで入ります。マシンポリシー（`AllowGameDVR`）は管理者で再実行すると入ります。
+
 ## Cursor
 
 - **User file rules**: `.cursor/rules/*.mdc` → `~/.cursor/rules/`（`alwaysApply: true` なら全チャットに載る）
@@ -147,6 +164,7 @@ Linux固有の設定は `.bin/linux/` と `.config/linux/` に配置されてい
 1. **共通設定**: `.bin/common/` に追加し、`.zshrc` から読み込む
 2. **macOS固有**: `.bin/macos/` に追加し、`.zshrc` のOS判定部分で読み込む
 3. **Linux固有**: `.bin/linux/` に追加し、`.zshrc` のOS判定部分で読み込む
+4. **Windows固有**: `.config/windows/` に宣言的設定を追加し、`.bin/windows/configure.ps1` で適用する
 
 ### 設定ファイルの更新
 

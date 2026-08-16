@@ -1,0 +1,40 @@
+# yaml-language-server: $schema=https://aka.ms/dsc/schemas/v3/bundled/config/document.json
+# Xbox Game Bar / Game DVR を無効化する。オーバーレイ本体が無い状態で
+# ゲーム起動時に ms-gamingoverlay ダイアログが出るのを防ぐ。
+$schema: https://aka.ms/dsc/schemas/v3/bundled/config/document.json
+resources:
+  - name: Disable Game DVR capture
+    type: Microsoft.Windows/Registry
+    properties:
+      keyPath: HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\GameDVR
+      valueName: AppCaptureEnabled
+      valueData:
+        DWord: 0
+  - name: Disable GameConfigStore DVR
+    type: Microsoft.Windows/Registry
+    properties:
+      keyPath: HKCU\System\GameConfigStore
+      valueName: GameDVR_Enabled
+      valueData:
+        DWord: 0
+  - name: Disable Game Bar controller shortcut
+    type: Microsoft.Windows/Registry
+    properties:
+      keyPath: HKCU\SOFTWARE\Microsoft\GameBar
+      valueName: UseNexusForGameBarEnabled
+      valueData:
+        DWord: 0
+  - name: Disable Game Bar gamepad nexus chord
+    type: Microsoft.Windows/Registry
+    properties:
+      keyPath: HKCU\SOFTWARE\Microsoft\GameBar
+      valueName: GamepadNexusChordEnabled
+      valueData:
+        DWord: 0
+  - name: Disable Game DVR machine policy
+    type: Microsoft.Windows/Registry
+    properties:
+      keyPath: HKLM\SOFTWARE\Policies\Microsoft\Windows\GameDVR
+      valueName: AllowGameDVR
+      valueData:
+        DWord: 0
