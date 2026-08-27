@@ -4,8 +4,11 @@ tap "homebrew/bundle"
 tap "modem-dev/tap"
 tap "nektos/tap"
 tap "olets/tap"
+tap "supabase/tap"
 # Run your GitHub Actions locally
 brew "act"
+# Official Amazon AWS command-line interface
+brew "awscli"
 # Bourne-Again SHell, a UNIX command interpreter
 brew "bash"
 # Get/set bluetooth power and discoverable state
@@ -40,6 +43,8 @@ brew "graphviz"
 brew "hadolint"
 # Agent multiplexer that lives in your terminal
 brew "herdr"
+# Self-improving AI agent that creates skills from experience
+brew "hermes-agent"
 # Lightweight and flexible command-line JSON processor
 brew "jq"
 # Modern load testing tool, using Go and JavaScript
@@ -106,6 +111,8 @@ brew "zinit"
 brew "hashicorp/tap/terraform", trusted: true
 # Desktop-inspired terminal diff viewer for agent-authored changesets
 brew "modem-dev/tap/hunk", trusted: true
+# Supabase CLI
+brew "supabase/tap/supabase", trusted: true
 # Password manager that keeps all passwords secure behind one password
 cask "1password"
 # Enable Windows-like alt-tab
@@ -116,8 +123,6 @@ cask "android-platform-tools"
 cask "claude-code"
 # Column-oriented database management system
 cask "clickhouse"
-# Clipboard extension app
-cask "clipy"
 # OpenAI's coding agent that runs in your terminal
 cask "codex"
 # Universal database tool and SQL client
@@ -126,7 +131,6 @@ cask "dbeaver-community"
 cask "discord"
 # App to build and share containerised applications and microservices
 cask "docker-desktop"
-# Reimagine your terminal
 cask "fig"
 cask "font-hackgen"
 cask "font-hackgen-nerd"
