@@ -48,6 +48,8 @@ cask "1password"
 cask "alt-tab"
 cask "android-platform-tools"
 cask "clipy"
+# AI code editor and terminal agent
+cask "cursor"
 cask "discord"
 cask "fig"
 cask "font-hackgen"
