@@ -125,6 +125,8 @@ cask "claude-code"
 cask "clickhouse"
 # OpenAI's coding agent that runs in your terminal
 cask "codex"
+# AI code editor and terminal agent
+cask "cursor"
 # Universal database tool and SQL client
 cask "dbeaver-community"
 # Voice and text chat software

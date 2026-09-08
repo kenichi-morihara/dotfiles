@@ -111,6 +111,24 @@ curl https://mise.run | sh
 - zeno: zinit経由で自動インストールされます
 - fzf: zinit経由で自動インストールされます
 
+#### Cursor Agent CLI
+
+Cursor本体とterminal agentを冪等に確認し、必要なら認証します。
+
+```bash
+.bin/common/setup-cursor-agent.sh
+.bin/common/setup-cursor-agent.sh --login
+```
+
+認証後は任意のrepositoryで次のように利用できます。
+
+```bash
+cursor agent --workspace "$PWD" --plan "Review the current project and propose the next task"
+cursor agent --workspace "$PWD" -p --trust "Run the project checks and report failures"
+```
+
+`-p`は書き込み・shell toolへアクセスできるため、信頼できるworkspaceだけで使用してください。自動実行ではまず`--plan`またはread-only promptを使い、`--force`/`--yolo`は使用しません。
+
 ## OS固有の設定
 
 ### macOS
