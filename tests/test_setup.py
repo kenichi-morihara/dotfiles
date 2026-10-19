@@ -43,7 +43,7 @@ class SetupTests(unittest.TestCase):
                                  str(ROOT / '.bin/macos/.Brewfile.core')],
                                 text=True, capture_output=True, check=True)
         self.assertEqual(set(result.stdout.splitlines()),
-                         {'deno', 'fzf', 'ghq', 'corepack', 'lua', 'mise', 'ranger', 'starship', 'zinit'})
+                         {'chezmoi', 'deno', 'fzf', 'ghq', 'corepack', 'lua', 'mise', 'ranger', 'starship', 'zinit'})
 
     def test_core_profile_inherits_options_and_rejects_missing_packages(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -62,7 +62,7 @@ class SetupTests(unittest.TestCase):
 
     def test_mise_manages_node_python_and_system_packages_manage_deno(self):
         self.assertFalse((ROOT / '.tool-versions').exists())
-        config = (ROOT / '.config/mise/config.toml').read_text()
+        config = (ROOT / 'home/dot_config/mise/config.toml').read_text()
         self.assertIn('node = "25.2.1"', config)
         self.assertIn('python = "3.14"', config)
         self.assertNotIn('deno =', config)  # Homebrew owns the shell's Deno.
@@ -82,6 +82,7 @@ class SetupTests(unittest.TestCase):
         scripts += [("zsh", p) for p in (ROOT / ".bin").rglob("*.zsh")]
         scripts.append(("zsh", ROOT / ".bin/common/.zshrc"))
         scripts += [("bash", p) for p in (ROOT / "tests/macos").glob("*.sh")]
+        scripts += [("bash", p) for p in (ROOT / "tests").glob("*.sh")]
         scripts += [("zsh", p) for p in (ROOT / "tests/macos").glob("*.zsh")]
         for shell, path in scripts:
             with self.subTest(path=str(path.relative_to(ROOT))):
@@ -95,14 +96,16 @@ class SetupTests(unittest.TestCase):
             config.mkdir(parents=True)
             (config / 'local.yml').write_text('local settings')
             (config / 'config.yml').write_text('original config')
-            env = dict(os.environ, HOME=tmp)
+            env = dict(os.environ, HOME=tmp, XDG_CONFIG_HOME=tmp + '/.config',
+                       XDG_DATA_HOME=tmp + '/.local/share', XDG_CACHE_HOME=tmp + '/.cache')
             for _ in range(2):
                 subprocess.run(['bash', str(ROOT / '.bin/link.sh')], env=env,
                                check=True, capture_output=True)
             self.assertEqual((home / '.zshrc.backup').read_text(), 'original shell')
             self.assertEqual((config / 'config.yml.backup').read_text(), 'original config')
             self.assertEqual((config / 'local.yml').read_text(), 'local settings')
-            self.assertEqual((config / 'config.yml').resolve(), ROOT / '.config/zeno/config.yml')
+            self.assertFalse((config / 'config.yml').is_symlink())
+            self.assertEqual((config / 'config.yml').read_text(), (ROOT / 'home/dot_config/zeno/config.yml').read_text())
             self.assertFalse((config / 'zeno').exists())
             self.assertFalse((home / '.config/windows').exists())
 
@@ -113,14 +116,16 @@ class SetupTests(unittest.TestCase):
             legacy = home / '.tool-versions'
             legacy.symlink_to(ROOT / '.tool-versions')
             subprocess.run(['bash', str(ROOT / '.bin/link.sh')],
-                           env=dict(os.environ, HOME=str(home)), check=True, capture_output=True)
+                           env=dict(os.environ, HOME=str(home), XDG_CONFIG_HOME=str(home / '.config'),
+                                    XDG_DATA_HOME=str(home / '.local/share'), XDG_CACHE_HOME=str(home / '.cache')), check=True, capture_output=True)
             self.assertFalse(legacy.exists())
             self.assertFalse(legacy.is_symlink())
 
             local = home / '.tool-versions'
             local.write_text('node 20.0.0\n')
             subprocess.run(['bash', str(ROOT / '.bin/link.sh')],
-                           env=dict(os.environ, HOME=str(home)), check=True, capture_output=True)
+                           env=dict(os.environ, HOME=str(home), XDG_CONFIG_HOME=str(home / '.config'),
+                                    XDG_DATA_HOME=str(home / '.local/share'), XDG_CACHE_HOME=str(home / '.cache')), check=True, capture_output=True)
             self.assertEqual(local.read_text(), 'node 20.0.0\n')
 
     def test_directory_symlink_does_not_modify_original_directory(self):
@@ -133,7 +138,8 @@ class SetupTests(unittest.TestCase):
             (home / '.config').mkdir()
             (home / '.config/zeno').symlink_to(original)
             subprocess.run(['bash', str(ROOT / '.bin/link.sh')],
-                           env=dict(os.environ, HOME=str(home)), check=True, capture_output=True)
+                           env=dict(os.environ, HOME=str(home), XDG_CONFIG_HOME=str(home / '.config'),
+                                    XDG_DATA_HOME=str(home / '.local/share'), XDG_CACHE_HOME=str(home / '.cache')), check=True, capture_output=True)
             self.assertEqual((original / 'config.yml').read_text(), 'keep')
             self.assertTrue((home / '.config/zeno.backup').is_symlink())
 

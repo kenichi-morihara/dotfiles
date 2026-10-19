@@ -1,6 +1,6 @@
 # Classification only; package declarations and options live in .Brewfile.
 # Read brew bundle dump's one-declaration-per-line format without duplicating it.
-core_formulae = %w[deno fzf ghq corepack lua mise ranger starship zinit]
+core_formulae = %w[chezmoi deno fzf ghq corepack lua mise ranger starship zinit]
 source = File.join(__dir__, ".Brewfile")
 found = []
 File.foreach(source).with_index(1) do |entry, line|

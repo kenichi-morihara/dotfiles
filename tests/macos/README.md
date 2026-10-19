@@ -35,7 +35,7 @@ python3 tests/macos/shell-smoke.py --output .validation/shell-$(date +%Y%m%d-%H%
 コマンド9種・ウィジェット5種・zenoの準備状態・キー割り当て3種を確認します。
 同じHOMEの再利用は拒否します。親シェルの `ZENO_LOADED` やPATHは引き継ぎません。
 
-結果は指定先の `result.json`、`shell.log`、`links.log` に保存します。
+結果は指定先の `result.json`、`shell.log`、`links.log`（chezmoi適用ログ） に保存します。
 Homebrew・macOS本体はホストと共用するため、新規Mac全体の検証にはVMを使います。
 キーの割り当ては検証しますが、対話型の候補選択や通知・GUI権限までは検証しません。
 

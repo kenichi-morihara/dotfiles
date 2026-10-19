@@ -11,7 +11,7 @@ if [ -x /opt/homebrew/bin/mise ]; then
 else
     mise_bin=/usr/local/bin/mise
 fi
-[ -f "$runtime_home/.config/mise/config.toml" ] || { echo 'Missing linked mise config' >&2; exit 1; }
+[ -f "$runtime_home/.config/mise/config.toml" ] || { echo 'Missing chezmoi-deployed mise config' >&2; exit 1; }
 cd "$runtime_home"
 run_mise() {
     env -i HOME="$runtime_home" PATH=/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin \

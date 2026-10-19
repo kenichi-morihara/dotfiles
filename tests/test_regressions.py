@@ -19,9 +19,11 @@ class LinkBackupTests(unittest.TestCase):
             (home / '.zshrc.backup.1').symlink_to(home / 'missing-backup')
             for _ in range(2):
                 subprocess.run(['bash', str(ROOT / '.bin/link.sh')],
-                               env=dict(os.environ, HOME=tmp),
+                               env=dict(os.environ, HOME=tmp, XDG_CONFIG_HOME=tmp + '/.config',
+                                        XDG_DATA_HOME=tmp + '/.local/share', XDG_CACHE_HOME=tmp + '/.cache'),
                                check=True, capture_output=True)
-            self.assertEqual((home / '.zshrc').resolve(), ROOT / '.bin/common/.zshrc')
+            self.assertFalse((home / '.zshrc').is_symlink())
+            self.assertIn(str(ROOT / '.bin/common/.zshrc'), (home / '.zshrc').read_text())
             self.assertEqual((home / '.zshrc.backup').read_text(), 'first backup')
             self.assertEqual(os.readlink(home / '.zshrc.backup.1'), str(home / 'missing-backup'))
             self.assertEqual(os.readlink(home / '.zshrc.backup.2'), str(missing))

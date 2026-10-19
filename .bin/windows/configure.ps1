@@ -1,7 +1,7 @@
 # Apply Windows desired state from this repo.
 # Sources:
-#   .config/windows/gamedvr.dsc.yaml
-#   .config/windows/desired-state.json
+#   home/dot_config/windows/gamedvr.dsc.yaml
+#   home/dot_config/windows/desired-state.json
 [CmdletBinding()]
 param()
 
@@ -15,8 +15,8 @@ if ($env:OS -ne 'Windows_NT') {
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $RepoRoot = (Resolve-Path (Join-Path $ScriptDir '..\..')).Path
-$DscPath = Join-Path $RepoRoot '.config\windows\gamedvr.dsc.yaml'
-$StatePath = Join-Path $RepoRoot '.config\windows\desired-state.json'
+$DscPath = Join-Path $RepoRoot 'home\dot_config\windows\gamedvr.dsc.yaml'
+$StatePath = Join-Path $RepoRoot 'home\dot_config\windows\desired-state.json'
 
 if (-not (Test-Path -LiteralPath $DscPath)) {
     Write-Error "Missing desired-state file: $DscPath"
