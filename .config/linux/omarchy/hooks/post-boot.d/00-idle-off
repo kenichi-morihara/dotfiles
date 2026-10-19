@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# Keep screensaver and suspend disabled across boots (Omarchy toggle flags).
+mkdir -p "$HOME/.local/state/omarchy/toggles"
+touch "$HOME/.local/state/omarchy/toggles/screensaver-off"
+touch "$HOME/.local/state/omarchy/toggles/suspend-off"

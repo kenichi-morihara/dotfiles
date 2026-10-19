@@ -133,6 +133,8 @@ cask "clickhouse"
 cask "codex"
 # Universal database tool and SQL client
 cask "dbeaver-community"
+# AI code editor and terminal agent
+cask "cursor"
 # Voice and text chat software
 cask "discord"
 # App to build and share containerised applications and microservices

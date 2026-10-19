@@ -14,6 +14,10 @@ brightnessctl
 btop
 btrfs-progs
 clang
+claude-code
+cmake
+cpio
+ctop
 cups
 cups-browsed
 cups-filters
@@ -37,6 +41,7 @@ fcitx5-mozc
 fcitx5-qt
 fd
 ffmpegthumbnailer
+firefox
 fontconfig
 fzf
 ghostty
@@ -92,6 +97,7 @@ luarocks
 mako
 man-db
 mariadb-libs
+meson
 mise
 mpv
 nautilus
@@ -169,6 +175,7 @@ xdg-desktop-portal-hyprland
 xdg-terminal-exec
 xmlstarlet
 xournalpp
+yarn
 yaru-icon-theme
 yay
 yq
