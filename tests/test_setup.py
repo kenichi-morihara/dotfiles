@@ -1,3 +1,4 @@
+import json
 import os
 import shutil
 from pathlib import Path
@@ -51,10 +52,10 @@ class SetupTests(unittest.TestCase):
             shutil.copy(ROOT / '.bin/macos/.Brewfile.core', directory / '.Brewfile.core')
             source = (ROOT / '.bin/macos/.Brewfile').read_text().replace('brew "fzf"', 'brew "fzf", link: false')
             (directory / '.Brewfile').write_text(source)
-            command = ['ruby', '-e', 'def brew(name, options = {}); puts options.inspect if name == "fzf"; end; load ARGV[0]',
+            command = ['ruby', '-rjson', '-e', 'def brew(name, options = {}); puts JSON.generate(options) if name == "fzf"; end; load ARGV[0]',
                        str(directory / '.Brewfile.core')]
             result = subprocess.run(command, text=True, capture_output=True, check=True)
-            self.assertIn(':link=>false', result.stdout)
+            self.assertEqual(json.loads(result.stdout), {'link': False})
             (directory / '.Brewfile').write_text(source.replace('brew "fzf", link: false', ''))
             result = subprocess.run(command, text=True, capture_output=True)
             self.assertNotEqual(result.returncode, 0)
