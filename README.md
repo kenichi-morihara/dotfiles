@@ -251,7 +251,10 @@ source ~/.zshrc
 
 ## テスト
 
-macOSでPython 3・Git・Zshを利用して実行します。
+GitHub Actionsの [Tests](.github/workflows/test.yml) で、push・Pull Request時に
+macOSとLinuxのテストを自動実行します。手動実行（workflow_dispatch）にも対応しています。
+
+ローカルではmacOSまたはLinuxでPython 3・Git・Zsh・Rubyを利用して実行します。
 
 ```bash
 python3 -m unittest discover -s tests -v
@@ -261,6 +264,8 @@ python3 -m unittest discover -s tests -v
 導入済みツールの初期化スキップを検証します。
 brewの自動コミット・pushは、偽brewと一時的なローカルGitリモートで検証します。
 実際のパッケージ導入やGitHubへのpushは行いません。
+既存バックアップ・リンク切れの保護、不正なBrewfileプロファイルの拒否、
+brew失敗時の終了コードも検証します。VMでの実導入テストは手動実行です。
 
 新規HOMEでの初回起動時間と、同じHOMEで繰り返した起動時間は次で計測します。
 初回プラグイン取得後に実行すると、キャッシュ済み起動時間を比較できます。
