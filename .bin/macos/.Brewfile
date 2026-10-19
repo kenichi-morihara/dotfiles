@@ -17,6 +17,8 @@ brew "blueutil"
 brew "btop"
 # CLI tool for analyzing Claude Code usage from local JSONL files
 brew "ccusage"
+# Cloudflare Tunnel client (formerly Argo Tunnel)
+brew "cloudflared"
 # Console Matrix
 brew "cmatrix"
 # Top-like interface for container metrics
@@ -27,6 +29,8 @@ brew "d2"
 brew "deno"
 # Modern, maintained replacement for ls
 brew "eza"
+# Simple, fast and user-friendly alternative to find
+brew "fd"
 # Command-line fuzzy finder written in Go
 brew "fzf"
 # GitHub command-line tool
@@ -85,6 +89,8 @@ brew "qemu"
 brew "ranger"
 # Ruby version manager
 brew "rbenv"
+# Search tool like grep and The Silver Searcher
+brew "ripgrep"
 # Fast and accurate code counter with complexity and COCOMO estimates
 brew "scc"
 # Display and control your Android device
@@ -125,8 +131,6 @@ cask "claude-code"
 cask "clickhouse"
 # OpenAI's coding agent that runs in your terminal
 cask "codex"
-# AI code editor and terminal agent
-cask "cursor"
 # Universal database tool and SQL client
 cask "dbeaver-community"
 # Voice and text chat software
