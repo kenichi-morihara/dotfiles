@@ -73,6 +73,9 @@ fi
 従来の全構成です。各プロファイルの不足確認は
 `.bin/macos/brew.sh --profile core check` / `.bin/macos/brew.sh check` で行えます。
 その他の引数も `brew bundle` に渡します。
+パッケージの宣言・オプションは `.bin/macos/.Brewfile` が正です。
+`.Brewfile.core` は分類だけを持ち、全構成から該当する宣言を読み込みます。
+`brew bundle dump` による全構成の自動更新後も、この分類を維持します。
 
 ### 2. シンボリックリンクの作成
 
@@ -153,7 +156,20 @@ curl https://mise.run | sh
 #### その他
 
 - zeno: zinit経由で自動インストールされます
-- fzf: zinit経由で自動インストールされます
+- fzf: macOSではHomebrew、LinuxではOSのパッケージマネージャーで導入します。
+  補完・検索ウィジェットはzenoを使い、zinitからfzfを重複取得しません。
+
+グローバルのNode・Pythonは `.config/mise/config.toml` で管理し、リンク作成後に
+`mise install` で導入します。Denoはzenoの初期化時（mise有効化前）にも必要なので、
+macOSではHomebrew管理に統一しています。プロジェクト固有のバージョンは
+そのプロジェクトのmise設定で指定できます。既存のmise版Denoは自動削除しません。
+Arch Linuxでは [公式のdenoパッケージ](https://archlinux.org/packages/extra/x86_64/deno/) を
+`.yay-packages.txt` に含めています。
+
+Ctrl+Rでは設定ファイルとキー割り当てを再読み込みします。プラグインのロードと
+starship・miseの初期化は各シェルで一度だけ行います。これらの初期化設定を編集した場合は、
+新しいシェルを起動してください。
+zenoはbootstrapを明示的に読み込み、初回のウィジェット利用時にDeno・ソケット・履歴を初期化します。
 
 #### Cursor Agent CLI
 
@@ -268,15 +284,16 @@ brewの自動コミット・pushは、偽brewと一時的なローカルGitリ�
 brew失敗時の終了コードも検証します。VMでの実導入テストは手動実行です。
 
 新規HOMEでの初回起動時間と、同じHOMEで繰り返した起動時間は次で計測します。
-初回プラグイン取得後に実行すると、キャッシュ済み起動時間を比較できます。
 
 ```bash
 python3 tests/macos/shell-benchmark.py \
   --output .validation/shell-benchmark-$(date +%Y%m%d-%H%M%S)
 ```
 
-計測は一時HOME上の対話・ログインzshをPTYで起動し、プロンプト表示後の最初の
-コマンドを受け付けるまでを測ります。Homebrew自体はホストと共用します。
+計測は一時HOME上の対話・ログインzshをPTYで起動し、最初のコマンドを受け付ける時刻と、
+補完・履歴検索・zenoの準備完了時刻を別々に記録します。各シェルで5回再読み込みし、
+PATH・fpath・フック・プラグイン登録・zenoサーバーが増えないことと、終了後にサーバーが
+残らないことも検証します。Homebrew自体はホストと共用します。
 
 検証環境（新規HOME・macOS VM）の作成と実行は [tests/macos/README.md](tests/macos/README.md)、実行結果は [tests/macos/VALIDATION.md](tests/macos/VALIDATION.md) を参照してください。
 

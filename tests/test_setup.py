@@ -1,4 +1,5 @@
 import os
+import shutil
 from pathlib import Path
 import subprocess
 import tempfile
@@ -38,19 +39,34 @@ class SetupTests(unittest.TestCase):
         self.assertNotIn('npm "corepack"', brewfile)
 
     def test_core_profile_contains_interactive_shell_dependencies(self):
-        brewfile = (ROOT / '.bin/macos/.Brewfile.core').read_text()
-        full = (ROOT / '.bin/macos/.Brewfile').read_text()
-        for package in ('deno', 'fzf', 'ghq', 'corepack', 'lua', 'mise', 'ranger', 'starship', 'zinit'):
-            with self.subTest(package=package):
-                self.assertIn(f'brew "{package}"', brewfile)
-                self.assertIn(f'brew "{package}"', full)
+        result = subprocess.run(['ruby', '-e', 'def brew(name, options = {}); puts name; end; load ARGV[0]',
+                                 str(ROOT / '.bin/macos/.Brewfile.core')],
+                                text=True, capture_output=True, check=True)
+        self.assertEqual(set(result.stdout.splitlines()),
+                         {'deno', 'fzf', 'ghq', 'corepack', 'lua', 'mise', 'ranger', 'starship', 'zinit'})
 
-    def test_mise_config_is_the_only_global_runtime_declaration(self):
+    def test_core_profile_inherits_options_and_rejects_missing_packages(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp)
+            shutil.copy(ROOT / '.bin/macos/.Brewfile.core', directory / '.Brewfile.core')
+            source = (ROOT / '.bin/macos/.Brewfile').read_text().replace('brew "fzf"', 'brew "fzf", link: false')
+            (directory / '.Brewfile').write_text(source)
+            command = ['ruby', '-e', 'def brew(name, options = {}); puts options.inspect if name == "fzf"; end; load ARGV[0]',
+                       str(directory / '.Brewfile.core')]
+            result = subprocess.run(command, text=True, capture_output=True, check=True)
+            self.assertIn(':link=>false', result.stdout)
+            (directory / '.Brewfile').write_text(source.replace('brew "fzf", link: false', ''))
+            result = subprocess.run(command, text=True, capture_output=True)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn('Core packages missing', result.stderr)
+
+    def test_mise_manages_node_python_and_system_packages_manage_deno(self):
         self.assertFalse((ROOT / '.tool-versions').exists())
         config = (ROOT / '.config/mise/config.toml').read_text()
         self.assertIn('node = "25.2.1"', config)
         self.assertIn('python = "3.14"', config)
-        self.assertIn('deno = "2.6.5"', config)
+        self.assertNotIn('deno =', config)  # Homebrew owns the shell's Deno.
+        self.assertIn('deno', (ROOT / '.bin/linux/.yay-packages.txt').read_text().splitlines())
 
     def test_zeno_bindings_work_before_lazy_initialization(self):
         result = subprocess.run(['zsh', '-f', '-c',
@@ -66,6 +82,7 @@ class SetupTests(unittest.TestCase):
         scripts += [("zsh", p) for p in (ROOT / ".bin").rglob("*.zsh")]
         scripts.append(("zsh", ROOT / ".bin/common/.zshrc"))
         scripts += [("bash", p) for p in (ROOT / "tests/macos").glob("*.sh")]
+        scripts += [("zsh", p) for p in (ROOT / "tests/macos").glob("*.zsh")]
         for shell, path in scripts:
             with self.subTest(path=str(path.relative_to(ROOT))):
                 subprocess.run([shell, '-n', str(path)], check=True, capture_output=True)

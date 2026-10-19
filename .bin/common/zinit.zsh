@@ -1,6 +1,7 @@
 # ============================================
 # zinit プラグイン管理
 # ============================================
+[[ ${_DOTFILES_ZINIT_INITIALIZED:-0} == 1 ]] && return
 # OS別のzinitパスを設定
 case "$(uname -s)" in
   Darwin)
@@ -24,6 +25,9 @@ case "$(uname -s)" in
     ;;
 esac
 
+(( $+functions[zinit] )) || return
+typeset -g _DOTFILES_ZINIT_INITIALIZED=1
+
 autoload -Uz _zinit
 (( ${+_comps} )) && _comps[zinit]=_zinit
 
@@ -31,7 +35,7 @@ autoload -Uz _zinit
 export ZENO_HOME=~/.config/zeno
 
 # zeno.zsh（fast-syntax-highlightingより先に読み込む必要がある）
-zinit ice lucid depth"1" blockf
+zinit ice lucid depth"1" blockf pick"zeno-bootstrap.zsh"
 zinit light yuki-yano/zeno.zsh
 
 # Prezto の代わりとなるプラグイン
@@ -73,9 +77,7 @@ zinit snippet OMZ::plugins/sudo/sudo.plugin.zsh
 zinit ice wait lucid
 zinit snippet OMZ::plugins/extract/extract.plugin.zsh
 
-# fzf（あいまい検索）: upstream has no root-level Zsh files to compile.
-zinit ice wait lucid nocompile
-zinit light junegunn/fzf
+# fzf本体はOSのパッケージマネージャーで導入。ウィジェットはzenoを使う。
 
 # fzfのデフォルトオプション（中央表示、ボーダー、レイアウト）
 export FZF_DEFAULT_OPTS='--height 80% --border --layout=reverse --info=inline'

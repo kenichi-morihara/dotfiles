@@ -2,6 +2,25 @@
 
 今回の実行結果は [VALIDATION.md](VALIDATION.md) を参照してください。
 
+## 起動時間と再読み込みを測定する
+
+```bash
+python3 tests/macos/shell-benchmark.py --output .validation/benchmark-$(date +%Y%m%d-%H%M%S)
+```
+
+空のHOMEから初回1回と同じHOMEで10回の対話シェルを起動し、最初のコマンドを受け付ける時刻と
+補完・履歴検索・zenoソケットの準備完了時刻を記録します。プローブ間はZLEに制御を戻し、
+zinitの遅延ロードを妨げません。zenoの初回利用に相当する `zeno-ensure-loaded` を実行し、
+遅延初期化時間を機能の準備完了時刻に含めます。判定間隔は約0.2秒です。
+マーカーは出力行だけを認識し、入力の表示を誤認しません。
+キー操作による候補選択のE2E検証は含みません。
+
+各シェルで5回 `.zshrc` を読み込み、PATH・fpath・フック・プラグイン登録・キー割り当て・
+zenoのPIDを比較します。テストHOMEに属するサーバーのPID集合も比較し、正常終了後に残存が
+ないことを確認します。終了時にPTYを読み続けるため、出力待ちを終了待ちと誤認しません。
+失敗時は非ゼロで終了します。各回のログと `benchmark.json` を出力し、異常終了時にも
+このテストHOMEのサーバーだけを後処理します。
+
 ## 初回シェルだけ確認する
 
 Python 3、Git、Brewfileのシェル依存ツールを導入したmacOSで実行します。
@@ -68,7 +87,7 @@ VM内では `guest.sh` が次を実行します。
 3. Formula/Cask/VS Code拡張/Go/npmを含む `brew bundle` の実導入
 4. `brew bundle check` で最終状態を検証
 5. 新規HOMEで初回シェルを検証
-6. そのHOMEにmiseのランタイムを導入し、Node・Python・Denoの起動を検証
+6. そのHOMEにmiseのNode・Pythonを導入し、Homebrew版Denoとともに起動を検証
 
 導入失敗時も、可能ならシェルの検証まで実行します。全フェーズが成功した場合だけ
 終了コード0になります。ログ・各フェーズの終了コード・導入済みバージョンは
