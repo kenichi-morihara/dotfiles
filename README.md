@@ -46,6 +46,34 @@ git clone https://github.com/kenichi-morihara/dotfiles.git ~/dotfiles
 cd ~/dotfiles
 ```
 
+### macOS: リンク作成前の準備
+
+新規Macでは、先にCommand Line ToolsとHomebrew、シェルの依存ツールを導入します。
+会社指定のアプリと重複しないよう `.bin/macos/.Brewfile` を確認してください。
+
+```bash
+.bin/macos/init.sh
+# Command Line Toolsのインストールが開始された場合は、完了後に再実行
+
+# HomebrewのPATHを現在のシェルに反映
+if [ -x /opt/homebrew/bin/brew ]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+else
+  eval "$(/usr/local/bin/brew shellenv)"
+fi
+
+# Homebrewインストーラーの案内に従い、shellenvを ~/.zprofile にも設定
+.bin/macos/brew.sh --profile core
+# 個人MacなどでGUIアプリや追加の開発ツールも入れる場合
+# .bin/macos/brew.sh --profile full
+```
+
+`.bin/macos/brew.sh` の既定は全構成です。`core` は対話シェルとランタイムの
+起動に使うCLI一式、`full` はGUIアプリ・エディタ拡張・追加開発ツールを含む
+従来の全構成です。各プロファイルの不足確認は
+`.bin/macos/brew.sh --profile core check` / `.bin/macos/brew.sh check` で行えます。
+その他の引数も `brew bundle` に渡します。
+
 ### 2. シンボリックリンクの作成
 
 ```bash
@@ -54,9 +82,12 @@ cd ~/dotfiles
 
 このスクリプトは以下を実行します：
 - `.bin/common/.zshrc` を `~/.zshrc` にリンク
-- `.config/` 内の共通設定を `~/.config/` にリンク
+- `.config/` 内の共通設定をファイル単位で `~/.config/` にマージリンク
 - OS固有の設定（macOSの場合は `.config/macos/`、Linuxの場合は `.config/linux/`、Windowsの場合は `.config/windows/`）を `~/.config/` にリンク
 - `.cursor/rules/` を `~/.cursor/rules/` にマージリンク（Cursor 全プロジェクト共通の User file rules）
+
+既存のファイルや異なるリンクは `.backup`（既存なら `.backup.1` 以降）へ退避します。
+既存ディレクトリ内の無関係なファイルは保持します。
 
 ### 3. zshのセットアップ
 
@@ -98,6 +129,9 @@ cd ~/dotfiles
 5. 新しいターミナルを開くか、`exec zsh` を実行
 
 ### 4. 必要なツールのインストール
+
+macOSで上記のBrewfileから導入済みの場合、zinit・starship・miseの個別インストールは不要です。
+以下は個別に導入する場合の手順です。
 
 #### zinit（zshプラグインマネージャー）
 
@@ -214,6 +248,48 @@ source ~/.zshrc
 1. zinitがインストールされているか確認
 2. `.bin/common/zinit.zsh` のパス設定が正しいか確認
 3. OS別のパスが適切に設定されているか確認
+
+## テスト
+
+macOSでPython 3・Git・Zshを利用して実行します。
+
+```bash
+python3 -m unittest discover -s tests -v
+```
+
+一時HOMEでのリンク作成・再実行・既存設定の保護、Brewfile指定、
+導入済みツールの初期化スキップを検証します。
+brewの自動コミット・pushは、偽brewと一時的なローカルGitリモートで検証します。
+実際のパッケージ導入やGitHubへのpushは行いません。
+
+新規HOMEでの初回起動時間と、同じHOMEで繰り返した起動時間は次で計測します。
+初回プラグイン取得後に実行すると、キャッシュ済み起動時間を比較できます。
+
+```bash
+python3 tests/macos/shell-benchmark.py \
+  --output .validation/shell-benchmark-$(date +%Y%m%d-%H%M%S)
+```
+
+計測は一時HOME上の対話・ログインzshをPTYで起動し、プロンプト表示後の最初の
+コマンドを受け付けるまでを測ります。Homebrew自体はホストと共用します。
+
+検証環境（新規HOME・macOS VM）の作成と実行は [tests/macos/README.md](tests/macos/README.md)、実行結果は [tests/macos/VALIDATION.md](tests/macos/VALIDATION.md) を参照してください。
+
+### 新規macOSでの最終確認
+
+一時HOMEのテストは、現在のMacにあるツールやOS状態を完全には隔離しません。
+クリーンなmacOS VMまたは新しいMacで、次を確認してください。
+
+- 上記の準備からリンク作成まで順に実行できること
+- `.config/mise/config.toml` の指定どおり `mise install` と `mise current` が動くこと
+- 新しいターミナルでエラーなく起動し、`command -v brew starship mise deno fzf ghq` が成功すること
+- 初回のプラグイン取得完了後、補完・上下キーの履歴検索・Ctrl+Gの移動・Ctrl+Rの再読込が動くこと
+- 通知とKarabinerのキー操作が、macOSの必要な権限を付与した後に動くこと
+- リンク作成をもう一度実行しても設定が変わらないこと
+
+`brew install/uninstall/tap/untap` の成功時には、対話シェルのラッパーが
+Brewfileを更新し、main/masterでは自動コミットとupstreamへのpushを試行します。
+実際の導入リハーサルでは `command brew ...` でラッパーを回避できます。
 
 ## ライセンス
 

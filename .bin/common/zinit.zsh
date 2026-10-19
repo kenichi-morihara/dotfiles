@@ -73,8 +73,8 @@ zinit snippet OMZ::plugins/sudo/sudo.plugin.zsh
 zinit ice wait lucid
 zinit snippet OMZ::plugins/extract/extract.plugin.zsh
 
-# fzf（あいまい検索）
-zinit ice wait lucid
+# fzf（あいまい検索）: upstream has no root-level Zsh files to compile.
+zinit ice wait lucid nocompile
 zinit light junegunn/fzf
 
 # fzfのデフォルトオプション（中央表示、ボーダー、レイアウト）
@@ -82,8 +82,8 @@ export FZF_DEFAULT_OPTS='--height 80% --border --layout=reverse --info=inline'
 
 # fzf-tab（タブ補完をfzfで表示）
 # zeno-completionを使用する場合はコメントアウト（zenoの補完と競合する可能性がある）
-zinit ice wait lucid
-zinit light Aloxaf/fzf-tab
+# zinit ice wait lucid
+# zinit light Aloxaf/fzf-tab
 
 # ============================================
 # Prezto（コメントアウト - 必要に応じて戻す）

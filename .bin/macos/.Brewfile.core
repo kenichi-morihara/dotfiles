@@ -1,0 +1,10 @@
+# Tools used directly by the interactive shell and its completion/key bindings.
+brew "deno"
+brew "fzf"
+brew "ghq"
+brew "corepack"
+brew "lua"
+brew "mise"
+brew "ranger"
+brew "starship"
+brew "zinit"

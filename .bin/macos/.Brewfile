@@ -1,6 +1,5 @@
 tap "felixkratz/formulae", "https://github.com/FelixKratz/homebrew-formulae"
 tap "hashicorp/tap"
-tap "homebrew/bundle"
 tap "modem-dev/tap"
 tap "nektos/tap"
 tap "olets/tap"
@@ -109,8 +108,8 @@ brew "tesseract-lang"
 brew "trivy"
 # Library to create, extract, and modify Windows Imaging files
 brew "wimlib"
-# JavaScript package manager
-brew "yarn"
+# Package manager versions and Yarn/pnpm shims (conflicts with standalone yarn)
+brew "corepack"
 # Flexible and fast Zsh plugin manager
 brew "zinit"
 # Terraform
@@ -139,7 +138,6 @@ cask "cursor"
 cask "discord"
 # App to build and share containerised applications and microservices
 cask "docker-desktop"
-cask "fig"
 cask "font-hackgen"
 cask "font-hackgen-nerd"
 cask "font-monaspace"
@@ -248,4 +246,3 @@ go "github.com/cweill/gotests/gotests"
 go "github.com/josharian/impl"
 go "honnef.co/go/tools/cmd/staticcheck"
 npm "@google/clasp"
-npm "corepack"

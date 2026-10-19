@@ -6,3 +6,5 @@ __pycache__/
 *$py.class
 *.so
 .Python
+# Disposable macOS validation homes, logs and snapshots
+.validation/

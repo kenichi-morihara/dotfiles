@@ -25,7 +25,8 @@ export ZENO_GIT_TREE="tree"
 # git folder preview with color
 # export ZENO_GIT_TREE="eza --tree"
 
-if [[ -n $ZENO_LOADED ]]; then
+# Recent zeno versions register widgets before lazy heavy initialization.
+if [[ -n $ZENO_LOADED || -n $ZENO_BOOTSTRAPPED ]]; then
   bindkey ' '  zeno-auto-snippet
 
   # fallback if snippet not matched (default: self-insert)

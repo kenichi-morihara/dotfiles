@@ -1,7 +1,26 @@
 #!/bin/bash
 
+set -euo pipefail
+
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 DOTFILES_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+# Preserve existing files and links before replacing them.
+link_file() {
+    local source="$1" target="$2" backup index=0
+    if [ -L "$target" ] && [ "$(readlink "$target")" = "$source" ]; then
+        return
+    fi
+    if [ -e "$target" ] || [ -L "$target" ]; then
+        backup="${target}.backup"
+        while [ -e "$backup" ] || [ -L "$backup" ]; do
+            index=$((index + 1))
+            backup="${target}.backup.${index}"
+        done
+        mv "$target" "$backup"
+    fi
+    ln -sv "$source" "$target"
+}
 
 # Recursively link files into a target directory (merge, do not replace the directory).
 # Needed for Omarchy-managed dirs like ~/.config/hypr and ~/.config/omarchy.
@@ -10,6 +29,14 @@ link_config_tree() {
     local target="$2"
 
     if [ -d "$source" ]; then
+        if [ -L "$target" ] || { [ -e "$target" ] && [ ! -d "$target" ]; }; then
+            local backup="${target}.backup" index=0
+            while [ -e "$backup" ] || [ -L "$backup" ]; do
+                index=$((index + 1))
+                backup="${target}.backup.${index}"
+            done
+            mv "$target" "$backup"
+        fi
         mkdir -p "$target"
         local child
         for child in "$source"/*; do
@@ -17,13 +44,13 @@ link_config_tree() {
             link_config_tree "$child" "$target/$(basename "$child")"
         done
     elif [ -f "$source" ]; then
-        ln -fnsv "$source" "$target"
+        link_file "$source" "$target"
     fi
 }
 
 # Link .zshrc from .bin/common/ to home directory
 if [ -f "${SCRIPT_DIR}/common/.zshrc" ]; then
-    ln -fnsv "${SCRIPT_DIR}/common/.zshrc" "$HOME/.zshrc"
+    link_file "${SCRIPT_DIR}/common/.zshrc" "$HOME/.zshrc"
 fi
 
 # Link .config directory files (excluding OS-specific directories)
@@ -40,10 +67,10 @@ if [ -d "${DOTFILES_DIR}/.config" ]; then
         
         if [ -d "$config_item" ]; then
             target_dir="$HOME/.config/$config_name"
-            ln -fnsv "$config_item" "$target_dir"
+            link_config_tree "$config_item" "$target_dir"
         elif [ -f "$config_item" ]; then
             target_file="$HOME/.config/$config_name"
-            ln -fnsv "$config_item" "$target_file"
+            link_file "$config_item" "$target_file"
         fi
     done
     
@@ -58,7 +85,7 @@ if [ -d "${DOTFILES_DIR}/.config" ]; then
                     if [ -d "$config_item" ]; then
                         link_config_tree "$config_item" "$target_path"
                     elif [ -f "$config_item" ]; then
-                        ln -fnsv "$config_item" "$target_path"
+                        link_file "$config_item" "$target_path"
                     fi
                 done
             fi
@@ -72,7 +99,7 @@ if [ -d "${DOTFILES_DIR}/.config" ]; then
                     if [ -d "$config_item" ]; then
                         link_config_tree "$config_item" "$target_path"
                     elif [ -f "$config_item" ]; then
-                        ln -fnsv "$config_item" "$target_path"
+                        link_file "$config_item" "$target_path"
                     fi
                 done
             fi
@@ -85,9 +112,11 @@ if [ -d "${DOTFILES_DIR}/.config" ]; then
     esac
 fi
 
-# Link .tool-versions to home directory
-if [ -f "${DOTFILES_DIR}/.tool-versions" ]; then
-    ln -fnsv "${DOTFILES_DIR}/.tool-versions" "$HOME/.tool-versions"
+# Remove only the legacy link created by an older dotfiles revision. Preserve a
+# user's own .tool-versions file or link so mise can still use project overrides.
+if [ -L "$HOME/.tool-versions" ] &&
+   [ "$(readlink "$HOME/.tool-versions")" = "${DOTFILES_DIR}/.tool-versions" ]; then
+    rm "$HOME/.tool-versions"
 fi
 
 # Link Cursor user rules into ~/.cursor/rules (merge; do not replace ~/.cursor)
