@@ -145,7 +145,7 @@ cursor agent --workspace "$PWD" -p --trust "Run the project checks and report fa
 
 macOS固有の設定は `.bin/macos/` と `.config/macos/` に配置されています：
 
-- **brew.zsh**: Homebrewの自動Brewfile更新機能
+- **brew.zsh**: Homebrewの自動Brewfile更新機能。`install` / `uninstall` / `tap` / `untap` 成功後、master/main では Brewfile のみをコミットし、upstream を fetch・merge して push します。Brewfile に差分がなくても未送信コミットを再送します。衝突時はマージを中止し、追跡ファイルに未コミット変更がある場合は自動マージをスキップします。Git のエラーは端末に表示します。
 - **notify.zsh**: macOSの通知機能
 - **karabiner/**: Karabiner-Elementsの設定
 
