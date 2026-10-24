@@ -33,9 +33,9 @@ class SetupTests(unittest.TestCase):
         brewfile = (ROOT / '.bin/macos/.Brewfile').read_text()
         self.assertNotIn('tap "homebrew/bundle"', brewfile)
 
-    def test_brewfile_uses_corepack_without_competing_yarn_binaries(self):
+    def test_brewfile_leaves_language_management_to_mise(self):
         brewfile = (ROOT / '.bin/macos/.Brewfile').read_text()
-        self.assertIn('brew "corepack"', brewfile)
+        self.assertNotIn('brew "corepack"', brewfile)
         self.assertNotIn('brew "yarn"', brewfile)
         self.assertNotIn('npm "corepack"', brewfile)
 
@@ -44,7 +44,7 @@ class SetupTests(unittest.TestCase):
                                  str(ROOT / '.bin/macos/.Brewfile.core')],
                                 text=True, capture_output=True, check=True)
         self.assertEqual(set(result.stdout.splitlines()),
-                         {'chezmoi', 'deno', 'fzf', 'ghq', 'corepack', 'lua', 'mise', 'ranger', 'starship', 'zinit'})
+                         {'chezmoi', 'fzf', 'ghq', 'mise', 'ranger', 'starship', 'zinit'})
 
     def test_core_profile_inherits_options_and_rejects_missing_packages(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -61,13 +61,13 @@ class SetupTests(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0)
             self.assertIn('Core packages missing', result.stderr)
 
-    def test_mise_manages_node_python_and_system_packages_manage_deno(self):
+    def test_mise_manages_language_runtimes(self):
         self.assertFalse((ROOT / '.tool-versions').exists())
         config = (ROOT / 'home/dot_config/mise/config.toml').read_text()
         self.assertIn('node = "25.2.1"', config)
-        self.assertIn('python = "3.14"', config)
-        self.assertNotIn('deno =', config)  # Homebrew owns the shell's Deno.
-        self.assertIn('deno', (ROOT / '.bin/linux/.yay-packages.txt').read_text().splitlines())
+        self.assertIn('python = "3.14.2"', config)
+        self.assertIn('deno = "2.9.7"', config)
+        self.assertNotIn('deno', (ROOT / '.bin/linux/.yay-packages.txt').read_text().splitlines())
 
     def test_zeno_bindings_work_before_lazy_initialization(self):
         result = subprocess.run(['zsh', '-f', '-c',
