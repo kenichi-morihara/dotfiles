@@ -44,9 +44,17 @@ case "$(uname -s)" in
 esac
 
 # starshipとmiseの初期化
-eval "$(starship init zsh)"
-eval "$(mise activate zsh)"
+if [[ ${_DOTFILES_STARSHIP_INITIALIZED:-0} != 1 ]] && (( $+commands[starship] )); then
+  eval "$(starship init zsh)"
+  typeset -g _DOTFILES_STARSHIP_INITIALIZED=1
+fi
+if [[ ${_DOTFILES_MISE_INITIALIZED:-0} != 1 ]] && (( $+commands[mise] )); then
+  eval "$(mise activate zsh)"
+  typeset -g _DOTFILES_MISE_INITIALIZED=1
+fi
 
 # 端末固有・秘密情報（git 管理外）
-[[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
+if [[ -f "$HOME/.zshrc.local" ]]; then
+  source "$HOME/.zshrc.local"
+fi
 

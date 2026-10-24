@@ -4,38 +4,28 @@
 
 ## ディレクトリ構造
 
-```
+```text
+.chezmoiroot                 # chezmoiの管理対象をhome/に限定
+home/
+  .chezmoi.toml.tmpl         # checkoutの場所をchezmoiに登録
+  .chezmoiignore             # OSごとの配布対象
+  .chezmoiscripts/           # 初回だけ既存設定を退避
+  dot_zshrc.tmpl             # 共通シェルモジュールを読み込む入口
+  dot_config/                # ~/.config/ に配布する設定
+    karabiner/              # macOSのみ
+    hypr/, omarchy/         # Linuxのみ
+    windows/                # Windowsのみ
+  dot_cursor/rules/         # ~/.cursor/rules/ に配布
 .bin/
-  common/          # 共通設定
-    .zshrc         # メインのzshrc（OS判定を含む）
-    zinit.zsh      # zinit設定（OS別のパスに対応）
-    zeno.zsh       # zeno設定
-    keybindings.zsh # キーバインド設定
-  macos/           # macOS固有設定
-    brew.zsh
-    notify.zsh
-    brew.sh
-    init.sh
-    .Brewfile
-  linux/           # Linux固有設定
-    yay.sh
-    .yay-packages.txt
-  windows/         # Windows固有設定
-    configure.ps1  # 宣言的設定の適用
-
-.config/
-  (共通設定: ranger, zeno)
-  macos/           # macOS固有
-    karabiner/
-  linux/           # Linux固有（必要に応じて追加）
-  windows/         # Windows固有
-    gamedvr.dsc.yaml
-    desired-state.json
-
-.cursor/
-  rules/           # Cursor ユーザー rules（全プロジェクト共通）
-    tdd.mdc        # TDD（Red-Green-Refactor）必須
+  common/                   # Zshモジュール、共通セットアップ
+  macos/                    # Homebrew、macOS初期化
+  linux/                    # Arch Linuxパッケージ導入
+  windows/                  # Windows設定適用
+  link.sh                   # 旧手順互換のchezmoi移行入口
 ```
+
+設定ファイルはシンボリックリンクではなくchezmoiが配布する通常ファイルです。
+パッケージはHomebrew/yay、Node・Pythonはmise、設定の配布はchezmoiが担当します。
 
 ## セットアップ手順
 
@@ -46,7 +36,7 @@ git clone https://github.com/kenichi-morihara/dotfiles.git ~/dotfiles
 cd ~/dotfiles
 ```
 
-### macOS: リンク作成前の準備
+### macOS: 設定配布前の準備
 
 新規Macでは、先にCommand Line ToolsとHomebrew、シェルの依存ツールを導入します。
 会社指定のアプリと重複しないよう `.bin/macos/.Brewfile` を確認してください。
@@ -73,21 +63,50 @@ fi
 従来の全構成です。各プロファイルの不足確認は
 `.bin/macos/brew.sh --profile core check` / `.bin/macos/brew.sh check` で行えます。
 その他の引数も `brew bundle` に渡します。
+パッケージの宣言・オプションは `.bin/macos/.Brewfile` が正です。
+`.Brewfile.core` は分類だけを持ち、全構成から該当する宣言を読み込みます。
+`brew bundle dump` による全構成の自動更新後も、この分類を維持します。
 
-### 2. シンボリックリンクの作成
+### 2. chezmoiで設定を配布する
+
+macOSではcoreプロファイルにchezmoiが含まれます。先に個別導入する場合は
+`command brew install chezmoi`、Arch Linuxでは `sudo pacman -S chezmoi` を使います。
+初回移行の退避処理にはPython 3も必要です（macOSのCommand Line Tools導入後に利用可能）。
+旧link.sh方式を利用中の場合は `.bin/link.sh` を実行してください。先に設定を安全に移行し、
+chezmoiの登録を行うので、既存の `~/.config` が外部へのリンクでもそこへ設定を書き込みません。
+新規HOMEでは次の手順を使えます。
 
 ```bash
-.bin/link.sh
+chezmoi init --source "$PWD"
+chezmoi diff
+chezmoi apply
 ```
 
-このスクリプトは以下を実行します：
-- `.bin/common/.zshrc` を `~/.zshrc` にリンク
-- `.config/` 内の共通設定をファイル単位で `~/.config/` にマージリンク
-- OS固有の設定（macOSの場合は `.config/macos/`、Linuxの場合は `.config/linux/`、Windowsの場合は `.config/windows/`）を `~/.config/` にリンク
-- `.cursor/rules/` を `~/.cursor/rules/` にマージリンク（Cursor 全プロジェクト共通の User file rules）
+初回の `apply` は、既存の管理対象ファイルを `.backup`、既存なら `.backup.1` 以降に
+退避してから配布します。既存ディレクトリの無関係なファイルは保持し、ディレクトリの
+シンボリックリンクは内容を保持して通常ディレクトリへ移行します。外部のリンク先は変更しません。
+この退避処理はmacOS/Linuxで初回だけ実行され、以降はchezmoiの状態管理で再適用します。
+Windowsへ移行する場合は既存設定を別途バックアップしてから適用してください。
 
-既存のファイルや異なるリンクは `.backup`（既存なら `.backup.1` 以降）へ退避します。
-既存ディレクトリ内の無関係なファイルは保持します。
+`chezmoi apply --dry-run --verbose` で書き込みせず確認できます。
+通常の再適用ではローカル編集との競合をchezmoiが検出します。自動検証では
+`chezmoi apply --error-on-conflict` を使うと上書きせずエラーになります。
+旧手順の `.bin/link.sh` も、同じcheckoutを指定してchezmoiを初期化・適用する薄い入口として残しています。
+
+### 設定の編集と更新
+
+```bash
+chezmoi edit ~/.config/zeno/config.yml
+chezmoi diff
+chezmoi apply
+# 配布先を直接編集した場合は、内容を確認してソースに取り込む
+chezmoi re-add ~/.config/zeno/config.yml
+```
+
+ソースを直接編集する場合は `home/dot_config/` 内を編集し、`chezmoi apply` します。
+`.bin/common/` のシェルモジュールは `.zshrc` のテンプレートからcheckout内のファイルを読み込みます。
+checkoutを移動した場合は、新しい場所で `chezmoi init --source "$PWD"` と `chezmoi apply` を実行します。
+秘密情報・端末固有のシェル設定は、従来どおり管理対象外の `~/.zshrc.local` に置けます。
 
 ### 3. zshのセットアップ
 
@@ -153,7 +172,20 @@ curl https://mise.run | sh
 #### その他
 
 - zeno: zinit経由で自動インストールされます
-- fzf: zinit経由で自動インストールされます
+- fzf: macOSではHomebrew、LinuxではOSのパッケージマネージャーで導入します。
+  補完・検索ウィジェットはzenoを使い、zinitからfzfを重複取得しません。
+
+グローバルのNode・Pythonは `home/dot_config/mise/config.toml` で管理し、設定配布後に
+`mise install` で導入します。Denoはzenoの初期化時（mise有効化前）にも必要なので、
+macOSではHomebrew管理に統一しています。プロジェクト固有のバージョンは
+そのプロジェクトのmise設定で指定できます。既存のmise版Denoは自動削除しません。
+Arch Linuxでは [公式のdenoパッケージ](https://archlinux.org/packages/extra/x86_64/deno/) を
+`.yay-packages.txt` に含めています。
+
+Ctrl+Rでは設定ファイルとキー割り当てを再読み込みします。プラグインのロードと
+starship・miseの初期化は各シェルで一度だけ行います。これらの初期化設定を編集した場合は、
+新しいシェルを起動してください。
+zenoはbootstrapを明示的に読み込み、初回のウィジェット利用時にDeno・ソケット・履歴を初期化します。
 
 #### Cursor Agent CLI
 
@@ -177,7 +209,7 @@ cursor agent --workspace "$PWD" -p --trust "Run the project checks and report fa
 
 ### macOS
 
-macOS固有の設定は `.bin/macos/` と `.config/macos/` に配置されています：
+macOS固有の設定は `.bin/macos/` と `home/dot_config/karabiner/` に配置されています：
 
 - **brew.zsh**: Homebrewの自動Brewfile更新機能。`install` / `uninstall` / `tap` / `untap` 成功後、master/main では Brewfile のみをコミットし、upstream を fetch・merge して push します。Brewfile に差分がなくても未送信コミットを再送します。衝突時はマージを中止し、追跡ファイルに未コミット変更がある場合は自動マージをスキップします。Git のエラーは端末に表示します。
 - **notify.zsh**: macOSの通知機能
@@ -185,7 +217,7 @@ macOS固有の設定は `.bin/macos/` と `.config/macos/` に配置されてい
 
 ### Linux
 
-Linux固有の設定は `.bin/linux/` と `.config/linux/` に配置されています：
+Linux固有の設定は `.bin/linux/` と `home/dot_config/hypr/`・`home/dot_config/omarchy/` に配置されています：
 
 - **yay.sh**: Arch Linuxのyayパッケージマネージャー用スクリプト
 - **hypr/hypridle.conf**: Omarchy の idle（スクリーンセーバー／自動ロック）を無効化
@@ -193,7 +225,7 @@ Linux固有の設定は `.bin/linux/` と `.config/linux/` に配置されてい
 
 ### Windows
 
-Windows固有の設定は `.bin/windows/` と `.config/windows/` に配置されています。
+Windows固有の設定は `.bin/windows/` と `home/dot_config/windows/` に配置されています。
 
 - **gamedvr.dsc.yaml**: Xbox Game Bar / Game DVR を無効化（ゲーム起動時の `ms-gamingoverlay` ダイアログ対策）
 - **desired-state.json**: NVIDIA ゲーム内オーバーレイ無効化、Armoury Crate 常駐の停止
@@ -209,39 +241,33 @@ Armoury Crate を止めると、ASUS の RGB / ファン制御 UI と ROG マウ
 
 ## Cursor
 
-- **User file rules**: `.cursor/rules/*.mdc` → `~/.cursor/rules/`（`alwaysApply: true` なら全チャットに載る）
-- 別端末: このリポジトリを clone して `.bin/link.sh` を再実行すれば入る
+- **User file rules**: `home/dot_cursor/rules/*.mdc` → `~/.cursor/rules/`（`alwaysApply: true` なら全チャットに載る）
+- 別端末: このリポジトリを clone して `chezmoi init --source "$PWD"`、`chezmoi apply` を実行
 - プロジェクト固有の置き場・テストコマンドは、各リポジトリの `.cursor/rules/` で上書き・補足する
 
 ## カスタマイズ
 
 ### 新しい設定ファイルを追加する場合
 
-1. **共通設定**: `.bin/common/` に追加し、`.zshrc` から読み込む
-2. **macOS固有**: `.bin/macos/` に追加し、`.zshrc` のOS判定部分で読み込む
-3. **Linux固有**: `.bin/linux/` に追加し、`.zshrc` のOS判定部分で読み込む
-4. **Windows固有**: `.config/windows/` に宣言的設定を追加し、`.bin/windows/configure.ps1` で適用する
+1. アプリの共通設定は `home/dot_config/` に追加し、`chezmoi diff` / `chezmoi apply` で配布します。
+2. OS固有のアプリ設定は、対象ディレクトリを `home/.chezmoiignore` のOS条件に追加します。
+3. 実行権限が必要なファイルは、ソース名に `executable_` を付けます。
+4. シェル処理は `.bin/common/`、OS固有処理は `.bin/macos/`・`.bin/linux/` に置き、共通Zshから読み込みます。
+5. Windowsのシステム設定は `home/dot_config/windows/` と `.bin/windows/configure.ps1` を更新します。
 
-### 設定ファイルの更新
-
-設定ファイルを編集した後、`.zshrc` を再読み込み：
-
-```bash
-source ~/.zshrc
-```
-
-または、Ctrl+Rでシェルをリロード（設定済みのキーバインド）
+アプリ設定の変更は `chezmoi apply`、キー割り当て・端末固有シェル設定の変更はCtrl+Rで
+反映します。プラグインとstarship・miseの初期化設定の変更は、新しいシェルで確認します。
 
 ## トラブルシューティング
 
 ### zshが起動しない
 
-1. `.zshrc` のシンボリックリンクが正しく作成されているか確認：
+1. `.zshrc` が配布されているか確認：
    ```bash
    ls -la ~/.zshrc
    ```
 
-2. `.zshrc` のパス参照が正しいか確認
+2. `chezmoi diff ~/.zshrc` と、テンプレート内のcheckoutへの参照を確認
 
 ### zinitが読み込めない
 
@@ -260,7 +286,7 @@ macOSとLinuxのテストを自動実行します。手動実行（workflow_disp
 python3 -m unittest discover -s tests -v
 ```
 
-一時HOMEでのリンク作成・再実行・既存設定の保護、Brewfile指定、
+一時HOMEでのchezmoi適用・再適用・既存設定の保護・編集の衝突検出・OS選択、Brewfile指定、
 導入済みツールの初期化スキップを検証します。
 brewの自動コミット・pushは、偽brewと一時的なローカルGitリモートで検証します。
 実際のパッケージ導入やGitHubへのpushは行いません。
@@ -268,15 +294,16 @@ brewの自動コミット・pushは、偽brewと一時的なローカルGitリ�
 brew失敗時の終了コードも検証します。VMでの実導入テストは手動実行です。
 
 新規HOMEでの初回起動時間と、同じHOMEで繰り返した起動時間は次で計測します。
-初回プラグイン取得後に実行すると、キャッシュ済み起動時間を比較できます。
 
 ```bash
 python3 tests/macos/shell-benchmark.py \
   --output .validation/shell-benchmark-$(date +%Y%m%d-%H%M%S)
 ```
 
-計測は一時HOME上の対話・ログインzshをPTYで起動し、プロンプト表示後の最初の
-コマンドを受け付けるまでを測ります。Homebrew自体はホストと共用します。
+計測は一時HOME上の対話・ログインzshをPTYで起動し、最初のコマンドを受け付ける時刻と、
+補完・履歴検索・zenoの準備完了時刻を別々に記録します。各シェルで5回再読み込みし、
+PATH・fpath・フック・プラグイン登録・zenoサーバーが増えないことと、終了後にサーバーが
+残らないことも検証します。Homebrew自体はホストと共用します。
 
 検証環境（新規HOME・macOS VM）の作成と実行は [tests/macos/README.md](tests/macos/README.md)、実行結果は [tests/macos/VALIDATION.md](tests/macos/VALIDATION.md) を参照してください。
 
@@ -285,12 +312,12 @@ python3 tests/macos/shell-benchmark.py \
 一時HOMEのテストは、現在のMacにあるツールやOS状態を完全には隔離しません。
 クリーンなmacOS VMまたは新しいMacで、次を確認してください。
 
-- 上記の準備からリンク作成まで順に実行できること
-- `.config/mise/config.toml` の指定どおり `mise install` と `mise current` が動くこと
+- 上記の準備からchezmoi適用まで順に実行できること
+- `home/dot_config/mise/config.toml` の指定どおり `mise install` と `mise current` が動くこと
 - 新しいターミナルでエラーなく起動し、`command -v brew starship mise deno fzf ghq` が成功すること
 - 初回のプラグイン取得完了後、補完・上下キーの履歴検索・Ctrl+Gの移動・Ctrl+Rの再読込が動くこと
 - 通知とKarabinerのキー操作が、macOSの必要な権限を付与した後に動くこと
-- リンク作成をもう一度実行しても設定が変わらないこと
+- `chezmoi apply` を再実行しても設定が変わらないこと
 
 `brew install/uninstall/tap/untap` の成功時には、対話シェルのラッパーが
 Brewfileを更新し、main/masterでは自動コミットとupstreamへのpushを試行します。

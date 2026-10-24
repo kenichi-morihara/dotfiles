@@ -27,6 +27,12 @@ export ZENO_GIT_TREE="tree"
 
 # Recent zeno versions register widgets before lazy heavy initialization.
 if [[ -n $ZENO_LOADED || -n $ZENO_BOOTSTRAPPED ]]; then
+  # Initialize Deno/socket/history only when a bound widget is first used.
+  if (( $+functions[zeno-register-lazy-widgets] )); then
+    zeno-register-lazy-widgets zeno-auto-snippet zeno-ghq-cd zeno-completion \
+      zeno-insert-snippet zeno-insert-space zeno-toggle-auto-snippet \
+      zeno-preprompt zeno-preprompt-snippet zeno-history-selection
+  fi
   bindkey ' '  zeno-auto-snippet
 
   # fallback if snippet not matched (default: self-insert)

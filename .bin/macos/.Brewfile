@@ -10,6 +10,8 @@ brew "act"
 brew "awscli"
 # Bourne-Again SHell, a UNIX command interpreter
 brew "bash"
+# Dotfile deployment, templates and machine-specific configuration
+brew "chezmoi"
 # Get/set bluetooth power and discoverable state
 brew "blueutil"
 # Resource monitor. C++ version and continuation of bashtop and bpytop

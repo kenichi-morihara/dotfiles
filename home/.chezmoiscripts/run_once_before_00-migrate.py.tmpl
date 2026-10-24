@@ -1,0 +1,64 @@
+{{ if ne .chezmoi.os "windows" -}}
+#!/usr/bin/env python3
+"""Preserve pre-chezmoi targets once; subsequent applies use chezmoi's state."""
+import os
+from pathlib import Path
+import shutil
+
+root = Path({{ .chezmoi.destDir | toJson }})
+repo = Path({{ .chezmoi.workingTree | toJson }})
+# Historical targets of link.sh. This is a one-time migration, not a file installer.
+targets = [
+    ".zshrc", ".config/alacritty.toml", ".config/starship.toml",
+    ".config/mise/config.toml", ".config/zeno/config.yml",
+    ".config/ranger/commands.py", ".config/ranger/commands_full.py",
+    ".config/ranger/rc.conf", ".config/ranger/rifle.conf", ".config/ranger/scope.sh",
+    ".cursor/rules/tdd.mdc",
+{{ if eq .chezmoi.os "darwin" }}
+    ".config/karabiner/karabiner.json",
+{{ else if eq .chezmoi.os "linux" }}
+    ".config/hypr/hypridle.conf", ".config/omarchy/hooks/post-boot.d/00-idle-off",
+{{ end }}
+]
+
+
+def preserve(path, move=False):
+    backup = Path(str(path) + ".backup")
+    index = 0
+    while os.path.lexists(backup):
+        index += 1
+        backup = Path(str(path) + f".backup.{index}")
+    if move:
+        path.rename(backup)
+    elif path.is_dir() and not path.is_symlink():
+        shutil.copytree(path, backup, symlinks=True)
+    else:
+        shutil.copy2(path, backup, follow_symlinks=False)
+    print(f"Preserved {path} as {backup}")
+
+
+# Materialize directory symlinks before chezmoi writes descendants, so external
+# directories stay untouched and unrelated local files remain available.
+parents = {root / parent for name in targets for parent in Path(name).parents if str(parent) != "."}
+for path in sorted(parents, key=lambda p: len(p.parts)):
+    if path.is_symlink():
+        resolved = path.resolve()
+        preserve(path, move=True)
+        if resolved.is_dir():
+            shutil.copytree(resolved, path, symlinks=True)
+        else:
+            path.mkdir(parents=True, exist_ok=True)
+    elif path.exists() and not path.is_dir():
+        preserve(path, move=True)
+        path.mkdir(parents=True, exist_ok=True)
+
+for name in targets:
+    path = root / name
+    if os.path.lexists(path):
+        preserve(path)
+
+legacy = root / ".tool-versions"
+if legacy.is_symlink() and os.readlink(legacy) == str(repo / ".tool-versions"):
+    preserve(legacy)
+    legacy.unlink()
+{{ end -}}

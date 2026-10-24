@@ -11,7 +11,7 @@ if [ -x /opt/homebrew/bin/mise ]; then
 else
     mise_bin=/usr/local/bin/mise
 fi
-[ -f "$runtime_home/.config/mise/config.toml" ] || { echo 'Missing linked mise config' >&2; exit 1; }
+[ -f "$runtime_home/.config/mise/config.toml" ] || { echo 'Missing chezmoi-deployed mise config' >&2; exit 1; }
 cd "$runtime_home"
 run_mise() {
     env -i HOME="$runtime_home" PATH=/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin \
@@ -20,6 +20,11 @@ run_mise() {
 }
 run_mise install > "$output/install.log" 2>&1
 run_mise current > "$output/current.txt" 2>&1
+run_mise exec -- /bin/sh -c 'command -v deno' > "$output/deno-source.txt"
+case "$(cat "$output/deno-source.txt")" in
+    /opt/homebrew/bin/deno|/usr/local/bin/deno) ;;
+    *) echo 'Deno must come from Homebrew, not a global mise installation' >&2; exit 1 ;;
+esac
 {
     run_mise exec -- node --version
     run_mise exec -- python --version
