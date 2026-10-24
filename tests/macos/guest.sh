@@ -45,9 +45,6 @@ if ! command brew install node > "$OUTPUT/node-bootstrap.log" 2>&1; then
     echo 'Node bootstrap failed; see node-bootstrap.log' >&2
     exit 1
 fi
-if command brew list --formula corepack >/dev/null 2>&1; then
-    command brew link corepack > "$OUTPUT/corepack-link.log" 2>&1 || exit 1
-fi
 # Record all phase statuses; shell validation still runs after a bundle failure.
 # Use the same default mode as brew.sh. Homebrew 7.0.x verbose mode skips
 # its npm-specific Node PATH setup.

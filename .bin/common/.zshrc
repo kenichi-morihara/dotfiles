@@ -21,6 +21,13 @@ setopt HIST_IGNORE_SPACE      # スペースで始まるコマンドを履歴に
 setopt HIST_VERIFY            # 履歴展開時にコマンドを実行せずに表示
 setopt HIST_REDUCE_BLANKS     # 余分な空白を削除して履歴に保存
 
+# Plugins use Deno/Lua during loading, before mise's first prompt hook.
+if [[ ${_DOTFILES_MISE_INITIALIZED:-0} != 1 ]] && (( $+commands[mise] )); then
+  eval "$(mise activate zsh)"
+  eval "$(mise env -s zsh)"
+  typeset -g _DOTFILES_MISE_INITIALIZED=1
+fi
+
 # zinitプラグイン管理
 source "$_ZSH_CONFIG_DIR/zinit.zsh"
 
@@ -43,14 +50,10 @@ case "$(uname -s)" in
     ;;
 esac
 
-# starshipとmiseの初期化
+# starshipの初期化
 if [[ ${_DOTFILES_STARSHIP_INITIALIZED:-0} != 1 ]] && (( $+commands[starship] )); then
   eval "$(starship init zsh)"
   typeset -g _DOTFILES_STARSHIP_INITIALIZED=1
-fi
-if [[ ${_DOTFILES_MISE_INITIALIZED:-0} != 1 ]] && (( $+commands[mise] )); then
-  eval "$(mise activate zsh)"
-  typeset -g _DOTFILES_MISE_INITIALIZED=1
 fi
 
 # 端末固有・秘密情報（git 管理外）

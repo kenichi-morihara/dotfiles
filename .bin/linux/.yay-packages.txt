@@ -24,7 +24,6 @@ cups-browsed
 cups-filters
 cups-pdf
 cursor-bin
-deno
 docker
 docker-buildx
 docker-compose

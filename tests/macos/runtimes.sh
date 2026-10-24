@@ -22,8 +22,8 @@ run_mise install > "$output/install.log" 2>&1
 run_mise current > "$output/current.txt" 2>&1
 run_mise exec -- /bin/sh -c 'command -v deno' > "$output/deno-source.txt"
 case "$(cat "$output/deno-source.txt")" in
-    /opt/homebrew/bin/deno|/usr/local/bin/deno) ;;
-    *) echo 'Deno must come from Homebrew, not a global mise installation' >&2; exit 1 ;;
+    "$runtime_home"/.local/share/mise/installs/deno/*/bin/deno|"$runtime_home"/.local/share/mise/installs/deno/*/deno) ;;
+    *) echo 'Deno must come from mise' >&2; exit 1 ;;
 esac
 {
     run_mise exec -- node --version

@@ -26,8 +26,6 @@ brew "cmatrix"
 brew "ctop"
 # Modern diagram scripting language that turns text to diagrams
 brew "d2"
-# Secure runtime for JavaScript and TypeScript
-brew "deno"
 # Modern, maintained replacement for ls
 brew "eza"
 # Simple, fast and user-friendly alternative to find
@@ -38,8 +36,6 @@ brew "fzf"
 brew "gh"
 # Remote repository management made easy
 brew "ghq"
-# Open source programming language to build simple/reliable/efficient software
-brew "go"
 # Ping, but with a graph
 brew "gping"
 # Graph visualization software from AT&T and Bell Labs
@@ -62,8 +58,6 @@ brew "lazygit"
 brew "lf"
 # Linux virtual machines
 brew "lima"
-# Powerful, lightweight programming language
-brew "lua"
 # Polyglot runtime manager (asdf rust clone)
 brew "mise"
 # Simple tool to make locally trusted development certificates
@@ -88,8 +82,6 @@ brew "pv"
 brew "qemu"
 # File browser
 brew "ranger"
-# Ruby version manager
-brew "rbenv"
 # Search tool like grep and The Silver Searcher
 brew "ripgrep"
 # Fast and accurate code counter with complexity and COCOMO estimates
@@ -110,8 +102,6 @@ brew "tesseract-lang"
 brew "trivy"
 # Library to create, extract, and modify Windows Imaging files
 brew "wimlib"
-# Package manager versions and Yarn/pnpm shims (conflicts with standalone yarn)
-brew "corepack"
 # Flexible and fast Zsh plugin manager
 brew "zinit"
 # Terraform

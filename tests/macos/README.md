@@ -108,12 +108,15 @@ baseイメージにはユーザー・SSH・開発用ツールが事前設定さ�
 
 ## 既存Macから移行する場合の注意
 
-BrewfileはCorepack経由のYarn/pnpmに統一しています。Homebrew版Yarnを既に
-導入している場合は、`command brew unlink yarn` で既存リンクを退避してから
-`command brew install corepack` を実行します。切り替えを確認したら
-`command brew uninstall yarn` で旧パッケージを削除します
-（残すと自動Brewfile更新で再び含まれます）。Yarnのバージョンは各プロジェクトの
-`packageManager` 設定で指定してください。
+言語ランタイムとCorepackはmiseで管理します。設定を配布して `mise install` を実行し、
+各コマンドがmise配下を参照することを確認してから、不要なHomebrew版を削除します。
+CorepackはNode 25に対応する0.34.7を使用します。Yarn/pnpmのバージョンは
+各プロジェクトの `packageManager` 設定に従います。
+
+Ruby 2.7.2とJava 16.0.1はこのPCの既存環境を `mise link` で取り込んだ設定です。
+新規VMで全ランタイムを検証するには、README記載の旧環境を準備して登録するか、
+VM用設定で導入可能なRuby/Javaを指定する必要があります。過去のVALIDATION.mdは
+当時の構成の記録であり、今回の変更後のVM検証結果ではありません。
 
 OpenVPN Connect等のPKG形式のアプリは管理者権限が必要です。実機での導入は
 パスワードを入力できるターミナルで実行してください。Cirrus Labsのbase VMは

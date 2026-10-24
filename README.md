@@ -25,7 +25,7 @@ home/
 ```
 
 設定ファイルはシンボリックリンクではなくchezmoiが配布する通常ファイルです。
-パッケージはHomebrew/yay、Node・Pythonはmise、設定の配布はchezmoiが担当します。
+パッケージはHomebrew/yay、言語ランタイムはmise、設定の配布はchezmoiが担当します。
 
 ## セットアップ手順
 
@@ -175,10 +175,26 @@ curl https://mise.run | sh
 - fzf: macOSではHomebrew、LinuxではOSのパッケージマネージャーで導入します。
   補完・検索ウィジェットはzenoを使い、zinitからfzfを重複取得しません。
 
-グローバルのNode・Pythonは `home/dot_config/mise/config.toml` で管理し、設定配布後に
-`mise install` で導入します。Denoはzenoの初期化時（mise有効化前）にも必要なので、
-macOSではHomebrew管理に統一しています。プロジェクト固有のバージョンは
-そのプロジェクトのmise設定で指定できます。既存のmise版Denoは自動削除しません。
+グローバルのNode・Python・Go・Deno・Lua・Ruby・Java・Corepackは
+`home/dot_config/mise/config.toml` で管理します。設定配布後に `mise install` を実行します。
+Corepackは現在のNode 25に対応する0.34.7を使用し、pnpm/Yarnのバージョンは
+各プロジェクトの `package.json` の `packageManager` に従います。
+プロジェクト固有のランタイムは、そのプロジェクトの `mise.toml` で指定します。
+
+このPCのRuby 2.7.2とAdoptOpenJDK 16.0.1は既存のインストールを取り込んでいます。
+以下の登録先はmiseから参照するため削除しないでください。
+
+```sh
+mise link ruby@2.7.2 "$HOME/.rbenv/versions/2.7.2"
+mise link java@adoptopenjdk-16.0.1 /Library/Java/JavaVirtualMachines/adoptopenjdk-16.jdk/Contents/Home
+```
+
+新しいPCでは、これらの旧バージョンを用意して登録するか、利用プロジェクトを確認して
+インストール可能なバージョンへ設定を変更してください。`mise install` だけでは
+既存環境の取り込みは再現できません。旧pyenvのPythonも `mise link` で登録できます。
+Homebrewはmise本体・CLI・アプリ・依存ライブラリを担当します。
+Homebrewが依存として必要とするNode/Python/LuaJITと、macOS付属の言語・Command Line Toolsは残します。
+シェルではmiseをプラグインより先に有効化し、Deno/Luaの参照先を揃えます。
 Arch Linuxでは [公式のdenoパッケージ](https://archlinux.org/packages/extra/x86_64/deno/) を
 `.yay-packages.txt` に含めています。
 

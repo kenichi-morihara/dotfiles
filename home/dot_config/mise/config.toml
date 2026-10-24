@@ -1,3 +1,12 @@
+# Language versions are managed here; Homebrew owns CLI/application dependencies.
 [tools]
 node = "25.2.1"
-python = "3.14"
+python = "3.14.2"
+go = "1.27.2"
+deno = "2.9.7"
+lua = "5.5.1"
+# Imported with `mise link`; see README before installing on a new machine.
+ruby = "2.7.2"
+java = "adoptopenjdk-16.0.1"
+# This Corepack release supports Node 25; packageManager selects pnpm/Yarn per project.
+"npm:corepack" = "0.34.7"
