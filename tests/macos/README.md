@@ -113,9 +113,8 @@ baseイメージにはユーザー・SSH・開発用ツールが事前設定さ�
 CorepackはNode 25に対応する0.34.7を使用します。Yarn/pnpmのバージョンは
 各プロジェクトの `packageManager` 設定に従います。
 
-Ruby 2.7.2とJava 16.0.1はこのPCの既存環境を `mise link` で取り込んだ設定です。
-新規VMで全ランタイムを検証するには、README記載の旧環境を準備して登録するか、
-VM用設定で導入可能なRuby/Javaを指定する必要があります。過去のVALIDATION.mdは
+Ruby 2.7.2は `mise install` でビルドできます。Javaはグローバル設定に含めません。
+過去のVALIDATION.mdは
 当時の構成の記録であり、今回の変更後のVM検証結果ではありません。
 
 OpenVPN Connect等のPKG形式のアプリは管理者権限が必要です。実機での導入は

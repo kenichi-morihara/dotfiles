@@ -175,23 +175,21 @@ curl https://mise.run | sh
 - fzf: macOSではHomebrew、LinuxではOSのパッケージマネージャーで導入します。
   補完・検索ウィジェットはzenoを使い、zinitからfzfを重複取得しません。
 
-グローバルのNode・Python・Go・Deno・Lua・Ruby・Java・Corepackは
+グローバルのNode・Python・Go・Deno・Lua・Ruby・Corepackは
 `home/dot_config/mise/config.toml` で管理します。設定配布後に `mise install` を実行します。
 Corepackは現在のNode 25に対応する0.34.7を使用し、pnpm/Yarnのバージョンは
 各プロジェクトの `package.json` の `packageManager` に従います。
 プロジェクト固有のランタイムは、そのプロジェクトの `mise.toml` で指定します。
 
-このPCのRuby 2.7.2とAdoptOpenJDK 16.0.1は既存のインストールを取り込んでいます。
-以下の登録先はmiseから参照するため削除しないでください。
+Ruby 2.7.2はApple Silicon Macでも `mise install` でビルドできます（数分かかります）。
+rbenvの既存インストールがあるPCでは、ビルドせずに取り込むこともできます。
 
 ```sh
 mise link ruby@2.7.2 "$HOME/.rbenv/versions/2.7.2"
-mise link java@adoptopenjdk-16.0.1 /Library/Java/JavaVirtualMachines/adoptopenjdk-16.jdk/Contents/Home
 ```
 
-新しいPCでは、これらの旧バージョンを用意して登録するか、利用プロジェクトを確認して
-インストール可能なバージョンへ設定を変更してください。`mise install` だけでは
-既存環境の取り込みは再現できません。旧pyenvのPythonも `mise link` で登録できます。
+Javaはグローバルには入れません。必要なプロジェクトの `mise.toml` でバージョンを指定します。
+旧pyenvのPythonも `mise link` で登録できます。
 Homebrewはmise本体・CLI・アプリ・依存ライブラリを担当します。
 Homebrewが依存として必要とするNode/Python/LuaJITと、macOS付属の言語・Command Line Toolsは残します。
 シェルではmiseをプラグインより先に有効化し、Deno/Luaの参照先を揃えます。
@@ -230,6 +228,14 @@ macOS固有の設定は `.bin/macos/` と `home/dot_config/karabiner/` に配置
 - **brew.zsh**: Homebrewの自動Brewfile更新機能。`install` / `uninstall` / `tap` / `untap` 成功後、master/main では Brewfile のみをコミットし、upstream を fetch・merge して push します。Brewfile に差分がなくても未送信コミットを再送します。衝突時はマージを中止し、追跡ファイルに未コミット変更がある場合は自動マージをスキップします。Git のエラーは端末に表示します。
 - **notify.zsh**: macOSの通知機能
 - **karabiner/**: Karabiner-Elementsの設定
+- **defaults.sh**: システム設定（ライブ変換オフ、Dockを自動的に隠す、バッテリー残量を%表示）
+
+```bash
+.bin/macos/defaults.sh          # 適用（Dock・コントロールセンター・日本語入力を再起動）
+.bin/macos/defaults.sh check    # 現在の値を確認（変更しない）
+```
+
+設定を追加する場合は `defaults.sh` の `SETTINGS` に1行追加します。
 
 ### Linux
 
