@@ -5,8 +5,10 @@ import os
 from pathlib import Path
 import shutil
 
-root = Path({{ .chezmoi.destDir | toJson }})
-repo = Path({{ .chezmoi.workingTree | toJson }})
+# run_once is keyed by the rendered content, so read paths at run time: embedding
+# them would make a moved checkout look like a new script and repeat the backups.
+root = Path(os.environ["CHEZMOI_DEST_DIR"])
+repo = Path(os.environ["CHEZMOI_WORKING_TREE"])
 # Historical targets of link.sh. This is a one-time migration, not a file installer.
 targets = [
     ".zshrc", ".config/alacritty.toml", ".config/starship.toml",

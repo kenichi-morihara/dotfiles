@@ -102,6 +102,21 @@ class ChezmoiTests(unittest.TestCase):
         self.assertEqual(sorted(p.name for p in external.iterdir()), ['private.txt'])
         self.assertTrue((self.home / '.config/chezmoi/chezmoi.toml').is_file())
 
+    def test_moving_checkout_does_not_rerun_migration(self):
+        shell = self.home / '.zshrc'
+        shell.write_text('personal shell\n')
+        old = Path(self.temp.name) / 'old-checkout'
+        new = Path(self.temp.name) / 'ghq/github.com/user/dotfiles'
+        for checkout in (old, new):
+            shutil.copytree(ROOT, checkout, ignore=shutil.ignore_patterns('.git', '.validation'))
+        for checkout in (old, new):
+            subprocess.run(['chezmoi', '--source', str(checkout), '--destination', str(self.home),
+                            'apply'], env=self.env, check=True, capture_output=True, text=True)
+        self.assertEqual((self.home / '.zshrc.backup').read_text(), 'personal shell\n')
+        backups = sorted(str(p.relative_to(self.home)) for p in self.home.rglob('*.backup*'))
+        self.assertEqual(backups, ['.zshrc.backup'])
+        self.assertIn(str(new), shell.read_text())
+
     def test_checkout_path_is_quoted_in_shell_entrypoint(self):
         source = Path(self.temp.name) / 'checkout with $literal'
         shutil.copytree(ROOT / 'home', source / 'home')
