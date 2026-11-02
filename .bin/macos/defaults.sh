@@ -17,6 +17,8 @@ SETTINGS=(
     "|com.apple.dock|autohide|bool|true|Dock"
     # メニューバーのバッテリー残量を常に%表示
     "-currentHost|com.apple.controlcenter|BatteryShowPercentage|bool|true|ControlCenter"
+    # iTerm2の既定プロファイルをchezmoiで配布したDraculaにする（DynamicProfiles/dotfiles.json）
+    "|com.googlecode.iterm2|Default Bookmark Guid|string|B8869F97-9F7A-4A40-AE09-9D8A48DB2922|iTerm2"
 )
 
 normalize() {
@@ -62,12 +64,16 @@ if [ "${#restart[@]}" -gt 0 ]; then
     for process in $(printf '%s\n' "${restart[@]}" | sort -u); do
         # macOSが自動で再起動する。名前の完全一致で止め、無関係なプロセスに触れない。
         case "$process" in
+            # 作業中のターミナルを落とさない。新しいウィンドウから反映される。
+            iTerm2) echo "iTerm2: 新しいウィンドウ（またはiTerm2の再起動後）からDraculaになります。" ;;
             JapaneseIM) pkill -x JapaneseIM-RomajiTyping 2>/dev/null || true
                         pkill -x JapaneseIM-KanaTyping 2>/dev/null || true ;;
             *) pkill -x "$process" 2>/dev/null || true ;;
         esac
     done
-    echo "ライブ変換が切り替わらない場合は、一度ログアウトしてください。"
+    if printf '%s\n' "${restart[@]}" | grep -qx JapaneseIM; then
+        echo "ライブ変換が切り替わらない場合は、一度ログアウトしてください。"
+    fi
 fi
 
 exit "$status"

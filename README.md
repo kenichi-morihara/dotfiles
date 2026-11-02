@@ -228,7 +228,7 @@ macOS固有の設定は `.bin/macos/` と `home/dot_config/karabiner/` に配置
 - **brew.zsh**: Homebrewの自動Brewfile更新機能。`install` / `uninstall` / `tap` / `untap` 成功後、master/main では Brewfile のみをコミットし、upstream を fetch・merge して push します。Brewfile に差分がなくても未送信コミットを再送します。衝突時はマージを中止し、追跡ファイルに未コミット変更がある場合は自動マージをスキップします。Git のエラーは端末に表示します。
 - **notify.zsh**: macOSの通知機能
 - **karabiner/**: Karabiner-Elementsの設定
-- **defaults.sh**: システム設定（ライブ変換オフ、Dockを自動的に隠す、バッテリー残量を%表示）
+- **defaults.sh**: システム設定（ライブ変換オフ、Dockを自動的に隠す、バッテリー残量を%表示、iTerm2の既定プロファイル）
 
 ```bash
 .bin/macos/defaults.sh          # 適用（Dock・コントロールセンター・日本語入力を再起動）
@@ -236,6 +236,12 @@ macOS固有の設定は `.bin/macos/` と `home/dot_config/karabiner/` に配置
 ```
 
 設定を追加する場合は `defaults.sh` の `SETTINGS` に1行追加します。
+
+- **iTerm2**: `home/private_Library/private_Application Support/iTerm2/DynamicProfiles/dotfiles.json` を
+  chezmoiが配布し、iTerm2が「Dracula」プロファイルとして自動で読み込みます
+  （配色は [dracula/iterm](https://github.com/dracula/iterm)、フォントはHackGen Console NF）。
+  プロファイルを編集する場合はこのJSONを直接編集して `chezmoi apply` します。
+  iTerm2の画面上で変更した内容はJSONに保存されないため、残したい設定はJSONへ反映します。
 
 ### Linux
 
