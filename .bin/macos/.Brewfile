@@ -155,6 +155,8 @@ cask "openvpn-connect"
 cask "popsql"
 # Collaboration platform for API development
 cask "postman"
+# Control your tools with a few keystrokes
+cask "raycast"
 # Move and resize windows using keyboard shortcuts or snap areas
 cask "rectangle"
 # Tool to reverse the direction of scrolling
