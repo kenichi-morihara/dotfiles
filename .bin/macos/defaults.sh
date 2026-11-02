@@ -76,4 +76,33 @@ if [ "${#restart[@]}" -gt 0 ]; then
     fi
 fi
 
+# 電源設定（pmset、要sudo）。スリープ・画面オフ・減光をすべて無効にする（0 = 無効）。
+# 形式: "セクション名|pmsetのフラグ|キー 値"
+PMSET=(
+    "AC Power|-c|sleep 0"
+    "AC Power|-c|displaysleep 0"
+    "Battery Power|-b|sleep 0"
+    "Battery Power|-b|displaysleep 0"
+    "Battery Power|-b|lessbright 0"
+)
+pmset_all=$(pmset -g custom)
+for entry in "${PMSET[@]}"; do
+    IFS='|' read -r section flag kv <<<"$entry"
+    read -r key value <<<"$kv"
+    current=$(awk -v s="$section:" -v k="$key" '/^[^ ]/{f=($0==s)} f && $1==k{print $2}' <<<"$pmset_all")
+    current="${current:-(unset)}"
+
+    if [ "$current" = "$value" ]; then
+        echo "✓ pmset($flag) $key = $value"
+    elif [ "$mode" = check ]; then
+        echo "✗ pmset($flag) $key = $current (expected $value)"
+        status=1
+    elif sudo pmset "$flag" "$key" "$value"; then
+        echo "→ pmset($flag) $key: $current → $value"
+    else
+        echo "✗ pmset($flag) $key: sudoに失敗しました" >&2
+        status=1
+    fi
+done
+
 exit "$status"
