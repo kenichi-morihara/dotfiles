@@ -240,6 +240,14 @@ macOS固有の設定は `.bin/macos/` と `home/dot_config/karabiner/` に配置
 
 設定を追加する場合は `defaults.sh` の `SETTINGS` に1行追加します。
 
+- **docker.sh**: Docker Desktopの割り当てメモリ（既定16GiB、`DOCKER_MEMORY_MIB`で変更可）。
+  `settings-store.json` は他の設定をDocker Desktopが管理するため、chezmoiでは配布せず `jq` で `memoryMiB` だけを書き換えます（初回のみ `.bak` を作成）。
+
+```bash
+.bin/macos/docker.sh          # 適用（反映にはDocker Desktopの再起動が必要）
+.bin/macos/docker.sh check    # 現在の値を確認（変更しない）
+```
+
 - **iTerm2**: `home/private_Library/private_Application Support/iTerm2/DynamicProfiles/dotfiles.json` を
   chezmoiが配布し、iTerm2が「Dracula」プロファイルとして自動で読み込みます
   （配色は [dracula/iterm](https://github.com/dracula/iterm)、フォントはHackGen Console NF）。
