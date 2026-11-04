@@ -43,6 +43,7 @@ case "$(uname -s)" in
     # macOS特有の設定
     source "$_DOTFILES_SCRIPTS_DIR/macos/notify.zsh"
     source "$_DOTFILES_SCRIPTS_DIR/macos/brew.zsh"
+    source "$_DOTFILES_SCRIPTS_DIR/macos/ca-certs.zsh"
     ;;
   Linux)
     source "$_DOTFILES_SCRIPTS_DIR/linux/yay.zsh"

@@ -8,7 +8,7 @@ PROFILE ?= core
 
 .PHONY: help setup init apply check diff dry-run status \
 	apply-files apply-apps apply-system verify check-apps \
-	macos-init sudo-touchid packages packages-check runtimes shell-setup test
+	macos-init sudo-touchid ca-certs packages packages-check runtimes shell-setup test
 
 help: ## 操作一覧（既定）
 	@awk 'BEGIN {FS = ":.*## "} /^##@ / {printf "\n%s\n", substr($$0, 5)} /^[a-zA-Z_-]+:.*## / {printf "  %-18s %s\n", $$1, $$2}' Makefile
@@ -38,6 +38,9 @@ init: ## 初回移行・ファイル配布・chezmoi登録（既存設定を退�
 
 sudo-touchid: ## sudoのTouch IDを有効化（初回は管理者認証）
 	bash scripts/macos/sudo-touchid.sh
+
+ca-certs: ## /etc/ssl/cert.pemから非信頼ルート(eMudhra/AAA)を除去（OS更新後に再実行）
+	bash scripts/macos/ca-certs.sh
 
 ##@ 個別に適用
 packages: ## パッケージ導入（PROFILE=core/full、既定core）
