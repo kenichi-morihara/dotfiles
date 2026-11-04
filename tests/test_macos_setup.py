@@ -2,6 +2,7 @@
 import os
 from pathlib import Path
 import subprocess
+import shutil
 import tempfile
 import unittest
 
@@ -12,6 +13,15 @@ class MacOSSetupTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             directory = Path(tmp)
             log = directory / 'calls'
+            # Keep the real setup orchestration, but never inspect or change the
+            # host's PAM configuration (including when CI runs on Linux).
+            fixture_scripts = directory / 'repo/scripts/macos'
+            fixture_scripts.mkdir(parents=True)
+            setup = fixture_scripts / 'setup.sh'
+            shutil.copyfile(ROOT / 'scripts/macos/setup.sh', setup)
+            (fixture_scripts / 'sudo-touchid.sh').write_text(
+                '#!/bin/bash\necho touchid >> "$CALL_LOG"\n'
+                '[ "$FAIL_STEP" != touchid ] || exit 9\n')
             scripts = {
                 'uname': 'echo Darwin',
                 'id': 'echo 501',
@@ -38,11 +48,9 @@ class MacOSSetupTests(unittest.TestCase):
             env = dict(os.environ, PATH=str(directory) + ':' + os.environ['PATH'],
                        CALL_LOG=str(log), FAIL_STEP=fail, AUTH_REVOKED=str(directory / "revoked"))
             env.pop("HOMEBREW_SUDO_CHECKED", None)
-            result = subprocess.run(['bash', str(ROOT / 'scripts/macos/setup.sh')],
+            result = subprocess.run(['bash', str(setup)],
                                     env=env, capture_output=True, text=True, timeout=10)
-            # Touch ID setup is idempotent: an already-enabled host skips its sudo call.
-            calls = [line for line in log.read_text().splitlines()
-                     if not line.startswith('sudo /bin/bash ')]
+            calls = log.read_text().splitlines()
             return result, calls
 
     def test_homebrew_privilege_probe_does_not_revoke_setup_authentication(self):
@@ -60,12 +68,18 @@ class MacOSSetupTests(unittest.TestCase):
     def test_authenticate_then_packages_then_apply(self):
         result, calls = self.run_setup()
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(calls, ['sudo -v', 'make packages PROFILE=full', 'sudo -n -v', 'make apply'])
+        self.assertEqual(calls, ['sudo -v', 'touchid', 'make packages PROFILE=full', 'sudo -n -v', 'make apply'])
 
     def test_package_failure_stops_before_apply(self):
         result, calls = self.run_setup('packages')
         self.assertEqual(result.returncode, 7)
-        self.assertEqual(calls, ['sudo -v', 'make packages PROFILE=full'])
+        self.assertEqual(calls, ['sudo -v', 'touchid', 'make packages PROFILE=full'])
+
+    def test_touchid_failure_stops_before_packages(self):
+        result, calls = self.run_setup('touchid')
+        self.assertEqual(result.returncode, 9)
+        self.assertEqual(calls, ['sudo -v', 'touchid'])
+        self.assertNotIn('Setup complete', result.stdout)
 
     def test_auth_failure_runs_no_make_commands(self):
         result, calls = self.run_setup('auth')
