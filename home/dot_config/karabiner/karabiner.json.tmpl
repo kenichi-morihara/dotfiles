@@ -1,4 +1,5 @@
-{{- $layout := default "jis" (get . "keyboardLayout") -}}
+{{- $profile := includeTemplate "profile.json.tmpl" . | fromJson -}}
+{{- $layout := default (default "jis" (get $profile "keyboard_layout")) (get . "keyboardLayout") -}}
 {{- if not (has $layout (list "jis" "us")) -}}
 {{- fail "keyboardLayout must be jis or us" -}}
 {{- end -}}

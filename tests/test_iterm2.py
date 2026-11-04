@@ -53,3 +53,22 @@ class ITerm2Tests(unittest.TestCase):
         self.assertEqual(hotkey['Command'], '/local/shell')
         self.assertTrue(updated['New Bookmarks'][0]['Is Dynamic Profile'])
         self.assertEqual(iterm2.merge_preferences(updated, config), updated)
+
+    def test_saved_profile_is_preferred_over_same_named_dynamic_profile(self):
+        dynamic = {'Name': 'Dracula', 'Guid': 'dynamic',
+                   'Dynamic Profile Filename': '/local/DynamicProfiles/dotfiles.json'}
+        saved = {'Name': 'Dracula', 'Guid': 'saved', 'Command': '/local/shell'}
+        current = {'Default Bookmark Guid': 'dynamic', 'New Bookmarks': [dynamic, saved]}
+        config = json.loads((ROOT / 'scripts/macos/iterm2.json').read_text())
+        updated = iterm2.merge_preferences(current, config)
+        self.assertEqual(updated['New Bookmarks'][0], dynamic)
+        self.assertEqual(updated['Default Bookmark Guid'], 'saved')
+        self.assertEqual(updated['New Bookmarks'][1]['Command'], '/local/shell')
+        self.assertEqual(iterm2.merge_preferences(updated, config), updated)
+
+    def test_duplicate_saved_profiles_are_still_rejected(self):
+        current = {'New Bookmarks': [{'Name': 'Dracula', 'Guid': 'one'},
+                                     {'Name': 'Dracula', 'Guid': 'two'}]}
+        config = json.loads((ROOT / 'scripts/macos/iterm2.json').read_text())
+        with self.assertRaises(ValueError):
+            iterm2.merge_preferences(current, config)

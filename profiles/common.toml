@@ -1,0 +1,7 @@
+# Lists are replaced, tables are merged: common -> usage -> machine.
+package_profile = "core"
+keyboard_layout = "jis"
+packages = [] # Additional Homebrew formulae (macOS only)
+casks = []
+repos = []
+knowledge_features = [] # Optional: "capture", "ledger"

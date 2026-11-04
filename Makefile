@@ -4,7 +4,10 @@ SHELL := /bin/bash
 ROOT := $(shell pwd)
 CHEZMOI ?= chezmoi
 PYTHON ?= python3
-PROFILE ?= core
+export DOTFILES_PROFILE_PYTHON := $(PYTHON)
+PROFILE ?=
+PROFILE_TOOL = $(PYTHON) scripts/common/profiles.py
+PROFILE_STATE = $(if $(XDG_CONFIG_HOME),$(XDG_CONFIG_HOME),$(HOME)/.config)/dotfiles/profile
 
 .PHONY: help setup init apply check diff dry-run status \
 	apply-files apply-apps apply-system verify check-apps \
@@ -14,9 +17,8 @@ help: ## 操作一覧（既定）
 	@awk 'BEGIN {FS = ":.*## "} /^##@ / {printf "\n%s\n", substr($$0, 5)} /^[a-zA-Z_-]+:.*## / {printf "  %-18s %s\n", $$1, $$2}' Makefile
 
 ##@ 普段使う操作
-setup: PROFILE = full
-setup: ## sudo認証→パッケージ導入→設定適用（macOS、既定full）
-	bash scripts/macos/setup.sh "$(PROFILE)"
+setup: ## 選択中profileのパッケージ・設定・ランタイム・repoを導入
+	$(PROFILE_TOOL) setup $(if $(PROFILE),--package-profile "$(PROFILE)")
 
 apply: ## ファイル→アプリ設定を適用（パッケージ導入なし）
 	$(MAKE) apply-files
@@ -41,7 +43,7 @@ sudo-touchid: ## sudoのTouch IDを有効化（初回は管理者認証）
 
 ##@ 個別に適用
 packages: ## パッケージ導入（PROFILE=core/full、既定core）
-	bash scripts/macos/brew.sh --profile "$(PROFILE)"
+	@if [ -f "$(PROFILE_STATE)" ]; then $(PROFILE_TOOL) packages $(if $(PROFILE),--package-profile "$(PROFILE)"); else bash scripts/macos/brew.sh --profile "$(or $(PROFILE),core)"; fi
 
 apply-files: ## chezmoiのファイルだけを適用（競合時は停止）
 	$(CHEZMOI) --source "$(ROOT)" --destination "$(HOME)" apply --error-on-conflict
@@ -60,7 +62,7 @@ shell-setup: ## zshをログインシェルに設定
 
 ##@ 個別に確認
 packages-check: ## パッケージの不足確認（PROFILE=core/full、既定core）
-	bash scripts/macos/brew.sh --profile "$(PROFILE)" check
+	@if [ -f "$(PROFILE_STATE)" ]; then $(PROFILE_TOOL) packages --check $(if $(PROFILE),--package-profile "$(PROFILE)"); else bash scripts/macos/brew.sh --profile "$(or $(PROFILE),core)" check; fi
 
 verify: ## chezmoiのファイルが宣言と一致するか確認
 	$(CHEZMOI) --source "$(ROOT)" --destination "$(HOME)" verify
@@ -76,3 +78,17 @@ dry-run: ## ファイル配布のプレビュー（変更なし）
 
 test: ## 一時HOMEなどを使うテストを実行
 	$(PYTHON) -m unittest discover -s tests -v
+
+##@ 用途・端末別profile
+.PHONY: profile-select profile-show setup-plan repos
+profile-select: ## 用途・端末のprofileを保存（NAME=personal または work/<端末ID>）
+	$(PROFILE_TOOL) select --name "$(NAME)"
+
+profile-show: ## 選択中profileの実効設定を表示
+	$(PROFILE_TOOL) show
+
+setup-plan: ## 一括導入の予定を表示（変更なし）
+	$(PROFILE_TOOL) plan
+
+repos: ## 選択中profileのrepo取得・開発依存導入
+	$(PROFILE_TOOL) repos

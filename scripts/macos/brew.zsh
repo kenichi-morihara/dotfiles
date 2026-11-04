@@ -70,6 +70,13 @@ brew() {
   command "$brew_cmd" "$@"
   local exit_code=$?
   
+  # Selected profiles own their package declarations. Never dump a machine's
+  # full inventory into the shared Brewfile or auto-push it (including work PCs).
+  local profile_state="${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/profile"
+  if [[ -f "$profile_state" ]]; then
+    return $exit_code
+  fi
+
   # install, uninstall, tap, untap の後にBrewfileを更新
   if [[ $exit_code -eq 0 ]] && [[ "$1" =~ ^(install|uninstall|tap|untap)$ ]]; then
     local brewfile_path="${BREWFILE_PATH:-${_DOTFILES_MACOS_DIR}/.Brewfile}"

@@ -71,6 +71,19 @@ do {
         }
         guard let selected = keyboards().first(where: { id($0) == config.selected }) else { fatalError("Source disappeared") }
         try require(TISSelectInputSource(selected), "Select \(config.selected)")
+        // Some built-in modes (notably Kotoeri Roman) remain enabled after
+        // disabling the child. Disable an unwanted input method at its parent.
+        let wantedBundles = Set(available.filter { wanted.contains(id($0)) }.compactMap {
+            property($0, kTISPropertyBundleID) as? String
+        })
+        for parent in sources() where
+            property(parent, kTISPropertyInputSourceType) as? String == kTISTypeKeyboardInputMethodModeEnabled as String
+            && flag(parent, kTISPropertyInputSourceIsEnabled) {
+            if let bundle = property(parent, kTISPropertyBundleID) as? String,
+               !wantedBundles.contains(bundle) {
+                try require(TISDisableInputSource(parent), "Disable input method \(id(parent))")
+            }
+        }
         for source in keyboards() where !wanted.contains(id(source)) && enabled(source) {
             try require(TISDisableInputSource(source), "Disable \(id(source))")
         }

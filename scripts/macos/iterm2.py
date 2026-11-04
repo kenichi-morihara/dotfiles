@@ -21,8 +21,12 @@ def merge_preferences(current, config):
                 profiles[0] if profiles else {'Custom Command': 'No', 'Custom Directory': 'No'})
     # New profiles inherit the existing default's colors and shell settings.
     base = copy.deepcopy(base)
+    managed = {}
     for declared in config['profiles']:
-        matches = [p for p in profiles if p.get('Name') == declared['Name']]
+        # Dynamic profiles are owned by their JSON file; they may share a name
+        # with a saved profile and must not make that saved profile ambiguous.
+        matches = [p for p in profiles if p.get('Name') == declared['Name']
+                   and not p.get('Is Dynamic Profile') and not p.get('Dynamic Profile Filename')]
         if len(matches) > 1:
             raise ValueError(f'Duplicate iTerm2 profile name: {declared["Name"]}')
         if matches:
@@ -39,7 +43,8 @@ def merge_preferences(current, config):
                                            'dotfiles:iterm2:' + declared['Name'])).upper()
             profiles.append(profile)
         profile.update(declared)
-    default = next(p for p in profiles if p['Name'] == config['defaultProfile'])
+        managed[declared['Name']] = profile
+    default = managed[config['defaultProfile']]
     result['Default Bookmark Guid'] = default['Guid']
     return result
 

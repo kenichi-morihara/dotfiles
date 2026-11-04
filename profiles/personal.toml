@@ -1,0 +1,4 @@
+package_profile = "full"
+keyboard_layout = "jis"
+packages = ["gmailctl"]
+repos = ["github.com/kenichi-morihara/personal-ops", "github.com/kenichi-morihara/personal-knowledge", "github.com/kenichi-morihara/mac-security-audit"]

@@ -1,4 +1,6 @@
 sourceDir = {{ .chezmoi.workingTree | quote }}
 
 [data]
-keyboardLayout = {{ default "jis" (get . "keyboardLayout") | quote }}
+{{ if hasKey . "keyboardLayout" -}}
+keyboardLayout = {{ .keyboardLayout | quote }}
+{{ end -}}

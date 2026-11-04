@@ -1,0 +1,6 @@
+{{- $config := default (joinPath .chezmoi.homeDir ".config") (env "XDG_CONFIG_HOME") -}}
+{{- if stat (joinPath $config "dotfiles/profile") -}}
+{{ output (default "python3" (env "DOTFILES_PROFILE_PYTHON")) (joinPath .chezmoi.workingTree "scripts/common/profiles.py") "show" }}
+{{- else -}}
+{}
+{{- end -}}

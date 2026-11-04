@@ -1,0 +1,6 @@
+# Copy to profiles/work/<machine-id>.toml, then select work/<machine-id>.
+# Commit reusable settings only; credentials belong outside Git.
+packages = []
+casks = []
+repos = []
+# keyboard_layout = "us"

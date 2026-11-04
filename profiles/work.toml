@@ -1,0 +1,3 @@
+package_profile = "core"
+keyboard_layout = "us"
+repos = []
