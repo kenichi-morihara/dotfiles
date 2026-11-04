@@ -25,13 +25,28 @@ _dotfiles-show-latency() {
   print -ru2 -- "$1"
 }
 
+# Never copy an autoload placeholder: its new name has no file in fpath.
+_dotfiles-copy-zeno-function() {
+  emulate -L zsh
+  local original="$1" saved="$2"
+  if [[ ${functions[$original]-} == *'builtin autoload -X'* ]]; then
+    # zinit can temporarily change fpath; use the plugin's known source location.
+    if [[ -n ${ZENO_ROOT-} && -r "$ZENO_ROOT/shells/zsh/functions/$original" ]]; then
+      source "$ZENO_ROOT/shells/zsh/functions/$original" || return
+    else
+      autoload +X "$original" 2>/dev/null || return
+    fi
+  fi
+  [[ -n ${functions[$original]-} && ${functions[$original]} != *'builtin autoload -X'* ]] || return 1
+  functions -c "$original" "$saved"
+}
+
 # Keep notifications out of fzf's alternate screen; print after the widget returns.
 _dotfiles-measure-zeno-shortcuts() {
   emulate -L zsh
   (( $+functions[_dotfiles-original-zeno-dispatch] )) && return 0
   (( $+functions[zeno-lazy-widget-dispatch] )) || return 0
-  autoload +X zeno-lazy-widget-dispatch 2>/dev/null || true
-  functions -c zeno-lazy-widget-dispatch _dotfiles-original-zeno-dispatch
+  _dotfiles-copy-zeno-function zeno-lazy-widget-dispatch _dotfiles-original-zeno-dispatch || return 0
   zeno-lazy-widget-dispatch() {
     local _DOTFILES_LATENCY_DEFER=1 result=0 message
     local -a _DOTFILES_LATENCY_NOTICES=()
@@ -48,8 +63,7 @@ _dotfiles-measure-zeno-init() {
   emulate -L zsh
   (( $+functions[_dotfiles-original-zeno-init] )) && return 0
   (( $+functions[zeno-init] )) || return 0
-  autoload +X zeno-init 2>/dev/null || true
-  functions -c zeno-init _dotfiles-original-zeno-init
+  _dotfiles-copy-zeno-function zeno-init _dotfiles-original-zeno-init || return 0
   zeno-init() {
     if [[ ${ZENO_LOADED-} == 1 ]]; then
       _dotfiles-original-zeno-init "$@"

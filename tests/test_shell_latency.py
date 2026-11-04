@@ -1,6 +1,7 @@
 """Measure shell latency without starting Deno, fzf, or the user's shell config."""
 from pathlib import Path
 import subprocess
+import tempfile
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -50,6 +51,30 @@ class ShellLatencyTests(unittest.TestCase):
         self.assertTrue(result.stderr.startswith('widget-finished\n'))
         self.assertIn('zeno-ghq-cd: [latency] zeno-init: 200ms', result.stderr)
         self.assertEqual(result.stderr.count('[latency]'), 1)
+
+    def test_autoload_uses_plugin_root_when_fpath_is_missing(self):
+        with tempfile.TemporaryDirectory() as directory:
+            functions = Path(directory) / 'shells/zsh/functions'
+            functions.mkdir(parents=True)
+            (functions / 'zeno-lazy-widget-dispatch').write_text(
+                'function zeno-lazy-widget-dispatch() { print widget-called; return 130; }\n')
+            result = self.run_zsh('source "$1"; ZENO_ROOT=' + repr(directory) + '; '
+                                  'fpath=(); autoload -Uz zeno-lazy-widget-dispatch; '
+                                  '_dotfiles-measure-zeno-shortcuts; '
+                                  'zeno-lazy-widget-dispatch; print result=$?')
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(result.stdout, 'widget-called\nresult=130\n')
+            self.assertEqual(result.stderr, '')
+
+    def test_missing_definition_does_not_replace_original_widget(self):
+        result = self.run_zsh('source "$1"; unset ZENO_ROOT; fpath=(); '
+                              'autoload -Uz zeno-lazy-widget-dispatch; '
+                              '_dotfiles-measure-zeno-shortcuts; '
+                              '(( ! $+functions[_dotfiles-original-zeno-dispatch] )); '
+                              'print saved=$?')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn('saved=0', result.stdout)
+        self.assertEqual(result.stderr, '')
 
     def test_invalid_threshold_uses_default(self):
         result = self.run_zsh('source "$1"; DOTFILES_LATENCY_THRESHOLD_MS=oops; '
