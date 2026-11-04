@@ -261,6 +261,29 @@ macOS固有の設定は `.bin/macos/` と `home/dot_config/karabiner/` に配置
 - **brew.zsh**: Homebrewの自動Brewfile更新機能。`install` / `uninstall` / `tap` / `untap` 成功後、master/main では Brewfile のみをコミットし、upstream を fetch・merge して push します。Brewfile に差分がなくても未送信コミットを再送します。衝突時はマージを中止し、追跡ファイルに未コミット変更がある場合は自動マージをスキップします。Git のエラーは端末に表示します。
 - **notify.zsh**: macOSの通知機能
 - **karabiner/**: Karabiner-Elementsの設定
+
+#### JIS／USキーボードと入力切り替え
+
+個人Macは `QWERTY JIS`（既定）、仕事Macは `QWERTY US` を使用します。
+端末ごとの選択は `chezmoi edit-config` で既存の `[data]` セクションに
+`keyboardLayout = "jis"` または `keyboardLayout = "us"` を設定して保存し、
+`make apply` で反映します。初回に `[data]` がなければ追加してください。
+再度 `make init` してもこの選択は維持します。
+
+| 操作 | JIS | US |
+| --- | --- | --- |
+| 英数入力 | 英数キー | 左Commandを単押し |
+| 日本語入力（ローマ字入力） | かなキー | 右Commandを単押し |
+| コピーなど | Command＋文字 | Command＋文字（単押し切り替えは発動しない） |
+| Rectangleの左右半分・最大化・復元 | Caps Lock＋矢印 | Caps Lock＋矢印 |
+| ディスプレイ間移動 | Caps Lock＋Shift＋左右矢印 | Caps Lock＋Shift＋左右矢印 |
+
+Caps Lockは押しながら使うとControl＋Option＋Command、単押しすると通常のCaps Lockです。
+従来のRectangleショートカットも引き続き使えます。
+macOS側で日本語入力ソースを追加し、日本語の入力方法は「ローマ字入力」に設定してください。
+Karabiner-Elementsのアクセシビリティ／入力監視など、求められる権限も必要です。
+プロファイルは手動選択よりchezmoiの設定を正とし、再適用時に指定のQWERTYプロファイルを選択します。
+既存の大西配列プロファイルは残しています。
 - **defaults.sh**: システム設定（ライブ変換オフ、Dockを自動的に隠す、バッテリー残量を%表示、iTerm2の既定プロファイル）
 
 ```bash
