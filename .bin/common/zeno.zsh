@@ -1,29 +1,14 @@
-### zeno
-# if disable deno cache command when plugin loaded
-# export ZENO_DISABLE_EXECUTE_CACHE_COMMAND=1
-
-# if enable fzf-tmux
-# export ZENO_ENABLE_FZF_TMUX=1
-
-# if setting fzf-tmux options
-# export ZENO_FZF_TMUX_OPTIONS="-p"
-
-# by default a unix domain socket is used
-# if disable it
-# export ZENO_DISABLE_SOCK=1
-
-# if disable builtin completion
-# export ZENO_DISABLE_BUILTIN_COMPLETION=1
-
-# default
-export ZENO_GIT_CAT="cat"
-# git file preview with color
-# export ZENO_GIT_CAT="bat --color=always"
-
-# default
-export ZENO_GIT_TREE="tree"
-# git folder preview with color
-# export ZENO_GIT_TREE="eza --tree"
+# Force ANSI colors even though fzf previews are pipes, not terminals.
+if (( $+commands[bat] )); then
+  export ZENO_GIT_CAT="bat --color=always --paging=never --style=plain --theme=Dracula"
+else
+  export ZENO_GIT_CAT="cat"
+fi
+if (( $+commands[eza] )); then
+  export ZENO_GIT_TREE="eza --tree --level=2 --color=always"
+else
+  export ZENO_GIT_TREE="ls -la"
+fi
 
 # Recent zeno versions register widgets before lazy heavy initialization.
 if [[ -n $ZENO_LOADED || -n $ZENO_BOOTSTRAPPED ]]; then
@@ -46,7 +31,36 @@ if [[ -n $ZENO_LOADED || -n $ZENO_BOOTSTRAPPED ]]; then
 
   # bindkey '^m' zeno-auto-snippet-and-accept-line
 
-  bindkey '^g' zeno-ghq-cd
+  # Upstream ghq preview hardcodes cat; use a local widget without patching the plugin.
+  typeset -g _DOTFILES_ZENO_PREVIEW="${${(%):-%x}:A:h}/zeno-project-preview.sh"
+  dotfiles-zeno-ghq-cd() {
+    emulate -L zsh
+    local dir preview="bash ${(q)_DOTFILES_ZENO_PREVIEW} {}"
+    local picker=${ZENO_FZF_COMMAND:-fzf}
+    local -a picker_options
+    if [[ $picker == fzf-tmux ]]; then
+      if [[ -n $TMUX ]] && (( $+commands[fzf-tmux] )); then
+        picker_options=(${(z)ZENO_FZF_TMUX_OPTIONS})
+      else
+        picker=fzf
+      fi
+    fi
+    dir=$(ghq list --full-path | "$picker" "${picker_options[@]}" --ansi --no-multi \
+      --prompt='Project >' --preview="$preview" \
+      --bind='ctrl-d:preview-page-down,ctrl-u:preview-page-up')
+    if [[ -z $dir ]]; then
+      zle reset-prompt
+      return 1
+    fi
+    BUFFER="cd ${(q)dir}"
+    zle reset-prompt
+    zle accept-line
+    if (( $+widgets[zeno-ghq-cd-post-hook] )); then
+      ZENO_GHQ_CD_DIR="$dir" zle zeno-ghq-cd-post-hook
+    fi
+  }
+  zle -N dotfiles-zeno-ghq-cd
+  bindkey '^g' dotfiles-zeno-ghq-cd
   # Ctrl+Shift+G: ghqでcdしてcursorで開く（fzf使用）
   ghq-cd-cursor() {
     local selected_dir

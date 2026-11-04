@@ -10,6 +10,8 @@ brew "act"
 brew "awscli"
 # Bourne-Again SHell, a UNIX command interpreter
 brew "bash"
+# Syntax-highlighted file previews for Zeno
+brew "bat"
 # Dotfile deployment, templates and machine-specific configuration
 brew "chezmoi"
 # Get/set bluetooth power and discoverable state
