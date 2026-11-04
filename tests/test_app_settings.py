@@ -19,7 +19,7 @@ class AppSettingsTests(unittest.TestCase):
                 (apps / (app + '.app')).mkdir()
             scripts = root / 'scripts'
             scripts.mkdir()
-            shutil.copy(ROOT / '.bin/macos/apps.sh', scripts / 'apps.sh')
+            shutil.copy(ROOT / 'scripts/macos/apps.sh', scripts / 'apps.sh')
             (scripts / 'rectangle.sh').write_text('echo rectangle-failed\nexit 7\n')
             (scripts / 'iterm2.py').write_text('print("iterm-ran")\n')
             (scripts / 'nani.py').write_text('raise Exception("must skip")\n')
@@ -59,7 +59,7 @@ sys.stdout.buffer.write(plistlib.dumps({a:dict(keyCode=k,modifierFlags=f) for a,
             uname.chmod(0o755)
             env = {**os.environ, 'HOME': str(root), 'PATH': str(binaries) + ':' + os.environ['PATH']}
             for mode in [[], [], ['--check']]:
-                result = subprocess.run(['bash', str(ROOT / '.bin/macos/rectangle.sh'), *mode],
+                result = subprocess.run(['bash', str(ROOT / 'scripts/macos/rectangle.sh'), *mode],
                                         env=env, text=True, capture_output=True)
                 self.assertEqual(result.returncode, 0, result.stderr)
                 self.assertIn('already match', result.stdout)

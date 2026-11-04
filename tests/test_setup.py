@@ -26,22 +26,22 @@ class ProbeTests(unittest.TestCase):
 
 class SetupTests(unittest.TestCase):
     def test_brewfile_does_not_install_unavailable_fig(self):
-        brewfile = (ROOT / '.bin/macos/.Brewfile').read_text()
+        brewfile = (ROOT / 'scripts/macos/.Brewfile').read_text()
         self.assertNotIn('cask "fig"', brewfile)
 
     def test_brewfile_does_not_tap_retired_builtin_bundle(self):
-        brewfile = (ROOT / '.bin/macos/.Brewfile').read_text()
+        brewfile = (ROOT / 'scripts/macos/.Brewfile').read_text()
         self.assertNotIn('tap "homebrew/bundle"', brewfile)
 
     def test_brewfile_leaves_language_management_to_mise(self):
-        brewfile = (ROOT / '.bin/macos/.Brewfile').read_text()
+        brewfile = (ROOT / 'scripts/macos/.Brewfile').read_text()
         self.assertNotIn('brew "corepack"', brewfile)
         self.assertNotIn('brew "yarn"', brewfile)
         self.assertNotIn('npm "corepack"', brewfile)
 
     def test_core_profile_contains_interactive_shell_dependencies(self):
         result = subprocess.run(['ruby', '-e', 'def brew(name, options = {}); puts name; end; load ARGV[0]',
-                                 str(ROOT / '.bin/macos/.Brewfile.core')],
+                                 str(ROOT / 'scripts/macos/.Brewfile.core')],
                                 text=True, capture_output=True, check=True)
         self.assertEqual(set(result.stdout.splitlines()),
                          {'chezmoi', 'fzf', 'ghq', 'mise', 'ranger', 'starship', 'zinit'})
@@ -49,8 +49,8 @@ class SetupTests(unittest.TestCase):
     def test_core_profile_inherits_options_and_rejects_missing_packages(self):
         with tempfile.TemporaryDirectory() as tmp:
             directory = Path(tmp)
-            shutil.copy(ROOT / '.bin/macos/.Brewfile.core', directory / '.Brewfile.core')
-            source = (ROOT / '.bin/macos/.Brewfile').read_text().replace('brew "fzf"', 'brew "fzf", link: false')
+            shutil.copy(ROOT / 'scripts/macos/.Brewfile.core', directory / '.Brewfile.core')
+            source = (ROOT / 'scripts/macos/.Brewfile').read_text().replace('brew "fzf"', 'brew "fzf", link: false')
             (directory / '.Brewfile').write_text(source)
             command = ['ruby', '-rjson', '-e', 'def brew(name, options = {}); puts JSON.generate(options) if name == "fzf"; end; load ARGV[0]',
                        str(directory / '.Brewfile.core')]
@@ -67,21 +67,21 @@ class SetupTests(unittest.TestCase):
         self.assertIn('node = "25.2.1"', config)
         self.assertIn('python = "3.14.2"', config)
         self.assertIn('deno = "2.9.7"', config)
-        self.assertNotIn('deno', (ROOT / '.bin/linux/.yay-packages.txt').read_text().splitlines())
+        self.assertNotIn('deno', (ROOT / 'scripts/linux/.yay-packages.txt').read_text().splitlines())
 
     def test_zeno_bindings_work_before_lazy_initialization(self):
         result = subprocess.run(['zsh', '-f', '-c',
                                  'unset ZENO_LOADED; ZENO_BOOTSTRAPPED=1; source "$1"; bindkey "^g"; bindkey "^i"',
-                                 'test', str(ROOT / '.bin/common/zeno.zsh')],
+                                 'test', str(ROOT / 'scripts/common/zeno.zsh')],
                                 text=True, capture_output=True, check=True)
         self.assertIn('zeno-ghq-cd', result.stdout)
         self.assertIn('zeno-completion', result.stdout)
 
     def test_shell_syntax(self):
         scripts = [("bash", ROOT / "setup-zsh.sh")]
-        scripts += [("bash", p) for p in (ROOT / ".bin").rglob("*.sh")]
-        scripts += [("zsh", p) for p in (ROOT / ".bin").rglob("*.zsh")]
-        scripts.append(("zsh", ROOT / ".bin/common/.zshrc"))
+        scripts += [("bash", p) for p in (ROOT / "scripts").rglob("*.sh")]
+        scripts += [("zsh", p) for p in (ROOT / "scripts").rglob("*.zsh")]
+        scripts.append(("zsh", ROOT / "scripts/common/.zshrc"))
         scripts += [("bash", p) for p in (ROOT / "tests/macos").glob("*.sh")]
         scripts += [("bash", p) for p in (ROOT / "tests").glob("*.sh")]
         scripts += [("zsh", p) for p in (ROOT / "tests/macos").glob("*.zsh")]
@@ -100,7 +100,7 @@ class SetupTests(unittest.TestCase):
             env = dict(os.environ, HOME=tmp, XDG_CONFIG_HOME=tmp + '/.config',
                        XDG_DATA_HOME=tmp + '/.local/share', XDG_CACHE_HOME=tmp + '/.cache')
             for _ in range(2):
-                subprocess.run(['bash', str(ROOT / '.bin/link.sh')], env=env,
+                subprocess.run(['bash', str(ROOT / 'scripts/link.sh')], env=env,
                                check=True, capture_output=True)
             self.assertEqual((home / '.zshrc.backup').read_text(), 'original shell')
             self.assertEqual((config / 'config.yml.backup').read_text(), 'original config')
@@ -116,7 +116,7 @@ class SetupTests(unittest.TestCase):
             home.mkdir()
             legacy = home / '.tool-versions'
             legacy.symlink_to(ROOT / '.tool-versions')
-            subprocess.run(['bash', str(ROOT / '.bin/link.sh')],
+            subprocess.run(['bash', str(ROOT / 'scripts/link.sh')],
                            env=dict(os.environ, HOME=str(home), XDG_CONFIG_HOME=str(home / '.config'),
                                     XDG_DATA_HOME=str(home / '.local/share'), XDG_CACHE_HOME=str(home / '.cache')), check=True, capture_output=True)
             self.assertFalse(legacy.exists())
@@ -124,7 +124,7 @@ class SetupTests(unittest.TestCase):
 
             local = home / '.tool-versions'
             local.write_text('node 20.0.0\n')
-            subprocess.run(['bash', str(ROOT / '.bin/link.sh')],
+            subprocess.run(['bash', str(ROOT / 'scripts/link.sh')],
                            env=dict(os.environ, HOME=str(home), XDG_CONFIG_HOME=str(home / '.config'),
                                     XDG_DATA_HOME=str(home / '.local/share'), XDG_CACHE_HOME=str(home / '.cache')), check=True, capture_output=True)
             self.assertEqual(local.read_text(), 'node 20.0.0\n')
@@ -138,7 +138,7 @@ class SetupTests(unittest.TestCase):
             (original / 'config.yml').write_text('keep')
             (home / '.config').mkdir()
             (home / '.config/zeno').symlink_to(original)
-            subprocess.run(['bash', str(ROOT / '.bin/link.sh')],
+            subprocess.run(['bash', str(ROOT / 'scripts/link.sh')],
                            env=dict(os.environ, HOME=str(home), XDG_CONFIG_HOME=str(home / '.config'),
                                     XDG_DATA_HOME=str(home / '.local/share'), XDG_CACHE_HOME=str(home / '.cache')), check=True, capture_output=True)
             self.assertEqual((original / 'config.yml').read_text(), 'keep')
@@ -151,7 +151,7 @@ class SetupTests(unittest.TestCase):
                 path = Path(tmp) / name
                 path.write_text('#!/bin/sh\n' + body + '\n')
                 path.chmod(0o755)
-            result = subprocess.run(['bash', str(ROOT / '.bin/macos/init.sh')],
+            result = subprocess.run(['bash', str(ROOT / 'scripts/macos/init.sh')],
                                     env=dict(os.environ, PATH=tmp + ':/usr/bin:/bin'),
                                     text=True, capture_output=True)
             self.assertEqual(result.returncode, 0, result.stderr)
@@ -181,7 +181,7 @@ class SetupTests(unittest.TestCase):
             git('init', '-b', 'main', str(repo))
             git('-C', str(repo), 'config', 'user.name', 'Test')
             git('-C', str(repo), 'config', 'user.email', 'test@example.invalid')
-            brewfile = repo / '.bin/macos/.Brewfile'
+            brewfile = repo / 'scripts/macos/.Brewfile'
             brewfile.parent.mkdir(parents=True)
             brewfile.write_text('old\n')
             (repo / 'unrelated').write_text('original')
@@ -192,14 +192,14 @@ class SetupTests(unittest.TestCase):
             (repo / 'unrelated').write_text('work in progress')
             git('-C', str(repo), 'add', 'unrelated')
             script = ('source "$1"; _DOTFILES_DIR="$2"; '
-                      'BREWFILE_PATH="$2/.bin/macos/.Brewfile"; brew install example')
+                      'BREWFILE_PATH="$2/scripts/macos/.Brewfile"; brew install example')
             result = subprocess.run(['zsh', '-f', '-c', script, 'test',
-                                     str(ROOT / '.bin/macos/brew.zsh'), str(repo)],
+                                     str(ROOT / 'scripts/macos/brew.zsh'), str(repo)],
                                     env=env, text=True, capture_output=True)
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertEqual(git('-C', str(repo), 'diff', '--cached', '--name-only'), 'unrelated')
             self.assertEqual(git('-C', str(repo), 'show', '--pretty=', '--name-only', 'HEAD'),
-                             '.bin/macos/.Brewfile')
+                             'scripts/macos/.Brewfile')
             self.assertEqual(git('-C', str(repo), 'rev-parse', 'HEAD'),
                              git('--git-dir=' + str(remote), 'rev-parse', 'refs/heads/main'))
 
@@ -211,9 +211,9 @@ class SetupTests(unittest.TestCase):
                 path.write_text('#!/bin/sh\n' + body + '\n')
                 path.chmod(0o755)
             env = dict(os.environ, HOME=tmp, PATH=tmp + ':' + os.environ['PATH'])
-            result = subprocess.run(['bash', str(ROOT / '.bin/macos/brew.sh')],
+            result = subprocess.run(['bash', str(ROOT / 'scripts/macos/brew.sh')],
                                     env=env, text=True, capture_output=True, check=True)
-            self.assertIn('--file=' + str(ROOT / '.bin/macos/.Brewfile'), result.stdout)
+            self.assertIn('--file=' + str(ROOT / 'scripts/macos/.Brewfile'), result.stdout)
 
     def test_brew_bundle_accepts_core_profile(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -223,10 +223,10 @@ class SetupTests(unittest.TestCase):
                 path.write_text('#!/bin/sh\n' + body + '\n')
                 path.chmod(0o755)
             env = dict(os.environ, HOME=tmp, PATH=tmp + ':' + os.environ['PATH'])
-            result = subprocess.run(['bash', str(ROOT / '.bin/macos/brew.sh'),
+            result = subprocess.run(['bash', str(ROOT / 'scripts/macos/brew.sh'),
                                      '--profile', 'core', 'check'], env=env,
                                     text=True, capture_output=True, check=True)
-            self.assertIn('--file=' + str(ROOT / '.bin/macos/.Brewfile.core'), result.stdout)
+            self.assertIn('--file=' + str(ROOT / 'scripts/macos/.Brewfile.core'), result.stdout)
             self.assertIn('check', result.stdout)
 
 

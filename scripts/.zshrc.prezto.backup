@@ -19,7 +19,7 @@ source /opt/homebrew/opt/zsh-abbr/share/zsh-abbr/zsh-abbr.zsh
 
 ## zeno.sh
 # zeno.zsh の読み込み
-source /Users/kenichi.morihara/ghq/github.com/kenichi-morihara/dotfiles/.bin/zeno.zsh/zeno.zsh
+source /Users/kenichi.morihara/ghq/github.com/kenichi-morihara/dotfiles/scripts/zeno.zsh/zeno.zsh
 # エラーが発生しても ZENO_LOADED を設定（zeno の基本機能は動作する）
 if [[ -z $ZENO_LOADED ]] && command -v deno >/dev/null 2>&1; then
   export ZENO_LOADED=1

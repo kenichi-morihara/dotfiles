@@ -16,7 +16,7 @@ home/
     hypr/, omarchy/         # Linuxのみ
     windows/                # Windowsのみ
   dot_cursor/rules/         # ~/.cursor/rules/ に配布
-.bin/
+scripts/
   common/                   # Zshモジュール、共通セットアップ
   macos/                    # Homebrew、macOS初期化
   linux/                    # Arch Linuxパッケージ導入
@@ -63,7 +63,7 @@ macOS付属のmakeでも実行できます。
 `apply` はファイルの競合時に停止します。アプリ設定は未インストールならスキップし、
 適用失敗があれば残りのアプリも処理して最後にエラーを返します。
 `check` はアプリ設定も含みますが、パッケージやmacOSシステム設定は含みません。
-システム設定の確認は `.bin/macos/defaults.sh check` で行えます。
+システム設定の確認は `scripts/macos/defaults.sh check` で行えます。
 `apply-system`・ランタイム導入・ログインシェル変更は `setup` / `apply` とは別に実行します。
 
 ### 1. リポジトリのクローン
@@ -77,10 +77,10 @@ cd "$(ghq root)/github.com/kenichi-morihara/dotfiles"
 ### macOS: 設定配布前の準備
 
 新規Macでは、先にCommand Line ToolsとHomebrew、シェルの依存ツールを導入します。
-会社指定のアプリと重複しないよう `.bin/macos/.Brewfile` を確認してください。
+会社指定のアプリと重複しないよう `scripts/macos/.Brewfile` を確認してください。
 
 ```bash
-.bin/macos/init.sh
+scripts/macos/init.sh
 # Command Line Toolsのインストールが開始された場合は、完了後に再実行
 
 # HomebrewのPATHを現在のシェルに反映
@@ -91,17 +91,17 @@ else
 fi
 
 # Homebrewインストーラーの案内に従い、shellenvを ~/.zprofile にも設定
-.bin/macos/brew.sh --profile core
+scripts/macos/brew.sh --profile core
 # 個人MacなどでGUIアプリや追加の開発ツールも入れる場合
-# .bin/macos/brew.sh --profile full
+# scripts/macos/brew.sh --profile full
 ```
 
-`.bin/macos/brew.sh` の既定は全構成です。`core` は対話シェルとランタイムの
+`scripts/macos/brew.sh` の既定は全構成です。`core` は対話シェルとランタイムの
 起動に使うCLI一式、`full` はGUIアプリ・エディタ拡張・追加開発ツールを含む
 従来の全構成です。各プロファイルの不足確認は
-`.bin/macos/brew.sh --profile core check` / `.bin/macos/brew.sh check` で行えます。
+`scripts/macos/brew.sh --profile core check` / `scripts/macos/brew.sh check` で行えます。
 その他の引数も `brew bundle` に渡します。
-パッケージの宣言・オプションは `.bin/macos/.Brewfile` が正です。
+パッケージの宣言・オプションは `scripts/macos/.Brewfile` が正です。
 `.Brewfile.core` は分類だけを持ち、全構成から該当する宣言を読み込みます。
 `brew bundle dump` による全構成の自動更新後も、この分類を維持します。
 
@@ -110,7 +110,7 @@ fi
 macOSではcoreプロファイルにchezmoiが含まれます。先に個別導入する場合は
 `command brew install chezmoi`、Arch Linuxでは `sudo pacman -S chezmoi` を使います。
 初回移行の退避処理にはPython 3も必要です（macOSのCommand Line Tools導入後に利用可能）。
-旧link.sh方式を利用中の場合は `.bin/link.sh` を実行してください。先に設定を安全に移行し、
+旧link.sh方式を利用中の場合は `scripts/link.sh` を実行してください。先に設定を安全に移行し、
 chezmoiの登録を行うので、既存の `~/.config` が外部へのリンクでもそこへ設定を書き込みません。
 新規HOMEでは次の手順を使えます。
 
@@ -132,7 +132,7 @@ Windowsへ移行する場合は既存設定を別途バックアップしてか�
 `chezmoi apply --dry-run --verbose` で書き込みせず確認できます。
 通常の再適用ではローカル編集との競合をchezmoiが検出します。自動検証では
 `chezmoi apply --error-on-conflict` を使うと上書きせずエラーになります。
-旧手順の `.bin/link.sh` も、同じcheckoutを指定してchezmoiを初期化・適用する薄い入口として残しています。
+旧手順の `scripts/link.sh` も、同じcheckoutを指定してchezmoiを初期化・適用する薄い入口として残しています。
 
 ### 設定の編集と更新
 
@@ -145,7 +145,7 @@ chezmoi re-add ~/.config/zeno/config.yml
 ```
 
 ソースを直接編集する場合は `home/dot_config/` 内を編集し、`chezmoi apply` します。
-`.bin/common/` のシェルモジュールは `.zshrc` のテンプレートからcheckout内のファイルを読み込みます。
+`scripts/common/` のシェルモジュールは `.zshrc` のテンプレートからcheckout内のファイルを読み込みます。
 checkoutを移動した場合は、新しい場所で `chezmoi init --source "$PWD"` と `chezmoi apply` を実行します。
 秘密情報・端末固有のシェル設定は、従来どおり管理対象外の `~/.zshrc.local` に置けます。
 
@@ -247,8 +247,8 @@ zenoはbootstrapを明示的に読み込み、初回のウィジェット利用�
 Cursor本体とterminal agentを冪等に確認し、必要なら認証します。
 
 ```bash
-.bin/common/setup-cursor-agent.sh
-.bin/common/setup-cursor-agent.sh --login
+scripts/common/setup-cursor-agent.sh
+scripts/common/setup-cursor-agent.sh --login
 ```
 
 認証後は任意のrepositoryで次のように利用できます。
@@ -264,7 +264,7 @@ cursor agent --workspace "$PWD" -p --trust "Run the project checks and report fa
 
 ### macOS
 
-macOS固有の設定は `.bin/macos/` と `home/dot_config/karabiner/` に配置されています：
+macOS固有の設定は `scripts/macos/` と `home/dot_config/karabiner/` に配置されています：
 
 - **brew.zsh**: Homebrewの自動Brewfile更新機能。`install` / `uninstall` / `tap` / `untap` 成功後、master/main では Brewfile のみをコミットし、upstream を fetch・merge して push します。Brewfile に差分がなくても未送信コミットを再送します。衝突時はマージを中止し、追跡ファイルに未コミット変更がある場合は自動マージをスキップします。Git のエラーは端末に表示します。
 - **notify.zsh**: macOSの通知機能
@@ -298,10 +298,10 @@ Karabiner-Elementsのアクセシビリティ／入力監視など、求めら�
 アプリ本体はBrewfileのfullプロファイルに含まれます。
 新規端末ではNaniを起動・ログインし、設定画面で選択テキスト翻訳のショートカットを
 一度設定してから `make apply-apps` を実行してください。
-アプリ設定の入口は `.bin/macos/apps.sh` に集約し、`make apply` からも実行します。
+アプリ設定の入口は `scripts/macos/apps.sh` に集約し、`make apply` からも実行します。
 アプリの追加時はこの入口へ処理を追加し、アプリ名のMakeターゲットは増やしません。
 
-設定の宣言は `.bin/macos/nani.json` です。現在の選択テキスト翻訳は
+設定の宣言は `scripts/macos/nani.json` です。現在の選択テキスト翻訳は
 `Command + Shift + J`、テーマはシステム追従、送信はEnterです。
 このショートカットはブラウザのダウンロード表示などと衝突する場合があります。
 変更する場合はJSONの `translate-select` を編集してください（Commandは `Meta`）。
@@ -313,7 +313,7 @@ Nani 1.1.8で確認したSQLiteの `localkv` 内の設定項目だけを更新�
 
 #### iTerm2
 
-`.bin/macos/iterm2.json` に通常用の `Dracula` と `Hotkey Window` のフォント、
+`scripts/macos/iterm2.json` に通常用の `Dracula` と `Hotkey Window` のフォント、
 ホットキーウィンドウの動作を宣言しています。`make apply` / `make apply-apps` で反映します。
 
 - フォント：`HackGen35ConsoleNFJ-Regular`、12pt（両プロファイル）
@@ -328,11 +328,11 @@ Nani 1.1.8で確認したSQLiteの `localkv` 内の設定項目だけを更新�
 配色は既存のデフォルトプロファイルから継承します（Draculaテーマの配布は含みません）。
 変更前の設定は `~/Library/Application Support/iTerm2/dotfiles-backups/` に保存します。
 iTerm2独自の外部設定フォルダーを利用中の場合は、二重管理を避けるため停止します。
-- **defaults.sh**: システム設定（ライブ変換オフ、Dockを自動的に隠す、バッテリー残量を%表示、iTerm2の既定プロファイル）
+- **defaults.sh**: システム設定（キーリピート速め：KeyRepeat=2・InitialKeyRepeat=15、ライブ変換オフ、Dockを自動的に隠す・固定アプリを空にする、バッテリー残量を%表示、iTerm2の既定プロファイル）
 
 ```bash
-.bin/macos/defaults.sh          # 適用（Dock・コントロールセンター・日本語入力を再起動）
-.bin/macos/defaults.sh check    # 現在の値を確認（変更しない）
+scripts/macos/defaults.sh          # 適用（Dock・コントロールセンター・日本語入力を再起動）
+scripts/macos/defaults.sh check    # 現在の値を確認（変更しない）
 ```
 
 設定を追加する場合は `defaults.sh` の `SETTINGS` に1行追加します。
@@ -341,8 +341,8 @@ iTerm2独自の外部設定フォルダーを利用中の場合は、二重管�
   `settings-store.json` は他の設定をDocker Desktopが管理するため、chezmoiでは配布せず `jq` で `memoryMiB` だけを書き換えます（初回のみ `.bak` を作成）。
 
 ```bash
-.bin/macos/docker.sh          # 適用（反映にはDocker Desktopの再起動が必要）
-.bin/macos/docker.sh check    # 現在の値を確認（変更しない）
+scripts/macos/docker.sh          # 適用（反映にはDocker Desktopの再起動が必要）
+scripts/macos/docker.sh check    # 現在の値を確認（変更しない）
 ```
 
 - **iTerm2**: `home/private_Library/private_Application Support/iTerm2/DynamicProfiles/dotfiles.json` を
@@ -353,7 +353,7 @@ iTerm2独自の外部設定フォルダーを利用中の場合は、二重管�
 
 ### Linux
 
-Linux固有の設定は `.bin/linux/` と `home/dot_config/hypr/`・`home/dot_config/omarchy/` に配置されています：
+Linux固有の設定は `scripts/linux/` と `home/dot_config/hypr/`・`home/dot_config/omarchy/` に配置されています：
 
 - **yay.sh**: Arch Linuxのyayパッケージマネージャー用スクリプト
 - **hypr/hypridle.conf**: Omarchy の idle（スクリーンセーバー／自動ロック）を無効化
@@ -361,14 +361,14 @@ Linux固有の設定は `.bin/linux/` と `home/dot_config/hypr/`・`home/dot_co
 
 ### Windows
 
-Windows固有の設定は `.bin/windows/` と `home/dot_config/windows/` に配置されています。
+Windows固有の設定は `scripts/windows/` と `home/dot_config/windows/` に配置されています。
 
 - **gamedvr.dsc.yaml**: Xbox Game Bar / Game DVR を無効化（ゲーム起動時の `ms-gamingoverlay` ダイアログ対策）
 - **desired-state.json**: NVIDIA ゲーム内オーバーレイ無効化、Armoury Crate 常駐の停止
 - **configure.ps1**: 上記をこのマシンへ適用する
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .bin/windows/configure.ps1
+powershell -ExecutionPolicy Bypass -File scripts/windows/configure.ps1
 ```
 
 HKCU のユーザー設定（Game DVR / NVIDIA Overlay）は管理者なしで入ります。Armoury Crate のサービス・タスク無効化と `AllowGameDVR` は管理者で再実行すると入ります。
@@ -388,8 +388,8 @@ Armoury Crate を止めると、ASUS の RGB / ファン制御 UI と ROG マウ
 1. アプリの共通設定は `home/dot_config/` に追加し、`chezmoi diff` / `chezmoi apply` で配布します。
 2. OS固有のアプリ設定は、対象ディレクトリを `home/.chezmoiignore` のOS条件に追加します。
 3. 実行権限が必要なファイルは、ソース名に `executable_` を付けます。
-4. シェル処理は `.bin/common/`、OS固有処理は `.bin/macos/`・`.bin/linux/` に置き、共通Zshから読み込みます。
-5. Windowsのシステム設定は `home/dot_config/windows/` と `.bin/windows/configure.ps1` を更新します。
+4. シェル処理は `scripts/common/`、OS固有処理は `scripts/macos/`・`scripts/linux/` に置き、共通Zshから読み込みます。
+5. Windowsのシステム設定は `home/dot_config/windows/` と `scripts/windows/configure.ps1` を更新します。
 
 アプリ設定の変更は `chezmoi apply`、キー割り当て・端末固有シェル設定の変更はCtrl+Rで
 反映します。プラグインとstarship・miseの初期化設定の変更は、新しいシェルで確認します。
@@ -408,7 +408,7 @@ Armoury Crate を止めると、ASUS の RGB / ファン制御 UI と ROG マウ
 ### zinitが読み込めない
 
 1. zinitがインストールされているか確認
-2. `.bin/common/zinit.zsh` のパス設定が正しいか確認
+2. `scripts/common/zinit.zsh` のパス設定が正しいか確認
 3. OS別のパスが適切に設定されているか確認
 
 ## テスト
@@ -465,15 +465,15 @@ MIT
 
 ### 入力ソース（Google 日本語入力）
 
-`.bin/macos/input-sources.json` にABCとひらがな（Google）、選択中の入力ソースを宣言しています。
+`scripts/macos/input-sources.json` にABCとひらがな（Google）、選択中の入力ソースを宣言しています。
 `make apply-apps` / `make apply` でCarbonの入力ソースAPIから適用します。
 宣言以外のキーボード入力ソースは無効化し、文字ビューアなどは維持します。
 
 ```bash
 brew install --cask google-japanese-ime
 # 初回インストール後はログアウト・再ログインしてから実行
-swift .bin/macos/input-sources.swift .bin/macos/input-sources.json
-swift .bin/macos/input-sources.swift .bin/macos/input-sources.json --check
+swift scripts/macos/input-sources.swift scripts/macos/input-sources.json
+swift scripts/macos/input-sources.swift scripts/macos/input-sources.json --check
 ```
 
 ログイン中のMacのターミナルで実行してください。Google IMEのローマ字入力・かな入力の
@@ -533,7 +533,7 @@ SSHなど指紋認証を使えない環境では、パスワード認証にな�
 最後に失敗した項目を表示して終了コード1を返します。
 
 ```bash
-bash .bin/macos/apps.sh --check  # 書き込みなしで一致・差分・スキップを確認
+bash scripts/macos/apps.sh --check  # 書き込みなしで一致・差分・スキップを確認
 ```
 
 iTerm2の設定が異なり、iTerm2が起動中の場合は自動終了せず失敗として報告します。

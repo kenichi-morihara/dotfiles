@@ -1,15 +1,15 @@
 # --- brew install/uninstall後に自動でBrewfileを更新 ---
-# dotfilesディレクトリの.bin/macosディレクトリのパスを取得
+# dotfilesディレクトリのscripts/macosディレクトリのパスを取得
 # .zshrcがシンボリックリンクの場合、実パスを取得
 if [[ -n "${(%):-%x}" ]]; then
   _DOTFILES_MACOS_DIR="${${(%):-%x}:A:h}"
-  _DOTFILES_BIN_DIR="${_DOTFILES_MACOS_DIR:h}"
-  _DOTFILES_DIR="${_DOTFILES_BIN_DIR:h}"
+  _DOTFILES_SCRIPTS_DIR="${_DOTFILES_MACOS_DIR:h}"
+  _DOTFILES_DIR="${_DOTFILES_SCRIPTS_DIR:h}"
   BREWFILE_PATH="$_DOTFILES_MACOS_DIR/.Brewfile"
 else
   # フォールバック: 環境変数や固定パスを使用
   _DOTFILES_DIR="${DOTFILES_DIR:-$HOME/ghq/github.com/kenichi-morihara/dotfiles}"
-  BREWFILE_PATH="${_DOTFILES_DIR}/.bin/macos/.Brewfile"
+  BREWFILE_PATH="${_DOTFILES_DIR}/scripts/macos/.Brewfile"
 fi
 
 # 現在の upstream と同期する。作業中の変更や衝突を自動で上書きしない。
@@ -108,19 +108,19 @@ brew() {
           fi
 
           # git diffで変更があるか確認
-          if ! git diff --quiet -- ".bin/macos/.Brewfile" 2>/dev/null; then
+          if ! git diff --quiet -- "scripts/macos/.Brewfile" 2>/dev/null; then
             # カラフルなdiffを表示
             echo ""
             echo "📦 Brewfile updated! Changes:"
             echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-            git diff --color=always -- ".bin/macos/.Brewfile" || true
+            git diff --color=always -- "scripts/macos/.Brewfile" || true
             echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
             echo ""
             
             local current_branch=$(git branch --show-current)
             if [[ "$current_branch" == "master" || "$current_branch" == "main" ]]; then
               # 他の作業中の変更を自動コミットに含めない。
-              if git commit --only -m "chore: update Brewfile [auto-commit]" -- .bin/macos/.Brewfile; then
+              if git commit --only -m "chore: update Brewfile [auto-commit]" -- scripts/macos/.Brewfile; then
                 echo "✅ Committed to $current_branch"
               else
                 echo "⚠️  Failed to commit Brewfile"

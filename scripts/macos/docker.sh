@@ -1,7 +1,7 @@
 #!/bin/bash
 # Docker Desktopのリソース設定を適用する。何度実行しても同じ状態になる。
-#   .bin/macos/docker.sh          memoryMiBだけをsettings-store.jsonにマージ（初回のみ.bakを作成）
-#   .bin/macos/docker.sh check    現在の値と期待値を比較（変更しない）
+#   scripts/macos/docker.sh          memoryMiBだけをsettings-store.jsonにマージ（初回のみ.bakを作成）
+#   scripts/macos/docker.sh check    現在の値と期待値を比較（変更しない）
 # 他のキーはDocker Desktopが管理するため、ファイル全体は配布せずjqで差分だけ書き換える。
 # Docker Desktopは起動中に書き換えても反映されないので、適用後に再起動する。
 set -euo pipefail

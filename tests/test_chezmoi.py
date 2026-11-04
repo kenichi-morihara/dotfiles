@@ -97,7 +97,7 @@ class ChezmoiTests(unittest.TestCase):
         external.mkdir()
         (external / 'private.txt').write_text('unmanaged\n')
         (self.home / '.config').symlink_to(external)
-        subprocess.run(['bash', str(ROOT / '.bin/link.sh')], env=self.env,
+        subprocess.run(['bash', str(ROOT / 'scripts/link.sh')], env=self.env,
                        check=True, capture_output=True)
         self.assertEqual(sorted(p.name for p in external.iterdir()), ['private.txt'])
         self.assertTrue((self.home / '.config/chezmoi/chezmoi.toml').is_file())
@@ -121,7 +121,7 @@ class ChezmoiTests(unittest.TestCase):
         source = Path(self.temp.name) / 'checkout with $literal'
         shutil.copytree(ROOT / 'home', source / 'home')
         shutil.copy(ROOT / '.chezmoiroot', source / '.chezmoiroot')
-        module = source / '.bin/common/.zshrc'
+        module = source / 'scripts/common/.zshrc'
         module.parent.mkdir(parents=True)
         module.write_text('DOTFILES_SOURCED=1\n')
         subprocess.run(['chezmoi', '--source', str(source), '--destination', str(self.home), 'apply'],

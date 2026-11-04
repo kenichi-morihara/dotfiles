@@ -7,7 +7,7 @@ import tempfile
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
-spec = importlib.util.spec_from_file_location('nani_settings', ROOT / '.bin/macos/nani.py')
+spec = importlib.util.spec_from_file_location('nani_settings', ROOT / 'scripts/macos/nani.py')
 nani = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(nani)
 
@@ -26,7 +26,7 @@ class NaniTests(unittest.TestCase):
                     ('local-settings', json.dumps({'theme': 'dark', 'onboardedAt': 123})),
                     ('user-custom-shortcuts', json.dumps({'open-app': ['Meta', 'KeyN']})),
                 ])
-            config = nani.load_config(ROOT / '.bin/macos/nani.json')
+            config = nani.load_config(ROOT / 'scripts/macos/nani.json')
             self.assertTrue(nani.apply_settings(database, config, root / 'backups'))
             with sqlite3.connect(database) as connection:
                 rows = dict(connection.execute('SELECT key, value FROM localkv'))
@@ -46,7 +46,7 @@ class NaniTests(unittest.TestCase):
                 connection.execute('CREATE TABLE localkv (key TEXT PRIMARY KEY, value TEXT)')
                 connection.execute("INSERT INTO localkv VALUES ('local-settings', '{}')")
             with self.assertRaises(ValueError):
-                nani.apply_settings(database, nani.load_config(ROOT / '.bin/macos/nani.json'), root / 'backups')
+                nani.apply_settings(database, nani.load_config(ROOT / 'scripts/macos/nani.json'), root / 'backups')
             self.assertFalse((root / 'backups').exists())
             with sqlite3.connect(database) as connection:
                 self.assertEqual(connection.execute('SELECT value FROM localkv').fetchone()[0], '{}')

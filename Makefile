@@ -16,7 +16,7 @@ help: ## 操作一覧（既定）
 ##@ 普段使う操作
 setup: PROFILE = full
 setup: ## sudo認証→パッケージ導入→設定適用（macOS、既定full）
-	bash .bin/macos/setup.sh "$(PROFILE)"
+	bash scripts/macos/setup.sh "$(PROFILE)"
 
 apply: ## ファイル→アプリ設定を適用（パッケージ導入なし）
 	$(MAKE) apply-files
@@ -31,26 +31,26 @@ diff: ## 配布するファイルの差分
 
 ##@ 初回準備（macOS）
 macos-init: ## Command Line Tools・Homebrewを準備
-	bash .bin/macos/init.sh
+	bash scripts/macos/init.sh
 
 init: ## 初回移行・ファイル配布・chezmoi登録（既存設定を退避）
-	CHEZMOI_BIN="$$(command -v "$(CHEZMOI)")" bash .bin/link.sh
+	CHEZMOI_BIN="$$(command -v "$(CHEZMOI)")" bash scripts/link.sh
 
 sudo-touchid: ## sudoのTouch IDを有効化（初回は管理者認証）
-	bash .bin/macos/sudo-touchid.sh
+	bash scripts/macos/sudo-touchid.sh
 
 ##@ 個別に適用
 packages: ## パッケージ導入（PROFILE=core/full、既定core）
-	bash .bin/macos/brew.sh --profile "$(PROFILE)"
+	bash scripts/macos/brew.sh --profile "$(PROFILE)"
 
 apply-files: ## chezmoiのファイルだけを適用（競合時は停止）
 	$(CHEZMOI) --source "$(ROOT)" --destination "$(HOME)" apply --error-on-conflict
 
 apply-apps: ## インストール済みアプリの設定を適用（macOS）
-	@if [ "$$(uname -s)" = Darwin ]; then PYTHON="$(PYTHON)" bash .bin/macos/apps.sh; fi
+	@if [ "$$(uname -s)" = Darwin ]; then PYTHON="$(PYTHON)" bash scripts/macos/apps.sh; fi
 
 apply-system: ## Dock・日本語入力・電源などのシステム設定を適用（要sudo）
-	bash .bin/macos/defaults.sh
+	bash scripts/macos/defaults.sh
 
 runtimes: ## mise管理の言語ランタイムを導入
 	mise install
@@ -60,13 +60,13 @@ shell-setup: ## zshをログインシェルに設定
 
 ##@ 個別に確認
 packages-check: ## パッケージの不足確認（PROFILE=core/full、既定core）
-	bash .bin/macos/brew.sh --profile "$(PROFILE)" check
+	bash scripts/macos/brew.sh --profile "$(PROFILE)" check
 
 verify: ## chezmoiのファイルが宣言と一致するか確認
 	$(CHEZMOI) --source "$(ROOT)" --destination "$(HOME)" verify
 
 check-apps: ## インストール済みアプリの設定を確認（変更なし、macOS）
-	@if [ "$$(uname -s)" = Darwin ]; then PYTHON="$(PYTHON)" bash .bin/macos/apps.sh --check; fi
+	@if [ "$$(uname -s)" = Darwin ]; then PYTHON="$(PYTHON)" bash scripts/macos/apps.sh --check; fi
 
 status: ## chezmoiの配布先ファイルの変更状況
 	$(CHEZMOI) --source "$(ROOT)" --destination "$(HOME)" status

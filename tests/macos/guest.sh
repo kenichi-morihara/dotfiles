@@ -8,7 +8,7 @@ exec > >(tee "$OUTPUT/guest.log") 2>&1
 cd "$ROOT"
 sw_vers
 uname -m
-shasum -a 256 .bin/macos/.Brewfile > "$OUTPUT/brewfile.sha256"
+shasum -a 256 scripts/macos/.Brewfile > "$OUTPUT/brewfile.sha256"
 # Tart expands the backing disk; APFS needs to consume its new free space too.
 container=$(diskutil info -plist / | plutil -extract APFSContainerReference raw -)
 if ! sudo -n diskutil apfs resizeContainer "$container" 0 > "$OUTPUT/disk-resize.log" 2>&1; then
@@ -20,7 +20,7 @@ if ! sudo -n diskutil apfs resizeContainer "$container" 0 > "$OUTPUT/disk-resize
 fi
 df -h / > "$OUTPUT/disk-space.txt"
 export NONINTERACTIVE=1
-if ! bash .bin/macos/init.sh; then
+if ! bash scripts/macos/init.sh; then
     echo 'Bootstrap failed; complete Command Line Tools setup before retrying.'
     exit 1
 fi
@@ -48,9 +48,9 @@ fi
 # Record all phase statuses; shell validation still runs after a bundle failure.
 # Use the same default mode as brew.sh. Homebrew 7.0.x verbose mode skips
 # its npm-specific Node PATH setup.
-command brew bundle --file="$ROOT/.bin/macos/.Brewfile" > "$OUTPUT/bundle.log" 2>&1
+command brew bundle --file="$ROOT/scripts/macos/.Brewfile" > "$OUTPUT/bundle.log" 2>&1
 bundle_status=$?
-command brew bundle check --file="$ROOT/.bin/macos/.Brewfile" > "$OUTPUT/bundle-check.log" 2>&1
+command brew bundle check --file="$ROOT/scripts/macos/.Brewfile" > "$OUTPUT/bundle-check.log" 2>&1
 check_status=$?
 python3 tests/macos/shell-smoke.py --output "$ROOT/.validation/shell"
 shell_status=$?

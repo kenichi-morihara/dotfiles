@@ -31,7 +31,9 @@ def merge_preferences(current, config):
             profile = copy.deepcopy(base)
             # A normal profile must not inherit the default profile's hotkey.
             for key in list(profile):
-                if key.startswith('HotKey ') or key in ('Has Hotkey', 'Keyboard Map'):
+                if key.startswith('HotKey ') or key in (
+                        'Has Hotkey', 'Keyboard Map', 'Is Dynamic Profile',
+                        'Dynamic Profile Filename', 'Dynamic Profile Parent Name'):
                     del profile[key]
             profile['Guid'] = str(uuid.uuid5(uuid.NAMESPACE_URL,
                                            'dotfiles:iterm2:' + declared['Name'])).upper()

@@ -1,5 +1,5 @@
 {
-  "description": "Windows desired state beyond Game DVR. Applied by .bin/windows/configure.ps1.",
+  "description": "Windows desired state beyond Game DVR. Applied by scripts/windows/configure.ps1.",
   "registryBinary": [
     {
       "keyPath": "HKCU\\SOFTWARE\\NVIDIA Corporation\\Global\\ShadowPlay\\NVSPCAPS",

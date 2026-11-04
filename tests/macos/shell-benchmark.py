@@ -155,7 +155,7 @@ env = {'HOME': str(home), 'ZDOTDIR': str(home), 'USER': os.environ.get('USER', '
        'XDG_CONFIG_HOME': str(home / '.config'), 'XDG_CACHE_HOME': str(home / '.cache'),
        'XDG_DATA_HOME': str(home / '.local/share')}
 with (out / 'links.log').open('w') as log:
-    subprocess.run(['/bin/bash', str(ROOT / '.bin/link.sh')], env=env, check=True,
+    subprocess.run(['/bin/bash', str(ROOT / 'scripts/link.sh')], env=env, check=True,
                    stdout=log, stderr=subprocess.STDOUT)
 (home / '.zprofile').write_text('if [[ -x /opt/homebrew/bin/brew ]]; then\n'
                                '  eval "$(/opt/homebrew/bin/brew shellenv)"\n'

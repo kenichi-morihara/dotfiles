@@ -18,12 +18,12 @@ class LinkBackupTests(unittest.TestCase):
             (home / '.zshrc.backup').write_text('first backup')
             (home / '.zshrc.backup.1').symlink_to(home / 'missing-backup')
             for _ in range(2):
-                subprocess.run(['bash', str(ROOT / '.bin/link.sh')],
+                subprocess.run(['bash', str(ROOT / 'scripts/link.sh')],
                                env=dict(os.environ, HOME=tmp, XDG_CONFIG_HOME=tmp + '/.config',
                                         XDG_DATA_HOME=tmp + '/.local/share', XDG_CACHE_HOME=tmp + '/.cache'),
                                check=True, capture_output=True)
             self.assertFalse((home / '.zshrc').is_symlink())
-            self.assertIn(str(ROOT / '.bin/common/.zshrc'), (home / '.zshrc').read_text())
+            self.assertIn(str(ROOT / 'scripts/common/.zshrc'), (home / '.zshrc').read_text())
             self.assertEqual((home / '.zshrc.backup').read_text(), 'first backup')
             self.assertEqual(os.readlink(home / '.zshrc.backup.1'), str(home / 'missing-backup'))
             self.assertEqual(os.readlink(home / '.zshrc.backup.2'), str(missing))
@@ -44,7 +44,7 @@ class BrewBundleFailureTests(unittest.TestCase):
                 command.write_text('#!/bin/sh\n' + body + '\n')
                 command.chmod(0o755)
             result = subprocess.run(
-                ['bash', str(ROOT / '.bin/macos/brew.sh'), *args],
+                ['bash', str(ROOT / 'scripts/macos/brew.sh'), *args],
                 env=dict(os.environ, HOME=tmp, PATH=tmp + ':' + os.environ['PATH'],
                          BREW_CALL_LOG=str(log)),
                 text=True, capture_output=True,
@@ -75,7 +75,7 @@ class BrewBundleFailureTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0)
         arguments = result.stdout.splitlines()
         self.assertIn('--verbose', arguments)
-        self.assertIn('--file=' + str(ROOT / '.bin/macos/.Brewfile.core'), arguments)
+        self.assertIn('--file=' + str(ROOT / 'scripts/macos/.Brewfile.core'), arguments)
         self.assertEqual(arguments[-2:], ['check', '--no-upgrade'])
 
     def test_bundle_failure_is_propagated(self):

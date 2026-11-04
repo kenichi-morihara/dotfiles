@@ -1,15 +1,15 @@
 # --- yay install/uninstall後に自動でパッケージリストを更新 ---
-# dotfilesディレクトリの.bin/linuxディレクトリのパスを取得
+# dotfilesディレクトリのscripts/linuxディレクトリのパスを取得
 # .zshrcがシンボリックリンクの場合、実パスを取得
 if [[ -n "${(%):-%x}" ]]; then
   _DOTFILES_LINUX_DIR="${${(%):-%x}:A:h}"
-  _DOTFILES_BIN_DIR="${_DOTFILES_LINUX_DIR:h}"
-  _DOTFILES_DIR="${_DOTFILES_BIN_DIR:h}"
+  _DOTFILES_SCRIPTS_DIR="${_DOTFILES_LINUX_DIR:h}"
+  _DOTFILES_DIR="${_DOTFILES_SCRIPTS_DIR:h}"
   PACKAGES_FILE_PATH="$_DOTFILES_LINUX_DIR/.yay-packages.txt"
 else
   # フォールバック: 環境変数や固定パスを使用
   _DOTFILES_DIR="${DOTFILES_DIR:-$HOME/ghq/github.com/kenichi-morihara/dotfiles}"
-  PACKAGES_FILE_PATH="${_DOTFILES_DIR}/.bin/linux/.yay-packages.txt"
+  PACKAGES_FILE_PATH="${_DOTFILES_DIR}/scripts/linux/.yay-packages.txt"
 fi
 
 # yayコマンドをラップする関数
@@ -47,19 +47,19 @@ yay() {
           cd "$dotfiles_dir" || return 1
           
           # git diffで変更があるか確認
-          if ! git diff --quiet -- ".bin/linux/.yay-packages.txt" 2>/dev/null; then
+          if ! git diff --quiet -- "scripts/linux/.yay-packages.txt" 2>/dev/null; then
             # カラフルなdiffを表示
             echo ""
             echo "📦 Package list updated! Changes:"
             echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-            git diff --color=always -- ".bin/linux/.yay-packages.txt" || true
+            git diff --color=always -- "scripts/linux/.yay-packages.txt" || true
             echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
             echo ""
             
             # git add, commit, push
             local current_branch=$(git branch --show-current 2>/dev/null || echo "master")
             if [[ "$current_branch" == "master" ]] || [[ "$current_branch" == "main" ]]; then
-              git add ".bin/linux/.yay-packages.txt" 2>/dev/null || true
+              git add "scripts/linux/.yay-packages.txt" 2>/dev/null || true
               local commit_msg="chore: update package list [auto-commit]"
               if git commit -m "$commit_msg" 2>/dev/null; then
                 echo "✅ Committed to $current_branch"

@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 class ShellLatencyTests(unittest.TestCase):
     def run_zsh(self, code):
         return subprocess.run(['zsh', '-f', '-c', code, 'test',
-                               str(ROOT / '.bin/common/latency.zsh')],
+                               str(ROOT / 'scripts/common/latency.zsh')],
                               capture_output=True, text=True, timeout=5)
 
     def test_warns_only_at_or_above_threshold(self):

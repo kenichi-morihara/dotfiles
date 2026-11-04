@@ -34,5 +34,5 @@ if [[ "$login_requested" == true ]]; then
   cursor agent status
 else
   echo "Cursor Agent is installed but not authenticated."
-  echo "Run: .bin/common/setup-cursor-agent.sh --login"
+  echo "Run: scripts/common/setup-cursor-agent.sh --login"
 fi

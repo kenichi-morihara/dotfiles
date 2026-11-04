@@ -1,7 +1,7 @@
 #!/bin/bash
 # macOSのシステム設定を適用する。何度実行しても同じ状態になる。
-#   .bin/macos/defaults.sh          設定を適用し、関連プロセスを再起動
-#   .bin/macos/defaults.sh check    現在の値と期待値を比較（変更しない）
+#   scripts/macos/defaults.sh          設定を適用し、関連プロセスを再起動
+#   scripts/macos/defaults.sh check    現在の値と期待値を比較（変更しない）
 set -euo pipefail
 
 if [ "$(uname -s)" != "Darwin" ]; then
@@ -11,8 +11,13 @@ fi
 
 # 形式: "currentHostなら-currentHost|ドメイン|キー|型|値|再起動するプロセス"
 SETTINGS=(
+    # キーリピートを速め、長押しからの開始待ちも短めにする（ログインし直して反映）
+    "|NSGlobalDomain|KeyRepeat|int|2|"
+    "|NSGlobalDomain|InitialKeyRepeat|int|15|"
     # 日本語入力のライブ変換をオフ
     "|com.apple.inputmethod.Kotoeri|JIMPrefLiveConversionKey|bool|false|JapaneseIM"
+    # Dockに固定するアプリを空にする（起動中のアプリは表示される）
+    "|com.apple.dock|persistent-apps|array|()|Dock"
     # Dockを自動的に隠す
     "|com.apple.dock|autohide|bool|true|Dock"
     # Dockを最小限に: 表示/非表示の遅延とアニメーションなし、アイコン48px、最近使ったアプリ非表示
@@ -51,6 +56,9 @@ for entry in "${SETTINGS[@]}"; do
     host_args=()
     [ -n "$host" ] && host_args=("$host")
     current=$(defaults ${host_args[@]+"${host_args[@]}"} read "$domain" "$key" 2>/dev/null || echo "(unset)")
+    if [ "$type" = array ]; then
+        current=$(printf '%s' "$current" | tr -d '[:space:]')
+    fi
     current=$(normalize "$current")
     expected=$(normalize "$value")
 
@@ -65,9 +73,13 @@ for entry in "${SETTINGS[@]}"; do
         continue
     fi
 
-    defaults ${host_args[@]+"${host_args[@]}"} write "$domain" "$key" "-$type" "$value"
+    if [ "$type" = array ] && [ "$value" = '()' ]; then
+        defaults ${host_args[@]+"${host_args[@]}"} write "$domain" "$key" -array
+    else
+        defaults ${host_args[@]+"${host_args[@]}"} write "$domain" "$key" "-$type" "$value"
+    fi
     echo "→ $domain $key: $current → $value"
-    restart+=("$process")
+    [ -z "$process" ] || restart+=("$process")
 done
 
 if [ "${#restart[@]}" -gt 0 ]; then

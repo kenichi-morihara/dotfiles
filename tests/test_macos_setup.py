@@ -38,7 +38,7 @@ class MacOSSetupTests(unittest.TestCase):
             env = dict(os.environ, PATH=str(directory) + ':' + os.environ['PATH'],
                        CALL_LOG=str(log), FAIL_STEP=fail, AUTH_REVOKED=str(directory / "revoked"))
             env.pop("HOMEBREW_SUDO_CHECKED", None)
-            result = subprocess.run(['bash', str(ROOT / '.bin/macos/setup.sh')],
+            result = subprocess.run(['bash', str(ROOT / 'scripts/macos/setup.sh')],
                                     env=env, capture_output=True, text=True, timeout=10)
             # Touch ID setup is idempotent: an already-enabled host skips its sudo call.
             calls = [line for line in log.read_text().splitlines()
