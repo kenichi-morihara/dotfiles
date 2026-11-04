@@ -1,5 +1,6 @@
 {{ if ne .chezmoi.os "darwin" }}
 .config/karabiner
+.config/ghostty
 Library
 {{ end }}
 {{ if ne .chezmoi.os "linux" }}

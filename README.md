@@ -542,3 +542,16 @@ iTerm2の設定が異なり、iTerm2が起動中の場合は自動終了せず�
 `make setup` は認証・Touch ID設定・パッケージ導入・設定適用を `[1/4]`〜`[4/4]` で
 表示します。Homebrewは `--verbose` で実行し、ダウンロードやインストーラーの出力も表示します。
 全体の残り時間や進捗率は表示しません。
+
+### Ghostty（通常ウィンドウ・一時ウィンドウ）
+
+full構成に `ghostty` を含めています。設定は `home/dot_config/ghostty/config` を
+chezmoiで `~/.config/ghostty/config` へ配布します（macOSのみ）。
+
+- Control＋バッククォート（`）: 一時ウィンドウを表示・非表示
+- マウスがある画面の上端に高さ60%で表示し、フォーカスを外すと隠す
+- Draculaテーマ、HackGen Console NF、12pt
+- 設定再読み込み: Command＋Shift＋カンマ
+
+初回起動時にグローバルキー用のアクセシビリティ許可が必要です。
+Ghosttyを起動した状態で使用します。iTerm2の設定・アプリは併存させています。
