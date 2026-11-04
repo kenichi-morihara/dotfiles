@@ -61,6 +61,30 @@ class ShellLatencyTests(unittest.TestCase):
         self.assertEqual(result.stdout.count('called'), 1)
         self.assertIn('zeno-init', result.stdout)
 
+    def test_lazy_init_keeps_terminal_output_off_input_line(self):
+        for result_code in (0, 7):
+            with self.subTest(result_code=result_code):
+                result = self.run_zsh(
+                    'zeno-init() { print init-output; print -u2 "erase-output"; '
+                    'typeset -g INIT_RAN=1; return ' + str(result_code) + '; }; '
+                    'source "$1"; _dotfiles-measure-zeno-init; '
+                    'zle() { (( $# == 0 )) && return 0; print -r -- "zle:$*"; }; '
+                    'BUFFER="ls"; CURSOR=2; zeno-init; print result=$?; '
+                    'print -r -- "buffer=$BUFFER cursor=$CURSOR initialized=$INIT_RAN"')
+                self.assertEqual(result.returncode, 0, result.stderr)
+                expected = ('zle:-M zeno initialization failed; run zeno-init for details\n'
+                            if result_code else '')
+                self.assertEqual(result.stdout, expected + 'result=' + str(result_code) +
+                                 '\nbuffer=ls cursor=2 initialized=1\n')
+                self.assertEqual(result.stderr, '')
+
+    def test_ready_init_does_not_invalidate_display(self):
+        result = self.run_zsh(
+            'zeno-init() { :; }; source "$1"; _dotfiles-measure-zeno-init; '
+            'ZENO_LOADED=1; zle() { print -r -- "zle:$*"; }; zeno-init')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout, '')
+
     def test_initialized_calls_do_not_overwrite_first_measurement(self):
         result = self.run_zsh('zeno-init() { ZENO_LOADED=1; }; source "$1"; '
                               '_dotfiles-measure-zeno-init; zeno-init; '

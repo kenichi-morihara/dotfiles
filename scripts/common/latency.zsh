@@ -72,7 +72,17 @@ _dotfiles-measure-zeno-init() {
       return $?
     fi
     local started=$EPOCHREALTIME result=0
-    _dotfiles-original-zeno-init "$@" || result=$?
+    if zle >/dev/null 2>&1; then
+      # Deno startup emits erase sequences even on success. Keep them off the
+      # terminal without invalidating ZLE (which leaves a duplicate input line).
+      # Run in this shell so initialization variables and hooks are preserved.
+      _dotfiles-original-zeno-init "$@" >/dev/null 2>&1 || result=$?
+      if (( result != 0 )); then
+        zle -M 'zeno initialization failed; run zeno-init for details'
+      fi
+    else
+      _dotfiles-original-zeno-init "$@" || result=$?
+    fi
     _dotfiles-record-latency zeno-init "$(( (EPOCHREALTIME - started) * 1000 ))"
     return $result
   }
