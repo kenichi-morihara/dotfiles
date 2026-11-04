@@ -133,14 +133,10 @@ cask "docker-desktop"
 cask "font-hackgen"
 cask "font-hackgen-nerd"
 cask "font-monaspace"
-# Finder replacement and FTP, SFTP, WebDAV and Amazon s3 client
-cask "forklift"
 # Set of tools to manage resources and applications hosted on Google Cloud
 cask "gcloud-cli"
 # Web browser
 cask "google-chrome"
-# Desktop automation application
-cask "hammerspoon"
 # Terminal emulator as alternative to Apple's Terminal app
 cask "iterm2"
 # Menu bar manager
