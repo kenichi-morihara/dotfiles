@@ -40,7 +40,10 @@ class MacOSSetupTests(unittest.TestCase):
             env.pop("HOMEBREW_SUDO_CHECKED", None)
             result = subprocess.run(['bash', str(ROOT / '.bin/macos/setup.sh')],
                                     env=env, capture_output=True, text=True, timeout=10)
-            return result, log.read_text().splitlines()
+            # Touch ID setup is idempotent: an already-enabled host skips its sudo call.
+            calls = [line for line in log.read_text().splitlines()
+                     if not line.startswith('sudo /bin/bash ')]
+            return result, calls
 
     def test_homebrew_privilege_probe_does_not_revoke_setup_authentication(self):
         result, calls = self.run_setup('homebrew-probe')
@@ -57,12 +60,12 @@ class MacOSSetupTests(unittest.TestCase):
     def test_authenticate_then_packages_then_apply(self):
         result, calls = self.run_setup()
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(calls, ['sudo -v', 'sudo /bin/bash ' + str(ROOT / '.bin/macos/sudo-touchid.sh'), 'make packages PROFILE=full', 'sudo -n -v', 'make apply'])
+        self.assertEqual(calls, ['sudo -v', 'make packages PROFILE=full', 'sudo -n -v', 'make apply'])
 
     def test_package_failure_stops_before_apply(self):
         result, calls = self.run_setup('packages')
         self.assertEqual(result.returncode, 7)
-        self.assertEqual(calls, ['sudo -v', 'sudo /bin/bash ' + str(ROOT / '.bin/macos/sudo-touchid.sh'), 'make packages PROFILE=full'])
+        self.assertEqual(calls, ['sudo -v', 'make packages PROFILE=full'])
 
     def test_auth_failure_runs_no_make_commands(self):
         result, calls = self.run_setup('auth')

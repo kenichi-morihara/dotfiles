@@ -38,7 +38,7 @@ class BrewBundleFailureTests(unittest.TestCase):
             log = directory / 'brew-called'
             for name, body in (
                 ('uname', f'echo {platform}'),
-                ('brew', f'echo called > "$BREW_CALL_LOG"\nexit {brew_status}'),
+                ('brew', f'echo called > "$BREW_CALL_LOG"\nprintf \'%s\\n\' "$@"\nexit {brew_status}'),
             ):
                 command = directory / name
                 command.write_text('#!/bin/sh\n' + body + '\n')
@@ -68,6 +68,15 @@ class BrewBundleFailureTests(unittest.TestCase):
         self.assertEqual(result.returncode, 1)
         self.assertIn('Not macOS!', result.stdout)
         self.assertFalse(called)
+
+    def test_bundle_streams_verbose_output_and_preserves_arguments(self):
+        result, called = self.run_bundle('--profile', 'core', 'check', '--no-upgrade')
+        self.assertTrue(called)
+        self.assertEqual(result.returncode, 0)
+        arguments = result.stdout.splitlines()
+        self.assertIn('--verbose', arguments)
+        self.assertIn('--file=' + str(ROOT / '.bin/macos/.Brewfile.core'), arguments)
+        self.assertEqual(arguments[-2:], ['check', '--no-upgrade'])
 
     def test_bundle_failure_is_propagated(self):
         result, called = self.run_bundle('check', brew_status=42)

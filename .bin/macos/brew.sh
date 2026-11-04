@@ -22,4 +22,5 @@ case "$profile" in
 	*) echo "Unknown profile: $profile (expected core or full)" >&2; exit 2 ;;
 esac
 
-command brew bundle --file="$brewfile" "$@"
+# Stream downloads, installer output and errors instead of only bundle summaries.
+command brew bundle --verbose --file="$brewfile" "$@"

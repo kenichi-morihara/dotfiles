@@ -23,11 +23,12 @@ fi
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$SCRIPT_DIR/../.."
-echo "Authenticate for package installers. Homebrew and settings run as your normal user."
+echo "[1/4] Administrator authentication (Homebrew runs as your normal user)"
 sudo -v
 # Homebrew's privilege probe resets the sudo timestamp. We have just verified it;
 # tell child brew processes to reuse that check instead of revoking our credential.
 export HOMEBREW_SUDO_CHECKED=1
+echo "[2/4] Configure sudo Touch ID"
 bash "$SCRIPT_DIR/sudo-touchid.sh"
 
 # Refresh the existing credential only; never prompt from the background.
@@ -54,11 +55,13 @@ trap cleanup EXIT
 trap 'exit 130' INT
 trap 'exit 143' TERM
 
+echo "[3/4] Install packages (profile: $profile; detailed Homebrew output follows)"
 "$make_bin" packages PROFILE="$profile"
 # Never start settings after losing authentication, nor report false completion.
 if ! sudo -n -v; then
     echo "sudo authentication expired. Run sudo -v, then rerun make setup." >&2
     exit 1
 fi
+echo "[4/4] Apply files and app settings"
 "$make_bin" apply
 echo "Setup complete. macOS permission prompts and initial app sign-in may still require manual action."
