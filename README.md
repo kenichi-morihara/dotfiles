@@ -330,7 +330,7 @@ Nani 1.1.8で確認したSQLiteの `localkv` 内の設定項目だけを更新�
 配色は既存のデフォルトプロファイルから継承します（Draculaテーマの配布は含みません）。
 変更前の設定は `~/Library/Application Support/iTerm2/dotfiles-backups/` に保存します。
 iTerm2独自の外部設定フォルダーを利用中の場合は、二重管理を避けるため停止します。
-- **defaults.sh**: システム設定（キーリピート速め：KeyRepeat=2・InitialKeyRepeat=15、ライブ変換オフ、Dockを自動的に隠す・固定アプリを空にする、バッテリー残量を%表示、iTerm2の既定プロファイル）
+- **defaults.sh**: システム設定（Spotlightのショートカットとインデックスを無効化、キーリピート速め：KeyRepeat=2・InitialKeyRepeat=15、ライブ変換オフ、Dockを自動的に隠す・固定アプリを空にする、バッテリー残量を%表示、iTerm2の既定プロファイル）
 
 ```bash
 scripts/macos/defaults.sh          # 適用（Dock・コントロールセンター・日本語入力を再起動）
