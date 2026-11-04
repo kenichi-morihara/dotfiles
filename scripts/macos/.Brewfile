@@ -137,6 +137,8 @@ cask "font-hackgen-nerd"
 cask "font-monaspace"
 # Set of tools to manage resources and applications hosted on Google Cloud
 cask "gcloud-cli"
+# Native terminal with a configurable quick terminal
+cask "ghostty"
 # Web browser
 cask "google-chrome"
 # Japanese input method
