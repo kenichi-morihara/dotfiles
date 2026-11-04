@@ -21,6 +21,36 @@ class ShellLatencyTests(unittest.TestCase):
         self.assertIn('slow: 100ms', result.stderr)
         self.assertIn('fast', result.stdout)
 
+    def test_slow_measurement_does_not_print_or_redraw_during_input(self):
+        result = self.run_zsh(
+            'source "$1"; '
+            # Model an active line editor; any redisplay command is observable.
+            'zle() { (( $# == 0 )) && return 0; print -u2 "REDRAW:$*"; }; '
+            'BUFFER="partially typed command"; '
+            '_dotfiles-record-latency zeno-init 200; '
+            'print -r -- "buffer=$BUFFER"; dotfiles-latency')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stderr, '')
+        self.assertIn('buffer=partially typed command', result.stdout)
+        self.assertIn('zeno-init', result.stdout)
+        self.assertIn('200.0ms', result.stdout)
+
+    def test_cancelled_widget_keeps_measurement_without_notifying_input(self):
+        result = self.run_zsh(
+            'zeno-lazy-widget-dispatch() { '
+            '_dotfiles-record-latency zeno-init 200; return 130; }; '
+            'source "$1"; '
+            'zle() { (( $# == 0 )) && return 0; print -u2 "REDRAW:$*"; }; '
+            'BUFFER="unfinished"; WIDGET=zeno-ghq-cd; '
+            '_dotfiles-measure-zeno-shortcuts; '
+            'zeno-lazy-widget-dispatch; print result=$?; '
+            'print -r -- "buffer=$BUFFER"; dotfiles-latency')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stderr, '')
+        self.assertTrue(result.stdout.startswith('result=130\nbuffer=unfinished\n'))
+        self.assertIn('zeno-init', result.stdout)
+        self.assertIn('200.0ms', result.stdout)
+
     def test_wrapper_preserves_failure_and_does_not_run_during_install(self):
         result = self.run_zsh('zeno-init() { print called; return 7; }; source "$1"; '
                               '_dotfiles-measure-zeno-init; _dotfiles-measure-zeno-init; '

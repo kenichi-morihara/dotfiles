@@ -21,7 +21,9 @@ _dotfiles-record-latency() {
 }
 
 _dotfiles-show-latency() {
-  if zle >/dev/null 2>&1; then zle -I; fi
+  # Widget return still runs inside ZLE. Printing here invalidates the input
+  # display and causes flicker; timings remain available via dotfiles-latency.
+  if zle >/dev/null 2>&1; then return 0; fi
   print -ru2 -- "$1"
 }
 
