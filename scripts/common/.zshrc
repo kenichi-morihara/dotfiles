@@ -10,6 +10,11 @@ _ZSH_CONFIG_DIR="${${(%):-%x}:A:h}"
 _DOTFILES_SCRIPTS_DIR="${_ZSH_CONFIG_DIR:h}"
 
 # === 共通設定 ===
+# GUI端末が起動元から継承した色の無効化を、対話シェルでは解除する。
+if [[ -o interactive ]]; then
+  unset NO_COLOR
+fi
+
 # 履歴設定
 HISTFILE="$HOME/.zsh_history"
 HISTSIZE=10000
