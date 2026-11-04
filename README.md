@@ -58,6 +58,7 @@ macOS付属のmakeでも実行できます。
 - `make status` / `make dry-run`: 配布先の変更状況／ファイル配布のプレビュー
 - `make sudo-touchid`: sudoのTouch IDを有効化
 - `make ca-certs`: `/etc/ssl/cert.pem` から非信頼ルート（eMudhra emSign ECC G3 / AAA Certificate Services）を除去。OS更新で元に戻るため更新後に再実行（`scripts/macos/ca-certs.sh check` で確認のみ）。Nodeは `scripts/macos/ca-certs.zsh` がシステムのCAを使うよう設定
+- `make doctor`: 上記の除去状態と環境変数（`SSL_CERT_FILE`・`PIP_CERT`・`NODE_OPTIONS`）を点検（変更なし、NGがあれば終了コード1）。`make doctor-online` は実サイトへ接続し、curl・node・pythonが拒否することまで確認
 - `make runtimes` / `make shell-setup`: miseのランタイム導入／ログインシェル変更
 - `make test`: テスト一式
 

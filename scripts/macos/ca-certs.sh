@@ -8,10 +8,14 @@ if [ "$(uname -s)" != Darwin ]; then
     echo "Not macOS!" >&2
     exit 1
 fi
-bundle=/etc/ssl/cert.pem
-# Matches the "=== /.../CN=<name>" header line of each certificate block.
-pattern='^=== .*/CN=(AAA Certificate Services|emSign ECC Root CA - G3)$'
+bundle="${CA_BUNDLE:-/etc/ssl/cert.pem}"  # CA_BUNDLE is for tests
+# Matches the "### /.../CN=<name>" and "=== /.../CN=<name>" header lines of a certificate block.
+pattern='^(###|===) .*/CN=(AAA Certificate Services|emSign ECC Root CA - G3)$'
 
+if [ ! -f "$bundle" ]; then
+    echo "NG: $bundle not found" >&2
+    exit 1
+fi
 present() { /usr/bin/grep -Eq "$pattern" "$bundle"; }
 
 case "${1:-apply}" in
@@ -31,14 +35,15 @@ if ! present; then
     echo "Target roots are already removed from $bundle."
     exit 0
 fi
-if [ "$(id -u)" != 0 ]; then
+if [ "$(id -u)" != 0 ] && { [ ! -w "$bundle" ] || [ ! -w "$(dirname "$bundle")" ]; }; then
     echo "Editing $bundle requires administrator authentication once."
-    exec sudo /bin/bash "$0" apply
+    exec sudo env CA_BUNDLE="$bundle" /bin/bash "$0" apply
 fi
 
 # Keep the first (pristine) copy; never overwrite it with an already-edited file.
 [ -e "${bundle}.bak" ] || cp -p "$bundle" "${bundle}.bak"
-tmp=$(mktemp)
+# Same directory as the bundle: no dependency on $TMPDIR, same filesystem for install.
+tmp=$(mktemp "${bundle}.tmp.XXXXXX")
 trap 'rm -f "$tmp"' EXIT
 before=$(/usr/bin/grep -c 'BEGIN CERTIFICATE' "$bundle")
 /usr/bin/awk -v pat="$pattern" '
@@ -51,5 +56,9 @@ if /usr/bin/grep -Eq "$pattern" "$tmp"; then
     exit 1
 fi
 after=$(/usr/bin/grep -c 'BEGIN CERTIFICATE' "$tmp")
-/usr/bin/install -o root -g wheel -m 0644 "$tmp" "$bundle"
+if [ "$(id -u)" = 0 ]; then
+    /usr/bin/install -o root -g wheel -m 0644 "$tmp" "$bundle"
+else
+    /usr/bin/install -m 0644 "$tmp" "$bundle"
+fi
 echo "Removed $((before - after)) root(s) from $bundle (backup: ${bundle}.bak)."

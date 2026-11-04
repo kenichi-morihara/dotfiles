@@ -8,7 +8,7 @@ PROFILE ?= core
 
 .PHONY: help setup init apply check diff dry-run status \
 	apply-files apply-apps apply-system verify check-apps \
-	macos-init sudo-touchid ca-certs packages packages-check runtimes shell-setup test
+	macos-init sudo-touchid ca-certs doctor doctor-online packages packages-check runtimes shell-setup test
 
 help: ## 操作一覧（既定）
 	@awk 'BEGIN {FS = ":.*## "} /^##@ / {printf "\n%s\n", substr($$0, 5)} /^[a-zA-Z_-]+:.*## / {printf "  %-18s %s\n", $$1, $$2}' Makefile
@@ -41,6 +41,12 @@ sudo-touchid: ## sudoのTouch IDを有効化（初回は管理者認証）
 
 ca-certs: ## /etc/ssl/cert.pemから非信頼ルート(eMudhra/AAA)を除去（OS更新後に再実行）
 	bash scripts/macos/ca-certs.sh
+
+doctor: ## 非信頼ルート(eMudhra/AAA)の除去と環境変数を点検（変更なし）
+	bash scripts/macos/doctor.sh
+
+doctor-online: ## doctorに加え、実サイトへ接続して各クライアントの拒否を確認
+	bash scripts/macos/doctor.sh --online
 
 ##@ 個別に適用
 packages: ## パッケージ導入（PROFILE=core/full、既定core）
