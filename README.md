@@ -29,11 +29,41 @@ home/
 
 ## セットアップ手順
 
+### Makefileからの操作
+
+リポジトリのルートで `make` を実行すると操作一覧を表示します。
+macOS/LinuxではGNU Makeを使用します（macOS付属のmakeでも実行可能）。
+
+```sh
+make init             # 初回移行・設定配布・chezmoiへのcheckout登録
+make diff             # 配布するファイルの差分
+make dry-run          # ファイル配布のプレビュー（書き込みなし）
+make apply            # ファイル配布 → macOSではRectangle設定も適用
+make apply-files      # ファイル配布のみ
+make rectangle        # Rectangle設定のみ（macOS）
+make status           # 配布先ファイルの変更状況
+make verify           # 配布先ファイルの一致確認
+make test             # 既存テスト一式
+```
+
+`make apply` はファイルの競合時に停止します。Rectangleは変更前にバックアップし、
+起動中なら再起動します。`diff`・`dry-run`・`status`・`verify` の対象はchezmoiの
+管理ファイルで、RectangleのNSUserDefaults設定は含みません。
+`make init` はファイル配布とchezmoi登録までを行い、Rectangleは `make apply` または
+`make rectangle` で適用します。
+
+新規Macの準備は `make macos-init` → HomebrewのPATH設定 → `make packages` →
+`make init` → `make apply` の順です。パッケージの既定はcoreで、全構成は
+`make packages PROFILE=full`、不足確認は `make packages-check` で実行します。
+ランタイム導入は `make runtimes`、ログインシェル変更は `make shell-setup` を使用します。
+これらの導入・変更処理は `make apply` には含みません。
+
 ### 1. リポジトリのクローン
 
 ```bash
-git clone https://github.com/kenichi-morihara/dotfiles.git ~/dotfiles
-cd ~/dotfiles
+ghq list --full-path  # 既存checkoutがあればそれを利用
+ghq get github.com/kenichi-morihara/dotfiles
+cd "$(ghq root)/github.com/kenichi-morihara/dotfiles"
 ```
 
 ### macOS: 設定配布前の準備
