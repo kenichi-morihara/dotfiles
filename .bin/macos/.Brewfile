@@ -137,6 +137,8 @@ cask "font-monaspace"
 cask "gcloud-cli"
 # Web browser
 cask "google-chrome"
+# Japanese input method
+cask "google-japanese-ime"
 # Terminal emulator as alternative to Apple's Terminal app
 cask "iterm2"
 # Menu bar manager

@@ -7,6 +7,41 @@ if [ "$(uname -s)" != "Darwin" ]; then
     exit 1
 fi
 
+mode="${1:-apply}"
+case "$mode" in apply|--check) ;; *) echo "Usage: $0 [--check]" >&2; exit 2 ;; esac
+SHORTCUTS='leftHalf 123 1835008
+rightHalf 124 1835008
+maximize 126 1835008
+restore 125 1835008
+previousDisplay 123 1966080
+nextDisplay 124 1966080'
+# Compare before backing up, writing or restarting. A check never mutates preferences.
+if "${PYTHON:-python3}" - "$SHORTCUTS" <<'PY_CHECK'
+import plistlib, subprocess, sys
+result = subprocess.run(['defaults', 'export', 'com.knollsoft.Rectangle', '-'], capture_output=True)
+try:
+    current = plistlib.loads(result.stdout) if result.returncode == 0 else {}
+except plistlib.InvalidFileException as error:
+    print(f'Cannot read Rectangle preferences: {error}', file=sys.stderr)
+    sys.exit(2)
+for line in sys.argv[1].splitlines():
+    action, key, flags = line.split()
+    value = current.get(action, {})
+    if value.get('keyCode') != int(key) or value.get('modifierFlags') != int(flags):
+        sys.exit(1)
+PY_CHECK
+then
+    echo "Rectangle shortcuts already match."
+    exit 0
+else
+    result=$?
+    [ "$result" -eq 1 ] || exit "$result"
+fi
+if [ "$mode" = --check ]; then
+    echo "Rectangle shortcuts differ."
+    exit 1
+fi
+
 domain=com.knollsoft.Rectangle
 backup_dir="$HOME/Library/Application Support/Rectangle/dotfiles-backups"
 mkdir -p "$backup_dir"
@@ -40,14 +75,7 @@ fi
 while read -r action key_code modifier_flags; do
     defaults write "$domain" "$action" -dict \
         keyCode -int "$key_code" modifierFlags -int "$modifier_flags"
-done <<'SHORTCUTS'
-leftHalf 123 1835008
-rightHalf 124 1835008
-maximize 126 1835008
-restore 125 1835008
-previousDisplay 123 1966080
-nextDisplay 124 1966080
-SHORTCUTS
+done <<<"$SHORTCUTS"
 
 if [ "$was_running" = true ]; then
     open -a Rectangle

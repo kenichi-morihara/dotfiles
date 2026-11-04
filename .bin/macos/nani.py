@@ -16,6 +16,10 @@ ALLOWED = {
 }
 
 
+class NotInitialized(ValueError):
+    """Nani has not created the preferences managed by dotfiles yet."""
+
+
 def load_config(path):
     config = json.loads(path.read_text())
     for key, values in config.items():
@@ -29,7 +33,7 @@ def updates(connection, config):
     for key, values in config.items():
         row = connection.execute('SELECT value FROM localkv WHERE key = ?', (key,)).fetchone()
         if row is None:
-            raise ValueError(f'Nani setting {key} is missing; configure Nani once first.')
+            raise NotInitialized(f'Nani setting {key} is missing; configure Nani once first.')
         current = json.loads(row[0])
         if not isinstance(current, dict):
             raise ValueError(f'Unexpected Nani setting format: {key}')
@@ -70,10 +74,15 @@ def main():
     directory = Path.home() / 'Library/Application Support/Nani'
     database = directory / 'app.db/db'
     if not database.is_file():
-        parser.error('Launch Nani and configure selected-text translation once first')
+        print('SKIP Nani: launch it and configure selected-text translation once first')
+        return 0
     config = load_config(Path(__file__).with_name('nani.json'))
-    with sqlite3.connect(database.as_uri() + '?mode=ro', uri=True) as connection:
-        changed = bool(updates(connection, config))
+    try:
+        with sqlite3.connect(database.as_uri() + '?mode=ro', uri=True) as connection:
+            changed = bool(updates(connection, config))
+    except NotInitialized as error:
+        print(f'SKIP Nani: {error}')
+        return 0
     if args.check:
         print('Nani settings differ' if changed else 'Nani settings match')
         return int(changed)

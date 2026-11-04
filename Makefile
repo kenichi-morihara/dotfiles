@@ -6,50 +6,73 @@ CHEZMOI ?= chezmoi
 PYTHON ?= python3
 PROFILE ?= core
 
-.PHONY: help init diff dry-run apply apply-files apply-apps status verify macos-init packages packages-check runtimes shell-setup test
+.PHONY: help setup init apply check diff dry-run status \
+	apply-files apply-apps apply-system verify check-apps \
+	macos-init sudo-touchid packages packages-check runtimes shell-setup test
 
-help: ## 操作一覧を表示（既定）
-	@awk 'BEGIN {FS = ":.*## "} /^[a-zA-Z_-]+:.*## / {printf "  %-18s %s\n", $$1, $$2}' Makefile
+help: ## 操作一覧（既定）
+	@awk 'BEGIN {FS = ":.*## "} /^##@ / {printf "\n%s\n", substr($$0, 5)} /^[a-zA-Z_-]+:.*## / {printf "  %-18s %s\n", $$1, $$2}' Makefile
 
-init: ## 初回移行・設定配布・chezmoi登録（既存設定を退避）
-	CHEZMOI_BIN="$$(command -v "$(CHEZMOI)")" bash .bin/link.sh
+##@ 普段使う操作
+setup: PROFILE = full
+setup: ## sudo認証→パッケージ導入→設定適用（macOS、既定full）
+	bash .bin/macos/setup.sh "$(PROFILE)"
 
-diff: ## 配布するファイルの差分を表示
-	$(CHEZMOI) --source "$(ROOT)" --destination "$(HOME)" diff
-
-dry-run: ## ファイル配布をプレビュー（アプリ設定は実行しない）
-	$(CHEZMOI) --source "$(ROOT)" --destination "$(HOME)" apply --dry-run --verbose --error-on-conflict
-
-apply: ## ファイル配布とアプリ設定を順に適用
+apply: ## ファイル→アプリ設定を適用（パッケージ導入なし）
 	$(MAKE) apply-files
 	$(MAKE) apply-apps
 
-apply-files: ## chezmoiの管理ファイルだけを適用（競合時は停止）
-	$(CHEZMOI) --source "$(ROOT)" --destination "$(HOME)" apply --error-on-conflict
+check: ## ファイルとアプリ設定の一致を確認（変更なし）
+	$(MAKE) verify
+	$(MAKE) check-apps
 
-status: ## 配布先ファイルの変更状況を表示
-	$(CHEZMOI) --source "$(ROOT)" --destination "$(HOME)" status
+diff: ## 配布するファイルの差分
+	$(CHEZMOI) --source "$(ROOT)" --destination "$(HOME)" diff
 
-verify: ## 配布先ファイルが宣言と一致するか検証
-	$(CHEZMOI) --source "$(ROOT)" --destination "$(HOME)" verify
-
-apply-apps: ## アプリ設定をまとめて適用（macOS）
-	@if [ "$$(uname -s)" = Darwin ]; then PYTHON="$(PYTHON)" bash .bin/macos/apps.sh; fi
-
-macos-init: ## Command Line Tools・Homebrewを準備（macOS）
+##@ 初回準備（macOS）
+macos-init: ## Command Line Tools・Homebrewを準備
 	bash .bin/macos/init.sh
 
-packages: ## Homebrewパッケージを導入（PROFILE=core/full、既定core）
+init: ## 初回移行・ファイル配布・chezmoi登録（既存設定を退避）
+	CHEZMOI_BIN="$$(command -v "$(CHEZMOI)")" bash .bin/link.sh
+
+sudo-touchid: ## sudoのTouch IDを有効化（初回は管理者認証）
+	bash .bin/macos/sudo-touchid.sh
+
+##@ 個別に適用
+packages: ## パッケージ導入（PROFILE=core/full、既定core）
 	bash .bin/macos/brew.sh --profile "$(PROFILE)"
 
-packages-check: ## Homebrewパッケージの不足を確認
-	bash .bin/macos/brew.sh --profile "$(PROFILE)" check
+apply-files: ## chezmoiのファイルだけを適用（競合時は停止）
+	$(CHEZMOI) --source "$(ROOT)" --destination "$(HOME)" apply --error-on-conflict
 
-runtimes: ## mise管理の言語ランタイムを導入（設定配布後）
+apply-apps: ## インストール済みアプリの設定を適用（macOS）
+	@if [ "$$(uname -s)" = Darwin ]; then PYTHON="$(PYTHON)" bash .bin/macos/apps.sh; fi
+
+apply-system: ## Dock・日本語入力・電源などのシステム設定を適用（要sudo）
+	bash .bin/macos/defaults.sh
+
+runtimes: ## mise管理の言語ランタイムを導入
 	mise install
 
 shell-setup: ## zshをログインシェルに設定
 	bash setup-zsh.sh
 
-test: ## 一時HOMEなどを使った既存テストを実行
+##@ 個別に確認
+packages-check: ## パッケージの不足確認（PROFILE=core/full、既定core）
+	bash .bin/macos/brew.sh --profile "$(PROFILE)" check
+
+verify: ## chezmoiのファイルが宣言と一致するか確認
+	$(CHEZMOI) --source "$(ROOT)" --destination "$(HOME)" verify
+
+check-apps: ## インストール済みアプリの設定を確認（変更なし、macOS）
+	@if [ "$$(uname -s)" = Darwin ]; then PYTHON="$(PYTHON)" bash .bin/macos/apps.sh --check; fi
+
+status: ## chezmoiの配布先ファイルの変更状況
+	$(CHEZMOI) --source "$(ROOT)" --destination "$(HOME)" status
+
+dry-run: ## ファイル配布のプレビュー（変更なし）
+	$(CHEZMOI) --source "$(ROOT)" --destination "$(HOME)" apply --dry-run --verbose --error-on-conflict
+
+test: ## 一時HOMEなどを使うテストを実行
 	$(PYTHON) -m unittest discover -s tests -v

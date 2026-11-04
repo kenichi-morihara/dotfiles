@@ -15,6 +15,15 @@ SETTINGS=(
     "|com.apple.inputmethod.Kotoeri|JIMPrefLiveConversionKey|bool|false|JapaneseIM"
     # Dockを自動的に隠す
     "|com.apple.dock|autohide|bool|true|Dock"
+    # Dockを最小限に: 表示/非表示の遅延とアニメーションなし、アイコン48px、最近使ったアプリ非表示
+    "|com.apple.dock|autohide-delay|float|0|Dock"
+    "|com.apple.dock|autohide-time-modifier|float|0|Dock"
+    "|com.apple.dock|tilesize|int|48|Dock"
+    "|com.apple.dock|magnification|bool|false|Dock"
+    "|com.apple.dock|show-recents|bool|false|Dock"
+    "|com.apple.dock|launchanim|bool|false|Dock"
+    "|com.apple.dock|mineffect|string|scale|Dock"
+    "|com.apple.dock|minimize-to-application|bool|true|Dock"
     # メニューバーのバッテリー残量を常に%表示
     "-currentHost|com.apple.controlcenter|BatteryShowPercentage|bool|true|ControlCenter"
     # iTerm2の既定プロファイルをchezmoiで配布したDraculaにする（DynamicProfiles/dotfiles.json）
@@ -43,14 +52,15 @@ for entry in "${SETTINGS[@]}"; do
     [ -n "$host" ] && host_args=("$host")
     current=$(defaults ${host_args[@]+"${host_args[@]}"} read "$domain" "$key" 2>/dev/null || echo "(unset)")
     current=$(normalize "$current")
+    expected=$(normalize "$value")
 
-    if [ "$current" = "$value" ]; then
+    if [ "$current" = "$expected" ]; then
         echo "✓ $domain $key = $value"
         continue
     fi
 
     if [ "$mode" = check ]; then
-        echo "✗ $domain $key = $current (expected $value)"
+        echo "✗ $domain $key = $current (expected $expected)"
         status=1
         continue
     fi
@@ -76,13 +86,13 @@ if [ "${#restart[@]}" -gt 0 ]; then
     fi
 fi
 
-# 電源設定（pmset、要sudo）。スリープ・画面オフ・減光をすべて無効にする（0 = 無効）。
+# 電源設定（pmset、要sudo）。電源接続時はスリープ・画面オフなし、バッテリー時は5分（0 = 無効）。減光は無効。
 # 形式: "セクション名|pmsetのフラグ|キー 値"
 PMSET=(
     "AC Power|-c|sleep 0"
     "AC Power|-c|displaysleep 0"
-    "Battery Power|-b|sleep 0"
-    "Battery Power|-b|displaysleep 0"
+    "Battery Power|-b|sleep 5"
+    "Battery Power|-b|displaysleep 5"
     "Battery Power|-b|lessbright 0"
 )
 pmset_all=$(pmset -g custom)

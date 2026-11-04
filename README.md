@@ -31,32 +31,40 @@ home/
 
 ### Makefileからの操作
 
-リポジトリのルートで `make` を実行すると操作一覧を表示します。
-macOS/LinuxではGNU Makeを使用します（macOS付属のmakeでも実行可能）。
+リポジトリのルートで `make` を実行すると、用途別の操作一覧を表示します。
+macOS付属のmakeでも実行できます。
 
-```sh
-make init             # 初回移行・設定配布・chezmoiへのcheckout登録
-make diff             # 配布するファイルの差分
-make dry-run          # ファイル配布のプレビュー（書き込みなし）
-make apply            # ファイル配布 → アプリ設定をまとめて適用
-make apply-files      # ファイル配布のみ
-make apply-apps       # アプリ設定をまとめて適用（macOS）
-make status           # 配布先ファイルの変更状況
-make verify           # 配布先ファイルの一致確認
-make test             # 既存テスト一式
-```
+| 用途 | コマンド | 実行すること |
+| --- | --- | --- |
+| パッケージも含めて反映 | `make setup` | sudo認証 → Touch ID設定 → fullパッケージ導入 → ファイル・アプリ設定適用 |
+| 日常の設定反映 | `make apply` | ファイル → インストール済みアプリの設定を適用 |
+| 反映状態の確認 | `make check` | ファイル・アプリ設定を変更せず検証 |
+| 配布前の差分確認 | `make diff` | chezmoiのファイル差分を表示 |
 
-`make apply` はファイルの競合時に停止します。Rectangleは変更前にバックアップし、
-起動中なら再起動します。`diff`・`dry-run`・`status`・`verify` の対象はchezmoiの
-管理ファイルで、Rectangle・Nani・iTerm2のアプリ内設定は含みません。
-`make init` はファイル配布とchezmoi登録までを行い、Rectangleは `make apply` または
-`make apply-apps` で適用します。
+新規Macは `make macos-init` → HomebrewのPATH設定 → `make packages` →
+`make init` → `make setup` の順に進めます。`make init` は既存設定を退避して
+ファイルを配布し、chezmoiにcheckoutを登録する初回移行用です。
+`make setup` はHomebrewとchezmoiの準備・初回移行後に使います。
 
-新規Macの準備は `make macos-init` → HomebrewのPATH設定 → `make packages` →
-`make init` → `make apply` の順です。パッケージの既定はcoreで、全構成は
-`make packages PROFILE=full`、不足確認は `make packages-check` で実行します。
-ランタイム導入は `make runtimes`、ログインシェル変更は `make shell-setup` を使用します。
-これらの導入・変更処理は `make apply` には含みません。
+`setup` はGUIアプリも入るfull構成が既定、単独の `packages` はcore構成が既定です。
+`make setup PROFILE=core` / `make packages PROFILE=full` で変更できます。
+
+個別操作は以下を使います。
+
+- `make apply-files` / `make apply-apps`: ファイルだけ／アプリ設定だけを適用
+- `make apply-system`: Dock・日本語入力・電源設定を適用（macOS、電源設定はsudoが必要）
+- `make verify` / `make check-apps`: ファイルだけ／アプリ設定だけを検証
+- `make packages-check`: パッケージの不足確認（`PROFILE=full` も指定可能）
+- `make status` / `make dry-run`: 配布先の変更状況／ファイル配布のプレビュー
+- `make sudo-touchid`: sudoのTouch IDを有効化
+- `make runtimes` / `make shell-setup`: miseのランタイム導入／ログインシェル変更
+- `make test`: テスト一式
+
+`apply` はファイルの競合時に停止します。アプリ設定は未インストールならスキップし、
+適用失敗があれば残りのアプリも処理して最後にエラーを返します。
+`check` はアプリ設定も含みますが、パッケージやmacOSシステム設定は含みません。
+システム設定の確認は `.bin/macos/defaults.sh check` で行えます。
+`apply-system`・ランタイム導入・ログインシェル変更は `setup` / `apply` とは別に実行します。
 
 ### 1. リポジトリのクローン
 
@@ -454,3 +462,79 @@ Brewfileを更新し、main/masterでは自動コミットとupstreamへのpush�
 ## ライセンス
 
 MIT
+
+### 入力ソース（Google 日本語入力）
+
+`.bin/macos/input-sources.json` にABCとひらがな（Google）、選択中の入力ソースを宣言しています。
+`make apply-apps` / `make apply` でCarbonの入力ソースAPIから適用します。
+宣言以外のキーボード入力ソースは無効化し、文字ビューアなどは維持します。
+
+```bash
+brew install --cask google-japanese-ime
+# 初回インストール後はログアウト・再ログインしてから実行
+swift .bin/macos/input-sources.swift .bin/macos/input-sources.json
+swift .bin/macos/input-sources.swift .bin/macos/input-sources.json --check
+```
+
+ログイン中のMacのターミナルで実行してください。Google IMEのローマ字入力・かな入力の
+設定や辞書・学習履歴はこの設定には含めません。ローマ字入力はGoogle IMEの既定値です。
+
+### RaycastのホットキーをKarabinerで管理
+
+Command＋Shift＋VでRaycastのClipboard Historyを開きます。
+全キーボードプロファイルの `complex_modifications` に定義してあり、
+`make apply-files` で配布します。Caps Lock＋矢印のRectangle設定も維持します。
+
+ホットキーは `home/dot_config/karabiner/karabiner.json.tmpl` を編集します。
+Raycastの各コマンドで「Copy Deeplink」して得たURLを `shell_command` の
+`/usr/bin/open -g 'raycast://…'` に指定します。Raycast側で同じキーを割り当てる必要はありません。
+Deeplinkの実行確認が表示された場合は、内容を確認して許可してください。
+
+前提はKarabiner-ElementsとRaycastのインストール・起動、およびKarabinerが要求する
+入力監視・ドライバなどの初回設定です。これらのmacOS側の許可はdotfilesでは復元しません。
+この方法で管理するのはキー割り当てで、Raycastの拡張設定全体のexport/importではありません。
+
+### sudo認証をまとめてセットアップ
+
+Homebrewの準備と `make init` が済んだMacでは、手元のターミナルから
+`make setup` を実行すると、最初に `sudo -v` で認証し、
+`make packages PROFILE=full` → `make apply` を順番に実行します。
+`make setup PROFILE=core` でCLIのcore構成だけにもできます。
+通常の `make packages` はこれまでどおりcoreが既定です。
+
+実行中だけ30秒ごとに `sudo -n -v` で認証を更新し、成功・失敗・中断時に
+更新処理を終了します。パスワードは保存せず、brewや設定配布は通常ユーザーで実行します。
+認証がOS側で失効した場合など、再認証が必要になることはあります。
+パッケージ導入が失敗した場合、設定適用には進みません。
+
+入力監視・ドライバ拡張の許可、アプリへの初回ログイン、IME導入後の
+ログアウト・再ログインは画面での操作が必要です。
+新規Macでは先に `make macos-init` とHomebrewのPATH設定、`make init` を行ってください。
+
+### sudoをTouch IDで認証する
+
+```sh
+make sudo-touchid
+```
+
+初回だけ管理者認証が必要です。以降はTouch IDを登録したローカルのターミナルで
+`sudo` の指紋認証を利用できます。`make setup` にもこの設定を組み込んでいます。
+`/etc/pam.d/sudo_local` にApple標準の `pam_tid.so` を追加し、
+既存のローカル設定はバックアップして保持します。パスワード認証も引き続き使えます。
+SSHなど指紋認証を使えない環境では、パスワード認証になります。
+
+確認は `sudo -k` → `sudo -v` で行えます。
+
+### アプリ設定の再適用と確認
+
+`make apply-apps` は未導入のアプリをスキップします。Naniは起動して初期設定が
+作られるまでスキップし、DB破損などのエラーは失敗として扱います。設定が一致する
+アプリは書き込み・バックアップ・再起動を行いません。失敗があっても残りを処理し、
+最後に失敗した項目を表示して終了コード1を返します。
+
+```bash
+bash .bin/macos/apps.sh --check  # 書き込みなしで一致・差分・スキップを確認
+```
+
+iTerm2の設定が異なり、iTerm2が起動中の場合は自動終了せず失敗として報告します。
+その場合はiTerm2を終了し、Terminal.appから再適用してください。

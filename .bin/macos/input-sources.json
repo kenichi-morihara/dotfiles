@@ -1,0 +1,4 @@
+{
+  "enabled": ["com.apple.keylayout.ABC", "com.google.inputmethod.Japanese.base"],
+  "selected": "com.google.inputmethod.Japanese.base"
+}

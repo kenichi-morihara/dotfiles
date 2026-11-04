@@ -37,7 +37,21 @@ class KarabinerTests(unittest.TestCase):
         self.assertEqual(selected[0]['virtual_hid_keyboard']['keyboard_type_v2'], 'jis')
         manipulators = [m for r in selected[0]['complex_modifications']['rules']
                         for m in r['manipulators']]
-        self.assertEqual([m['from']['key_code'] for m in manipulators], ['caps_lock'])
+        self.assertEqual([m['from']['key_code'] for m in manipulators], ['v', 'caps_lock'])
+
+    def test_raycast_binding_is_available_in_both_layouts(self):
+        for layout in ('jis', 'us'):
+            config = self.render(layout)
+            for profile in config['profiles']:
+                rules = profile['complex_modifications']['rules']
+                binding = next(r for r in rules if r['description'].startswith('Raycast:'))
+                manipulator, = binding['manipulators']
+                self.assertEqual(manipulator['from'], {
+                    'key_code': 'v',
+                    'modifiers': {'mandatory': ['command', 'shift']},
+                })
+                self.assertEqual(manipulator['to'], [{'shell_command':
+                    "/usr/bin/open -g 'raycast://extensions/raycast/clipboard-history/clipboard-history'"}])
 
     def test_us_command_taps_preserve_command_chords_and_rectangle(self):
         config = self.render('us')

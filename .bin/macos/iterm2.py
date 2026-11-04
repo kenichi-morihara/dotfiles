@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Merge declared iTerm2 profile settings without replacing unrelated preferences."""
+import argparse
 import copy
 import json
 from pathlib import Path
@@ -42,6 +43,9 @@ def merge_preferences(current, config):
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--check", action="store_true")
+    args = parser.parse_args()
     if sys.platform != 'darwin':
         raise SystemExit('iTerm2 settings are supported on macOS only')
     exported = subprocess.run(['defaults', 'export', DOMAIN, '-'], capture_output=True)
@@ -50,6 +54,9 @@ def main():
         raise SystemExit('iTerm2 uses an external preferences folder; disable it before applying')
     config = json.loads(Path(__file__).with_name('iterm2.json').read_text())
     desired = merge_preferences(current, config)
+    if args.check:
+        print("iTerm2 settings match" if desired == current else "iTerm2 settings differ")
+        return int(desired != current)
     if desired == current:
         print('iTerm2 settings already match')
         return
@@ -71,4 +78,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    sys.exit(main())
