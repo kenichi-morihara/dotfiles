@@ -1,0 +1,15 @@
+{
+  "user-custom-shortcuts": {
+    "translate-select": ["Shift", "Meta", "KeyJ"]
+  },
+  "local-settings": {
+    "theme": "system",
+    "translateLang": null,
+    "translateBcp47": null,
+    "allowParaphrase": true,
+    "rubyType": "none",
+    "preferredModelType": "fast",
+    "submitKey": "enter",
+    "inAppHotkeys": {}
+  }
+}

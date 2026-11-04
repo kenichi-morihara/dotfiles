@@ -1,9 +1,9 @@
 # Rectangle
 
-リポジトリのルートで以下を実行して、ショートカットを適用する。
+リポジトリのルートで以下を実行して、Rectangleを含むアプリ設定をまとめて適用する。
 
 ```sh
-make rectangle
+make apply-apps
 ```
 
 | 操作 | キー |

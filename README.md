@@ -38,9 +38,9 @@ macOS/LinuxではGNU Makeを使用します（macOS付属のmakeでも実行可�
 make init             # 初回移行・設定配布・chezmoiへのcheckout登録
 make diff             # 配布するファイルの差分
 make dry-run          # ファイル配布のプレビュー（書き込みなし）
-make apply            # ファイル配布 → macOSではRectangle設定も適用
+make apply            # ファイル配布 → アプリ設定をまとめて適用
 make apply-files      # ファイル配布のみ
-make rectangle        # Rectangle設定のみ（macOS）
+make apply-apps       # アプリ設定をまとめて適用（macOS）
 make status           # 配布先ファイルの変更状況
 make verify           # 配布先ファイルの一致確認
 make test             # 既存テスト一式
@@ -48,9 +48,9 @@ make test             # 既存テスト一式
 
 `make apply` はファイルの競合時に停止します。Rectangleは変更前にバックアップし、
 起動中なら再起動します。`diff`・`dry-run`・`status`・`verify` の対象はchezmoiの
-管理ファイルで、RectangleのNSUserDefaults設定は含みません。
+管理ファイルで、Rectangle・Nani・iTerm2のアプリ内設定は含みません。
 `make init` はファイル配布とchezmoi登録までを行い、Rectangleは `make apply` または
-`make rectangle` で適用します。
+`make apply-apps` で適用します。
 
 新規Macの準備は `make macos-init` → HomebrewのPATH設定 → `make packages` →
 `make init` → `make apply` の順です。パッケージの既定はcoreで、全構成は
@@ -284,6 +284,42 @@ macOS側で日本語入力ソースを追加し、日本語の入力方法は「
 Karabiner-Elementsのアクセシビリティ／入力監視など、求められる権限も必要です。
 プロファイルは手動選択よりchezmoiの設定を正とし、再適用時に指定のQWERTYプロファイルを選択します。
 既存の大西配列プロファイルは残しています。
+
+#### Nani
+
+アプリ本体はBrewfileのfullプロファイルに含まれます。
+新規端末ではNaniを起動・ログインし、設定画面で選択テキスト翻訳のショートカットを
+一度設定してから `make apply-apps` を実行してください。
+アプリ設定の入口は `.bin/macos/apps.sh` に集約し、`make apply` からも実行します。
+アプリの追加時はこの入口へ処理を追加し、アプリ名のMakeターゲットは増やしません。
+
+設定の宣言は `.bin/macos/nani.json` です。現在の選択テキスト翻訳は
+`Command + Shift + J`、テーマはシステム追従、送信はEnterです。
+このショートカットはブラウザのダウンロード表示などと衝突する場合があります。
+変更する場合はJSONの `translate-select` を編集してください（Commandは `Meta`）。
+
+Nani 1.1.8で確認したSQLiteの `localkv` 内の設定項目だけを更新し、
+認証情報・翻訳履歴・キャッシュはGitに含めません。未指定の設定項目は維持します。
+変更前の設定は `~/Library/Application Support/Nani/dotfiles-backups/` に保存し、
+起動中なら終了・再起動して反映します。初期設定が未完了の場合やDB形式が変わった場合は停止します。
+
+#### iTerm2
+
+`.bin/macos/iterm2.json` に通常用の `Dracula` と `Hotkey Window` のフォント、
+ホットキーウィンドウの動作を宣言しています。`make apply` / `make apply-apps` で反映します。
+
+- フォント：`HackGen35ConsoleNFJ-Regular`、12pt（両プロファイル）
+- 呼び出し：Controlを2回押す
+- ホットキーウィンドウ：最前面表示、フォーカスを外すと自動で隠れる
+
+フォントは既存Brewfileの `font-hackgen-nerd` で導入します（`make packages PROFILE=full`）。
+設定変更が必要なときはiTerm2を終了し、Terminal.appなどから適用してください。
+作業中のシェルは自動で終了しません。既に設定が一致している場合は起動中でも何もしません。
+既存のプロファイルは名前で照合して対象項目だけを更新し、GUID・配色・コマンドなどを維持します。
+新しい端末では通常用とホットキー用のプロファイルを作成し、Draculaをデフォルトにします。
+配色は既存のデフォルトプロファイルから継承します（Draculaテーマの配布は含みません）。
+変更前の設定は `~/Library/Application Support/iTerm2/dotfiles-backups/` に保存します。
+iTerm2独自の外部設定フォルダーを利用中の場合は、二重管理を避けるため停止します。
 - **defaults.sh**: システム設定（ライブ変換オフ、Dockを自動的に隠す、バッテリー残量を%表示、iTerm2の既定プロファイル）
 
 ```bash

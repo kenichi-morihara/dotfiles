@@ -149,6 +149,8 @@ cask "jordanbaird-ice"
 cask "karabiner-elements"
 # GPU-based terminal emulator
 cask "kitty"
+# AI-powered translator
+cask "nani"
 # Client program for the OpenVPN Access Server
 cask "openvpn-connect"
 # Collaborative SQL editor
