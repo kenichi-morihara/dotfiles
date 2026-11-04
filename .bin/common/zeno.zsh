@@ -27,6 +27,9 @@ export ZENO_GIT_TREE="tree"
 
 # Recent zeno versions register widgets before lazy heavy initialization.
 if [[ -n $ZENO_LOADED || -n $ZENO_BOOTSTRAPPED ]]; then
+  source "${${(%):-%x}:A:h}/latency.zsh"
+  _dotfiles-measure-zeno-init
+  _dotfiles-measure-zeno-shortcuts
   # Initialize Deno/socket/history only when a bound widget is first used.
   if (( $+functions[zeno-register-lazy-widgets] )); then
     zeno-register-lazy-widgets zeno-auto-snippet zeno-ghq-cd zeno-completion \
