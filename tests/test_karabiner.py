@@ -37,7 +37,7 @@ class KarabinerTests(unittest.TestCase):
         self.assertEqual(selected[0]['virtual_hid_keyboard']['keyboard_type_v2'], 'jis')
         manipulators = [m for r in selected[0]['complex_modifications']['rules']
                         for m in r['manipulators']]
-        self.assertEqual([m['from']['key_code'] for m in manipulators], ['v', 'caps_lock'])
+        self.assertEqual([m['from']['key_code'] for m in manipulators], ['v'])
 
     def test_raycast_binding_is_available_in_both_layouts(self):
         for layout in ('jis', 'us'):
@@ -53,7 +53,7 @@ class KarabinerTests(unittest.TestCase):
                 self.assertEqual(manipulator['to'], [{'shell_command':
                     "/usr/bin/open -g 'raycast://extensions/raycast/clipboard-history/clipboard-history'"}])
 
-    def test_us_command_taps_preserve_command_chords_and_rectangle(self):
+    def test_us_command_taps_preserve_command_chords(self):
         config = self.render('us')
         selected = [p for p in config['profiles'] if p.get('selected')]
         self.assertEqual(len(selected), 1)
@@ -65,9 +65,18 @@ class KarabinerTests(unittest.TestCase):
             key = side + '_command'
             self.assertEqual(manipulators[key]['to'], [{'key_code': key}])
             self.assertEqual(manipulators[key]['to_if_alone'], [{'key_code': output}])
-        caps = manipulators['caps_lock']['to'][0]
-        self.assertEqual(caps['key_code'], 'left_control')
-        self.assertEqual(set(caps['modifiers']), {'left_option', 'left_command'})
+
+    def test_caps_lock_and_control_pass_through_in_all_profiles(self):
+        # macOS swaps these modifiers on the virtual keyboard. A Caps Lock
+        # hold/tap rule would turn Control+C into extra modifiers on this Mac.
+        for layout in ('jis', 'us'):
+            config = self.render(layout)
+            for profile in config['profiles']:
+                for rule in profile['complex_modifications']['rules']:
+                    for manipulator in rule['manipulators']:
+                        self.assertNotIn(manipulator['from'].get('key_code'),
+                                         ('caps_lock', 'left_control', 'right_control'))
+
 
 
 if __name__ == '__main__':

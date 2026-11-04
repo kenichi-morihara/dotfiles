@@ -289,38 +289,6 @@
                                 ]
                             }
                         ]
-                    },
-                    {
-                        "description": "Hold Caps Lock for Rectangle (Control+Option+Command); tap for Caps Lock",
-                        "manipulators": [
-                            {
-                                "type": "basic",
-                                "from": {
-                                    "key_code": "caps_lock",
-                                    "modifiers": {
-                                        "optional": [
-                                            "any"
-                                        ]
-                                    }
-                                },
-                                "to": [
-                                    {
-                                        "key_code": "left_control",
-                                        "modifiers": [
-                                            "left_option",
-                                            "left_command"
-                                        ],
-                                        "lazy": true
-                                    }
-                                ],
-                                "to_if_alone": [
-                                    {
-                                        "key_code": "caps_lock",
-                                        "hold_down_milliseconds": 200
-                                    }
-                                ]
-                            }
-                        ]
                     }
                 ]
             }
@@ -351,38 +319,6 @@
                                 "to": [
                                     {
                                         "shell_command": "/usr/bin/open -g 'raycast://extensions/raycast/clipboard-history/clipboard-history'"
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "description": "Hold Caps Lock for Rectangle (Control+Option+Command); tap for Caps Lock",
-                        "manipulators": [
-                            {
-                                "type": "basic",
-                                "from": {
-                                    "key_code": "caps_lock",
-                                    "modifiers": {
-                                        "optional": [
-                                            "any"
-                                        ]
-                                    }
-                                },
-                                "to": [
-                                    {
-                                        "key_code": "left_control",
-                                        "modifiers": [
-                                            "left_option",
-                                            "left_command"
-                                        ],
-                                        "lazy": true
-                                    }
-                                ],
-                                "to_if_alone": [
-                                    {
-                                        "key_code": "caps_lock",
-                                        "hold_down_milliseconds": 200
                                     }
                                 ]
                             }
@@ -422,38 +358,7 @@
                             }
                         ]
                     },
-                    {
-                        "description": "Hold Caps Lock for Rectangle (Control+Option+Command); tap for Caps Lock",
-                        "manipulators": [
-                            {
-                                "type": "basic",
-                                "from": {
-                                    "key_code": "caps_lock",
-                                    "modifiers": {
-                                        "optional": [
-                                            "any"
-                                        ]
-                                    }
-                                },
-                                "to": [
-                                    {
-                                        "key_code": "left_control",
-                                        "modifiers": [
-                                            "left_option",
-                                            "left_command"
-                                        ],
-                                        "lazy": true
-                                    }
-                                ],
-                                "to_if_alone": [
-                                    {
-                                        "key_code": "caps_lock",
-                                        "hold_down_milliseconds": 200
-                                    }
-                                ]
-                            }
-                        ]
-                    },
+
                     {
                         "description": "Tap left Command for Eisuu, right Command for Kana; hold for Command",
                         "manipulators": [

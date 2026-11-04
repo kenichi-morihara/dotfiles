@@ -285,11 +285,11 @@ macOS固有の設定は `scripts/macos/` と `home/dot_config/karabiner/` に配
 | 英数入力 | 英数キー | 左Commandを単押し |
 | 日本語入力（ローマ字入力） | かなキー | 右Commandを単押し |
 | コピーなど | Command＋文字 | Command＋文字（単押し切り替えは発動しない） |
-| Rectangleの左右半分・最大化・復元 | Caps Lock＋矢印 | Caps Lock＋矢印 |
-| ディスプレイ間移動 | Caps Lock＋Shift＋左右矢印 | Caps Lock＋Shift＋左右矢印 |
+| Rectangleの左右半分・最大化・復元 | Control＋Option＋Command＋矢印 | Control＋Option＋Command＋矢印 |
+| ディスプレイ間移動 | Control＋Option＋Command＋Shift＋左右矢印 | Control＋Option＋Command＋Shift＋左右矢印 |
 
-Caps Lockは押しながら使うとControl＋Option＋Command、単押しすると通常のCaps Lockです。
-従来のRectangleショートカットも引き続き使えます。
+Caps LockとControlはKarabinerで変換せず、macOS側の修飾キー設定に従います。
+macOSで入れ替えている場合も、Control＋Cなどの組み合わせとControl二度押しを維持します。
 macOS側で日本語入力ソースを追加し、日本語の入力方法は「ローマ字入力」に設定してください。
 Karabiner-Elementsのアクセシビリティ／入力監視など、求められる権限も必要です。
 プロファイルは手動選択よりchezmoiの設定を正とし、再適用時に指定のQWERTYプロファイルを選択します。
@@ -485,7 +485,7 @@ swift scripts/macos/input-sources.swift scripts/macos/input-sources.json --check
 
 Command＋Shift＋VでRaycastのClipboard Historyを開きます。
 全キーボードプロファイルの `complex_modifications` に定義してあり、
-`make apply-files` で配布します。Caps Lock＋矢印のRectangle設定も維持します。
+`make apply-files` で配布します。RectangleはControl＋Option＋Command＋矢印で操作します。
 
 ホットキーは `home/dot_config/karabiner/karabiner.json.tmpl` を編集します。
 Raycastの各コマンドで「Copy Deeplink」して得たURLを `shell_command` の

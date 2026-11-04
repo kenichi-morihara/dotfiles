@@ -15,8 +15,8 @@ make apply-apps
 | 前のディスプレイへ | Control + Option + Shift + Command + ← |
 | 次のディスプレイへ | Control + Option + Shift + Command + → |
 
-Karabiner設定の配布後は、Control + Option + Commandの代わりにCaps Lockを
-押しながら操作できる（例：左半分はCaps Lock + ←、画面移動はCaps Lock + Shift + ←/→）。
+Caps LockとControlはKarabinerでは変換しません。macOSの修飾キー設定で
+入れ替えている場合も、そのControlにOption＋Commandを組み合わせて操作します。
 
 宣言は `rectangle.sh` の `SHORTCUTS` 内で管理する。繰り返し実行しても同じ設定になる。
 この6項目以外の設定は変更しない。`make apply` ではmacOSの場合にファイル配布後に実行する。
