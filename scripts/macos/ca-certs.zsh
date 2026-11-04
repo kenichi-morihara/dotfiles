@@ -5,6 +5,8 @@
 _ca_bundle="${CA_BUNDLE:-/etc/ssl/cert.pem}"  # CA_BUNDLE is for tests
 if [[ -f "$_ca_bundle" ]]; then
   export SSL_CERT_FILE="${SSL_CERT_FILE:-$_ca_bundle}"
+  # Claude Code のネイティブ版にも同じ CA バンドルを明示的に渡す。
+  export NODE_EXTRA_CA_CERTS="${NODE_EXTRA_CA_CERTS:-$_ca_bundle}"
   # pip は certifi/システムのキーチェーンに頼らず、除去済みの cert.pem を使う。
   export PIP_CERT="${PIP_CERT:-$_ca_bundle}"
   case " ${NODE_OPTIONS:-} " in

@@ -20,12 +20,14 @@ else
 fi
 
 # 2. The environment a fresh interactive zsh would get from ca-certs.zsh.
-env_out=$(env -u SSL_CERT_FILE -u PIP_CERT -u NODE_OPTIONS CA_BUNDLE="$bundle" \
-    zsh -c 'source "$1"; print -r -- "$SSL_CERT_FILE|$PIP_CERT|$NODE_OPTIONS"' _ "$SCRIPT_DIR/ca-certs.zsh" 2>/dev/null)
-IFS='|' read -r ssl pip node <<<"$env_out"
+env_out=$(env -u SSL_CERT_FILE -u PIP_CERT -u NODE_OPTIONS -u NODE_EXTRA_CA_CERTS CA_BUNDLE="$bundle" \
+    zsh -c 'source "$1"; print -r -- "$SSL_CERT_FILE|$PIP_CERT|$NODE_OPTIONS|$NODE_EXTRA_CA_CERTS"' _ "$SCRIPT_DIR/ca-certs.zsh" 2>/dev/null)
+IFS='|' read -r ssl pip node extra <<<"$env_out"
 [ "$ssl" = "$bundle" ] && ok "SSL_CERT_FILE=$ssl" || ng "SSL_CERT_FILE is not $bundle (is $SCRIPT_DIR/ca-certs.zsh sourced from .zshrc?)"
 [ "$pip" = "$bundle" ] && ok "PIP_CERT=$pip"      || ng "PIP_CERT is not $bundle"
 case " $node " in *" --use-openssl-ca "*) ok "NODE_OPTIONS has --use-openssl-ca" ;; *) ng "NODE_OPTIONS lacks --use-openssl-ca (Node would use its built-in roots)" ;; esac
+
+[ "$extra" = "$bundle" ] && ok "NODE_EXTRA_CA_CERTS=$extra" || ng "NODE_EXTRA_CA_CERTS is not $bundle"
 
 # 3. Live probes: every client must reject both hosts. Only a certificate error counts as OK.
 if [ "${1:-}" = "--online" ]; then

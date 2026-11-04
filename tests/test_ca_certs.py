@@ -39,7 +39,7 @@ class Fixture(unittest.TestCase):
 
     def env(self, **extra):
         env = dict(os.environ, CA_BUNDLE=str(self.bundle))
-        for key in ('SSL_CERT_FILE', 'PIP_CERT', 'NODE_OPTIONS'):
+        for key in ('SSL_CERT_FILE', 'PIP_CERT', 'NODE_OPTIONS', 'NODE_EXTRA_CA_CERTS'):
             env.pop(key, None)
         env.update(extra)
         return env
@@ -93,15 +93,15 @@ class CaCertsScriptTests(Fixture):
 
 class CaCertsShellEnvTests(Fixture):
     def source(self, preset=''):
-        script = f'{preset}\nsource "{CA_ZSH}"\nprint -r -- "SSL=$SSL_CERT_FILE|PIP=$PIP_CERT|NODE=$NODE_OPTIONS"'
+        script = f'{preset}\nsource "{CA_ZSH}"\nprint -r -- "SSL=$SSL_CERT_FILE|PIP=$PIP_CERT|EXTRA=$NODE_EXTRA_CA_CERTS|NODE=$NODE_OPTIONS"'
         return self.run_script('zsh', '-c', script).stdout.strip()
 
     def test_exports_bundle_for_openssl_pip_and_node(self):
         self.write_bundle(*KEEP)
-        self.assertEqual(self.source(), f'SSL={self.bundle}|PIP={self.bundle}|NODE=--use-openssl-ca')
+        self.assertEqual(self.source(), f'SSL={self.bundle}|PIP={self.bundle}|EXTRA={self.bundle}|NODE=--use-openssl-ca')
 
     def test_does_nothing_when_the_bundle_is_missing(self):
-        self.assertEqual(self.source(), 'SSL=|PIP=|NODE=')
+        self.assertEqual(self.source(), 'SSL=|PIP=|EXTRA=|NODE=')
 
     def test_node_options_are_preserved_and_not_duplicated(self):
         self.write_bundle(*KEEP)
