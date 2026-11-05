@@ -1,6 +1,7 @@
 {
   "user-custom-shortcuts": {
-    "translate-select": ["Shift", "Meta", "KeyJ"]
+    "translate-select": ["Control", "Alt", "KeyJ"],
+    "translate-new": ["Meta", "Control", "KeyJ"]
   },
   "local-settings": {
     "theme": "system",

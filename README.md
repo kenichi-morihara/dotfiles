@@ -303,10 +303,13 @@ Karabiner-Elementsのアクセシビリティ／入力監視など、求めら�
 アプリ設定の入口は `scripts/macos/apps.sh` に集約し、`make apply` からも実行します。
 アプリの追加時はこの入口へ処理を追加し、アプリ名のMakeターゲットは増やしません。
 
-設定の宣言は `scripts/macos/nani.json` です。現在の選択テキスト翻訳は
-`Command + Shift + J`、テーマはシステム追従、送信はEnterです。
-このショートカットはブラウザのダウンロード表示などと衝突する場合があります。
-変更する場合はJSONの `translate-select` を編集してください（Commandは `Meta`）。
+設定の宣言は `scripts/macos/nani.json` です。
+
+- クイック翻訳（`translate-select`）は `Control + Option + J`
+- アプリを開く（`translate-new`）は `Control + Command + J`
+
+JSONではOptionを `Alt`、Commandを `Meta` と表記します。
+テーマはシステム追従、送信はEnterです。
 
 Nani 1.1.8で確認したSQLiteの `localkv` 内の設定項目だけを更新し、
 認証情報・翻訳履歴・キャッシュはGitに含めません。未指定の設定項目は維持します。

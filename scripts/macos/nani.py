@@ -10,7 +10,7 @@ import tempfile
 import time
 
 ALLOWED = {
-    'user-custom-shortcuts': {'translate-select'},
+    'user-custom-shortcuts': {'translate-select', 'translate-new'},
     'local-settings': {'theme', 'translateLang', 'translateBcp47', 'allowParaphrase',
                        'rubyType', 'preferredModelType', 'submitKey', 'inAppHotkeys'},
 }
