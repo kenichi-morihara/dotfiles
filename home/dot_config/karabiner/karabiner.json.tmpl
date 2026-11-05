@@ -360,7 +360,7 @@
                     },
 
                     {
-                        "description": "US modifiers: Fn → Control, Control → Option, Option → Command; tap original left Command to toggle input",
+                        "description": "US modifiers: Fn → Control, Control → Option, Option → Command; tap original left Command to toggle input, right Command for Kana",
                         "manipulators": [
                             {
                                 "type": "basic",
@@ -469,6 +469,22 @@
                                                 "language": "^en$"
                                             }
                                         ]
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "basic",
+                                "from": {
+                                    "key_code": "right_command"
+                                },
+                                "to": [
+                                    {
+                                        "key_code": "right_command"
+                                    }
+                                ],
+                                "to_if_alone": [
+                                    {
+                                        "key_code": "japanese_kana"
                                     }
                                 ]
                             }

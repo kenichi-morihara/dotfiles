@@ -67,7 +67,7 @@ class KarabinerTests(unittest.TestCase):
             'left_control': [{'key_code': 'left_option'}],
             'left_option': [{'key_code': 'left_command'}],
         })
-        taps = [m for m in manipulators if 'to_if_alone' in m]
+        taps = [m for m in manipulators if m['from']['key_code'] == 'left_command']
         self.assertEqual(len(taps), 2)
         for manipulator, (language, output) in zip(taps, [
             ('^ja$', 'japanese_eisuu'), ('^en$', 'japanese_kana'),
@@ -78,6 +78,11 @@ class KarabinerTests(unittest.TestCase):
             self.assertEqual(manipulator['conditions'], [
                 {'type': 'input_source_if', 'input_sources': [{'language': language}]},
             ])
+
+        right, = (m for m in manipulators if m['from']['key_code'] == 'right_command')
+        self.assertEqual(right['to'], [{'key_code': 'right_command'}])
+        self.assertEqual(right['to_if_alone'], [{'key_code': 'japanese_kana'}])
+        self.assertEqual(sum('to_if_alone' in m for m in manipulators), 3)
 
     def test_caps_lock_and_right_control_pass_through(self):
         for layout in ('jis', 'us'):
