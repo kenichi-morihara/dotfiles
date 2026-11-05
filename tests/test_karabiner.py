@@ -53,29 +53,42 @@ class KarabinerTests(unittest.TestCase):
                 self.assertEqual(manipulator['to'], [{'shell_command':
                     "/usr/bin/open -g 'raycast://extensions/raycast/clipboard-history/clipboard-history'"}])
 
-    def test_us_command_taps_preserve_command_chords(self):
+    def test_us_modifiers_and_left_command_toggle(self):
         config = self.render('us')
         selected = [p for p in config['profiles'] if p.get('selected')]
         self.assertEqual(len(selected), 1)
         self.assertEqual(selected[0]['virtual_hid_keyboard']['keyboard_type_v2'], 'ansi')
-        manipulators = {m['from']['key_code']: m
-                        for r in selected[0]['complex_modifications']['rules']
-                        for m in r['manipulators']}
-        for side, output in [('left', 'japanese_eisuu'), ('right', 'japanese_kana')]:
-            key = side + '_command'
-            self.assertEqual(manipulators[key]['to'], [{'key_code': key}])
-            self.assertEqual(manipulators[key]['to_if_alone'], [{'key_code': output}])
+        manipulators = [m for r in selected[0]['complex_modifications']['rules']
+                        for m in r['manipulators']]
+        remaps = {m['from']['key_code']: m['to'] for m in manipulators
+                  if m['from']['key_code'] in ('fn', 'left_control', 'left_option')}
+        self.assertEqual(remaps, {
+            'fn': [{'key_code': 'left_control'}],
+            'left_control': [{'key_code': 'left_option'}],
+            'left_option': [{'key_code': 'left_command'}],
+        })
+        taps = [m for m in manipulators if 'to_if_alone' in m]
+        self.assertEqual(len(taps), 2)
+        for manipulator, (language, output) in zip(taps, [
+            ('^ja$', 'japanese_eisuu'), ('^en$', 'japanese_kana'),
+        ]):
+            self.assertEqual(manipulator['from']['key_code'], 'left_command')
+            self.assertEqual(manipulator['to'], [{'key_code': 'left_command'}])
+            self.assertEqual(manipulator['to_if_alone'], [{'key_code': output}])
+            self.assertEqual(manipulator['conditions'], [
+                {'type': 'input_source_if', 'input_sources': [{'language': language}]},
+            ])
 
-    def test_caps_lock_and_control_pass_through_in_all_profiles(self):
-        # macOS swaps these modifiers on the virtual keyboard. A Caps Lock
-        # hold/tap rule would turn Control+C into extra modifiers on this Mac.
+    def test_caps_lock_and_right_control_pass_through(self):
         for layout in ('jis', 'us'):
             config = self.render(layout)
             for profile in config['profiles']:
+                untouched = {'caps_lock', 'right_control'}
+                if profile['name'] != 'QWERTY US':
+                    untouched.add('left_control')
                 for rule in profile['complex_modifications']['rules']:
                     for manipulator in rule['manipulators']:
-                        self.assertNotIn(manipulator['from'].get('key_code'),
-                                         ('caps_lock', 'left_control', 'right_control'))
+                        self.assertNotIn(manipulator['from'].get('key_code'), untouched)
 
 
 

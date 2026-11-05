@@ -360,12 +360,65 @@
                     },
 
                     {
-                        "description": "Tap left Command for Eisuu, right Command for Kana; hold for Command",
+                        "description": "US modifiers: Fn → Control, Control → Option, Option → Command; tap original left Command to toggle input",
                         "manipulators": [
                             {
                                 "type": "basic",
                                 "from": {
-                                    "key_code": "left_command"
+                                    "key_code": "fn",
+                                    "modifiers": {
+                                        "optional": [
+                                            "any"
+                                        ]
+                                    }
+                                },
+                                "to": [
+                                    {
+                                        "key_code": "left_control"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "basic",
+                                "from": {
+                                    "key_code": "left_control",
+                                    "modifiers": {
+                                        "optional": [
+                                            "any"
+                                        ]
+                                    }
+                                },
+                                "to": [
+                                    {
+                                        "key_code": "left_option"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "basic",
+                                "from": {
+                                    "key_code": "left_option",
+                                    "modifiers": {
+                                        "optional": [
+                                            "any"
+                                        ]
+                                    }
+                                },
+                                "to": [
+                                    {
+                                        "key_code": "left_command"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "basic",
+                                "from": {
+                                    "key_code": "left_command",
+                                    "modifiers": {
+                                        "optional": [
+                                            "caps_lock"
+                                        ]
+                                    }
                                 },
                                 "to": [
                                     {
@@ -376,21 +429,46 @@
                                     {
                                         "key_code": "japanese_eisuu"
                                     }
+                                ],
+                                "conditions": [
+                                    {
+                                        "type": "input_source_if",
+                                        "input_sources": [
+                                            {
+                                                "language": "^ja$"
+                                            }
+                                        ]
+                                    }
                                 ]
                             },
                             {
                                 "type": "basic",
                                 "from": {
-                                    "key_code": "right_command"
+                                    "key_code": "left_command",
+                                    "modifiers": {
+                                        "optional": [
+                                            "caps_lock"
+                                        ]
+                                    }
                                 },
                                 "to": [
                                     {
-                                        "key_code": "right_command"
+                                        "key_code": "left_command"
                                     }
                                 ],
                                 "to_if_alone": [
                                     {
                                         "key_code": "japanese_kana"
+                                    }
+                                ],
+                                "conditions": [
+                                    {
+                                        "type": "input_source_if",
+                                        "input_sources": [
+                                            {
+                                                "language": "^en$"
+                                            }
+                                        ]
                                     }
                                 ]
                             }
