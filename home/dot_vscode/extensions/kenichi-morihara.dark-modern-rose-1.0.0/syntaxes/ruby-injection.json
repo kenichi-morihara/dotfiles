@@ -5,6 +5,14 @@
     {
       "name": "keyword.control.end.ruby",
       "match": "(?<![.\\w:@$])\\bend\\b(?![?!:]|\\s*\\()"
+    },
+    {
+      "name": "support.function.rails.dsl.ruby",
+      "match": "(?<=^\\s*)(?:with_options|validates|validate|validates_with|validates_each|scope|belongs_to|has_one|has_many|has_and_belongs_to_many|before_validation|after_validation|after_initialize|after_find|(?:before|after|around)_(?:save|create|update|destroy)|after_(?:commit|rollback))(?=\\(|[ \\t]+(?![ \\t])[\\w:'\\\"&])"
+    },
+    {
+      "name": "support.function.predicate.ruby",
+      "match": "(?<![\\w:@$])\\b[a-z_]\\w*\\?(?![\\w?:])"
     }
   ]
 }

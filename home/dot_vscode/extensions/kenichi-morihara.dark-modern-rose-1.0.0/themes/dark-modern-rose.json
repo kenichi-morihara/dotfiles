@@ -35,6 +35,8 @@
     { "scope": ["comment", "punctuation.definition.comment"], "settings": { "foreground": "#8DBB7A" } },
     { "scope": ["string", "punctuation.definition.string"], "settings": { "foreground": "#FFAE92" } },
     { "scope": ["keyword", "storage"], "settings": { "foreground": "#BD93F9" } },
+    { "scope": "variable.language.self.ruby", "settings": { "foreground": "#BD93F9" } },
+    { "scope": "support.function.rails.dsl.ruby", "settings": { "foreground": "#A6B4EE" } },
     { "scope": "keyword.operator", "settings": { "foreground": "#E3E1ED" } },
     { "scope": ["entity.name.type", "entity.name.class", "entity.name.namespace", "entity.other.inherited-class", "support.class", "support.type"], "settings": { "foreground": "#62E1C7" } },
     { "scope": ["variable.other.constant", "variable.other.enummember", "constant.language", "constant.other"], "settings": { "foreground": "#74C4FF" } },
