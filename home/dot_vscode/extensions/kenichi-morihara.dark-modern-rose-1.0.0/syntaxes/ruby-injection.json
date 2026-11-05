@@ -1,0 +1,10 @@
+{
+  "scopeName": "dark-modern-rose.ruby.injection",
+  "injectionSelector": "L:source.ruby -comment -string",
+  "patterns": [
+    {
+      "name": "keyword.control.end.ruby",
+      "match": "(?<![.\\w:@$])\\bend\\b(?![?!:]|\\s*\\()"
+    }
+  ]
+}
