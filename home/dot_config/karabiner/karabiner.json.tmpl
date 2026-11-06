@@ -360,7 +360,7 @@
                     },
 
                     {
-                        "description": "US modifiers: Fn → Control, Control → Option, Option → Command; tap original left Command to toggle input, right Command for Kana",
+                        "description": "US modifiers: Fn → Control, Control → Option, Option → Command; tap original left Command for Eisuu, right Command for Kana",
                         "manipulators": [
                             {
                                 "type": "basic",
@@ -428,47 +428,6 @@
                                 "to_if_alone": [
                                     {
                                         "key_code": "japanese_eisuu"
-                                    }
-                                ],
-                                "conditions": [
-                                    {
-                                        "type": "input_source_if",
-                                        "input_sources": [
-                                            {
-                                                "language": "^ja$"
-                                            }
-                                        ]
-                                    }
-                                ]
-                            },
-                            {
-                                "type": "basic",
-                                "from": {
-                                    "key_code": "left_command",
-                                    "modifiers": {
-                                        "optional": [
-                                            "caps_lock"
-                                        ]
-                                    }
-                                },
-                                "to": [
-                                    {
-                                        "key_code": "left_command"
-                                    }
-                                ],
-                                "to_if_alone": [
-                                    {
-                                        "key_code": "japanese_kana"
-                                    }
-                                ],
-                                "conditions": [
-                                    {
-                                        "type": "input_source_if",
-                                        "input_sources": [
-                                            {
-                                                "language": "^en$"
-                                            }
-                                        ]
                                     }
                                 ]
                             },

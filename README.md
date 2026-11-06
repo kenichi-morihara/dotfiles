@@ -282,8 +282,8 @@ macOS固有の設定は `scripts/macos/` と `home/dot_config/karabiner/` に配
 
 | 操作 | JIS | US |
 | --- | --- | --- |
-| 英数入力 | 英数キー | 元の左Commandを単押しして切り替え |
-| 日本語入力（ローマ字入力） | かなキー | 右Commandを単押し、または元の左Commandで切り替え |
+| 英数入力 | 英数キー | 元の左Commandを単押し |
+| 日本語入力（ローマ字入力） | かなキー | 右Commandを単押し |
 | コピーなど | Command＋文字 | Command＋文字（単押し切り替えは発動しない） |
 | Rectangleの左右半分・最大化・復元 | Control＋Option＋Command＋矢印 | Control＋Option＋Command＋矢印 |
 | ディスプレイ間移動 | Control＋Option＋Command＋Shift＋左右矢印 | Control＋Option＋Command＋Shift＋左右矢印 |
