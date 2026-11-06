@@ -68,12 +68,12 @@ class KarabinerTests(unittest.TestCase):
             'left_option': [{'key_code': 'left_command'}],
         })
         left, = (m for m in manipulators if m['from']['key_code'] == 'left_command')
-        self.assertEqual(left['to'], [{'key_code': 'left_command'}])
+        self.assertEqual(left['to'], [{'key_code': 'left_command', 'lazy': True}])
         self.assertEqual(left['to_if_alone'], [{'key_code': 'japanese_eisuu'}])
         self.assertNotIn('conditions', left)
 
         right, = (m for m in manipulators if m['from']['key_code'] == 'right_command')
-        self.assertEqual(right['to'], [{'key_code': 'right_command'}])
+        self.assertEqual(right['to'], [{'key_code': 'right_command', 'lazy': True}])
         self.assertEqual(right['to_if_alone'], [{'key_code': 'japanese_kana'}])
         self.assertEqual(sum('to_if_alone' in m for m in manipulators), 2)
 
