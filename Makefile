@@ -65,7 +65,13 @@ packages-check: ## パッケージの不足確認（PROFILE=core/full、既定co
 	@if [ -f "$(PROFILE_STATE)" ]; then $(PROFILE_TOOL) packages --check $(if $(PROFILE),--package-profile "$(PROFILE)"); else bash scripts/macos/brew.sh --profile "$(or $(PROFILE),core)" check; fi
 
 verify: ## chezmoiのファイルが宣言と一致するか確認
-	$(CHEZMOI) --source "$(ROOT)" --destination "$(HOME)" verify
+	@$(CHEZMOI) --source "$(ROOT)" --destination "$(HOME)" verify || { \
+		result=$$?; \
+		echo 'File verification failed. Pending changes (current -> declared):' >&2; \
+		$(CHEZMOI) --source "$(ROOT)" --destination "$(HOME)" --no-pager diff; \
+		echo 'Review with make diff; apply with make apply-files.' >&2; \
+		exit $$result; \
+	}
 
 check-apps: ## インストール済みアプリの設定を確認（変更なし、macOS）
 	@if [ "$$(uname -s)" = Darwin ]; then PYTHON="$(PYTHON)" bash scripts/macos/apps.sh --check; fi

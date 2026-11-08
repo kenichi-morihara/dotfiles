@@ -1,10 +1,13 @@
 """Verify preference merging never replaces translation or account data."""
 import importlib.util
+import contextlib
+import io
 import json
 from pathlib import Path
 import sqlite3
 import tempfile
 import unittest
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location('nani_settings', ROOT / 'scripts/macos/nani.py')
@@ -13,6 +16,29 @@ spec.loader.exec_module(nani)
 
 
 class NaniTests(unittest.TestCase):
+    def test_check_reports_changed_fields_without_writing(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            database = root / 'Library/Application Support/Nani/app.db/db'
+            database.parent.mkdir(parents=True)
+            with sqlite3.connect(database) as connection:
+                connection.execute('CREATE TABLE localkv (key TEXT PRIMARY KEY, value TEXT)')
+                connection.executemany('INSERT INTO localkv VALUES (?, ?)', [
+                    ('local-settings', '{"theme":"dark","private":"do not print"}'),
+                    ('user-custom-shortcuts', '{}'),
+                ])
+            before = database.read_bytes()
+            output = io.StringIO()
+            with patch.object(nani.sys, 'argv', ['nani.py', '--check']), \
+                 patch.object(nani.sys, 'platform', 'darwin'), \
+                 patch.object(nani.Path, 'home', return_value=root), \
+                 contextlib.redirect_stdout(output):
+                self.assertEqual(nani.main(), 1)
+            self.assertIn('local-settings.theme: "dark" ->', output.getvalue())
+            self.assertIn('make apply-apps', output.getvalue())
+            self.assertNotIn('do not print', output.getvalue())
+            self.assertEqual(database.read_bytes(), before)
+
     def test_apply_preserves_history_account_and_unmanaged_preferences(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

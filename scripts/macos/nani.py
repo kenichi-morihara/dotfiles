@@ -79,12 +79,21 @@ def main():
     config = load_config(Path(__file__).with_name('nani.json'))
     try:
         with sqlite3.connect(database.as_uri() + '?mode=ro', uri=True) as connection:
-            changed = bool(updates(connection, config))
+            changes = updates(connection, config)
+            changed = bool(changes)
     except NotInitialized as error:
         print(f'SKIP Nani: {error}')
         return 0
     if args.check:
         print('Nani settings differ' if changed else 'Nani settings match')
+        for key, (old, _) in changes.items():
+            current = json.loads(old)
+            for name, expected in config[key].items():
+                if name not in current or current[name] != expected:
+                    actual = json.dumps(current[name], ensure_ascii=False) if name in current else '<missing>'
+                    print(f'  {key}.{name}: {actual} -> {json.dumps(expected, ensure_ascii=False)}')
+        if changed:
+            print('Apply with make apply-apps.')
         return int(changed)
     if not changed:
         print('Nani settings already match')

@@ -90,11 +90,15 @@ do {
     }
     let actual = Set(keyboards().filter { enabled($0) }.map(id))
     let current = id(TISCopyCurrentKeyboardInputSource().takeRetainedValue())
-    guard actual == wanted, current == config.selected else {
+    // The current selection changes during normal typing; only apply enforces it.
+    guard actual == wanted, check || current == config.selected else {
+        let nextStep = check
+            ? "Apply with make apply-apps."
+            : "Settings did not take effect. Retry from Terminal in your logged-in desktop session."
         throw NSError(domain: "InputSources", code: 1, userInfo: [NSLocalizedDescriptionKey:
-            "Input sources differ: enabled=\(actual.sorted()), selected=\(current). Retry from Terminal in your logged-in desktop session."])
+            "Input sources differ:\n  enabled: \(actual.sorted()) -> \(wanted.sorted())\n  selected: \(current) -> \(config.selected)\n\(nextStep)"])
     }
-    print("Input sources match: ABC + Hiragana (Google); selected: Hiragana (Google)")
+    print("Input sources match: ABC + Hiragana (Google); current selection: \(current)")
 } catch {
     fputs("\(error.localizedDescription)\n", stderr)
     exit(1)

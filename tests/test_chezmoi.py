@@ -50,6 +50,13 @@ class ChezmoiTests(unittest.TestCase):
         self.run_chezmoi('verify')
         target.write_text('local edit\n')
         self.assertNotEqual(self.run_chezmoi('verify', check=False).returncode, 0)
+        diagnostic = subprocess.run(['make', 'verify', f'HOME={self.home}'], cwd=ROOT,
+                                    env=self.env, text=True, capture_output=True)
+        self.assertNotEqual(diagnostic.returncode, 0)
+        self.assertIn('local edit', diagnostic.stdout)
+        self.assertIn('config.yml', diagnostic.stdout)
+        self.assertIn('make apply-files', diagnostic.stderr)
+        self.assertEqual(target.read_text(), 'local edit\n')
         result = self.run_chezmoi('--error-on-conflict', 'apply', check=False)
         self.assertNotEqual(result.returncode, 0)
         self.assertEqual(target.read_text(), 'local edit\n')
