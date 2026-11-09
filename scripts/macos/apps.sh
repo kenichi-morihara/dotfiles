@@ -10,6 +10,7 @@ applications_dir="${DOTFILES_APPLICATIONS_DIR:-/Applications}"
 run_app() {
     local name="$1" app="$2"
     shift 2
+    echo "--> $name"
     if [ ! -d "$applications_dir/$app.app" ] && [ ! -d "$HOME/Applications/$app.app" ]; then
         echo "SKIP $name: not installed"
         return
@@ -23,6 +24,7 @@ run_app() {
 run_app Rectangle Rectangle bash "$SCRIPT_DIR/rectangle.sh"
 run_app Nani Nani "${PYTHON:-python3}" "$SCRIPT_DIR/nani.py"
 run_app iTerm2 iTerm "${PYTHON:-python3}" "$SCRIPT_DIR/iterm2.py"
+echo "--> Input sources"
 if [ -d "/Library/Input Methods/GoogleJapaneseInput.app" ]; then
     if swift "$SCRIPT_DIR/input-sources.swift" "$SCRIPT_DIR/input-sources.json" ${args[@]+"${args[@]}"}; then
         :

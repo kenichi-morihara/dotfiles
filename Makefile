@@ -46,10 +46,18 @@ packages: ## パッケージ導入（PROFILE=core/full、既定core）
 	@if [ -f "$(PROFILE_STATE)" ]; then $(PROFILE_TOOL) packages $(if $(PROFILE),--package-profile "$(PROFILE)"); else bash scripts/macos/brew.sh --profile "$(or $(PROFILE),core)"; fi
 
 apply-files: ## chezmoiのファイルだけを適用（競合時は停止）
+	@echo '==> Files (chezmoi)'
+	@changes="$$($(CHEZMOI) --source "$(ROOT)" --destination "$(HOME)" status)" || exit $$?; \
+	if [ -z "$$changes" ]; then \
+		echo '    変更なし'; \
+	else \
+		echo '    適用する変更（A=追加 M=変更 D=削除 R=スクリプト実行）:'; \
+		printf '%s\n' "$$changes" | sed 's/^/    /'; \
+	fi
 	$(CHEZMOI) --source "$(ROOT)" --destination "$(HOME)" apply --error-on-conflict
 
 apply-apps: ## インストール済みアプリの設定を適用（macOS）
-	@if [ "$$(uname -s)" = Darwin ]; then PYTHON="$(PYTHON)" bash scripts/macos/apps.sh; fi
+	@if [ "$$(uname -s)" = Darwin ]; then echo '==> Apps (macOS)'; PYTHON="$(PYTHON)" bash scripts/macos/apps.sh; fi
 
 apply-system: ## Dock・日本語入力・電源などのシステム設定を適用（要sudo）
 	bash scripts/macos/defaults.sh
