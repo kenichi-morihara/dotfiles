@@ -28,4 +28,4 @@ week=$(pct .rate_limits.seven_day.used_percentage)
 five_r=$(fmt "$(until_reset .rate_limits.five_hour.resets_at)")
 week_r=$(fmt "$(until_reset .rate_limits.seven_day.resets_at)")
 
-echo "$model | ctx ${ctx:--}% | 5h ${five:--}%${five_r:+ (reset in ${five_r})} | 7d ${week:--}%${week_r:+ (reset in ${week_r})}"
+echo "$model | ctx ${ctx:--}/100% | 5h ${five:--}/100%${five_r:+ (reset ${five_r})} | 7d ${week:--}/100%${week_r:+ (reset ${week_r})}"
