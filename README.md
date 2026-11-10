@@ -570,6 +570,9 @@ Homebrew の PATH 設定後、必要なら `command brew install python` で準�
 `DOTFILES_PROFILE_PYTHON=/path/to/python3 chezmoi apply`）。
 
 ```sh
+# 対話的に選ぶ（会社端末の設定ファイルもここで作成できます）
+make profile-select
+
 # 個人端末
 make profile-select NAME=personal
 make profile-show
@@ -614,6 +617,9 @@ casks = []
 repos = ["github.com/example-company/example-repo"]
 keyboard_layout = "us"
 ```
+
+会社用の pi coding agent の設定は [work/pi/](work/pi/README.md) にまとめています。
+共通設定とは独立しており、`make pi-setup` で導入します。
 
 `make packages` / `make packages-check` は選択済み profile の構成と追加パッケージを使います。
 `PROFILE=core/full` は従来どおり構成の明示指定として使えます（追加分は維持）。

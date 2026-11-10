@@ -95,8 +95,8 @@ test: ## 一時HOMEなどを使うテストを実行
 
 ##@ 用途・端末別profile
 .PHONY: profile-select profile-show setup-plan repos
-profile-select: ## 用途・端末のprofileを保存（NAME=personal または work/<端末ID>）
-	$(PROFILE_TOOL) select --name "$(NAME)"
+profile-select: ## 用途・端末のprofileを選択（NAME省略で対話的に選ぶ）
+	$(PROFILE_TOOL) select $(if $(NAME),--name "$(NAME)")
 
 profile-show: ## 選択中profileの実効設定を表示
 	$(PROFILE_TOOL) show
@@ -106,3 +106,7 @@ setup-plan: ## 一括導入の予定を表示（変更なし）
 
 repos: ## 選択中profileのrepo取得・開発依存導入
 	$(PROFILE_TOOL) repos
+
+.PHONY: pi-setup
+pi-setup: ## 会社用: pi coding agentを導入
+	bash work/pi/install.sh
