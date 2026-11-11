@@ -59,7 +59,7 @@ sys.stdout.buffer.write(plistlib.dumps({a:dict(keyCode=k,modifierFlags=f) for a,
             uname.chmod(0o755)
             env = {**os.environ, 'HOME': str(root), 'PATH': str(binaries) + ':' + os.environ['PATH']}
             for mode in [[], [], ['--check']]:
-                result = subprocess.run(['bash', str(ROOT / 'scripts/macos/rectangle.sh'), *mode],
+                result = subprocess.run(['bash', str(ROOT / 'modules/window-manager/scripts/macos/rectangle.sh'), *mode],
                                         env=env, text=True, capture_output=True)
                 self.assertEqual(result.returncode, 0, result.stderr)
                 self.assertIn('already match', result.stdout)

@@ -1,0 +1,7 @@
+{
+  "name": "macos-preferences",
+  "description": "macOS・IME・アプリ設定",
+  "platforms": [
+    "darwin"
+  ]
+}

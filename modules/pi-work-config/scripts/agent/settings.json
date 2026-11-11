@@ -1,0 +1,7 @@
+{
+  "$schema": "https://pi.dev/schemas/settings.schema.json",
+  "defaultProvider": "claude-code-cli",
+  "defaultModel": "sonnet",
+  "enabledModels": ["claude-code-cli/*"],
+  "defaultProjectTrust": "never"
+}

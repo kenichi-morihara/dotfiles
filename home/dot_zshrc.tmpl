@@ -1,2 +1,5 @@
-# Managed by chezmoi; shared shell modules remain in the source repository.
-source {{ joinPath .chezmoi.workingTree "scripts/common/.zshrc" | shellQuote }}
+{{ includeTemplate (joinPath .chezmoi.workingTree "modules/shell-environment/home/dot_zshrc.tmpl") (merge (dict "moduleRoot" (joinPath .chezmoi.workingTree "modules/shell-environment")) .) }}
+case "$(uname -s)" in
+  Darwin) source {{ joinPath .chezmoi.workingTree "scripts/macos/brew.zsh" | shellQuote }} ;;
+  Linux) source {{ joinPath .chezmoi.workingTree "scripts/linux/yay.zsh" | shellQuote }} ;;
+esac

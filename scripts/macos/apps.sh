@@ -26,7 +26,7 @@ run_app Nani Nani "${PYTHON:-python3}" "$SCRIPT_DIR/nani.py"
 run_app iTerm2 iTerm "${PYTHON:-python3}" "$SCRIPT_DIR/iterm2.py"
 echo "--> Input sources"
 if [ -d "/Library/Input Methods/GoogleJapaneseInput.app" ]; then
-    if swift "$SCRIPT_DIR/input-sources.swift" "$SCRIPT_DIR/input-sources.json" ${args[@]+"${args[@]}"}; then
+    if swift "$SCRIPT_DIR/../../modules/macos-preferences/scripts/macos/input-sources.swift" "$SCRIPT_DIR/../../modules/macos-preferences/scripts/macos/input-sources.json" ${args[@]+"${args[@]}"}; then
         :
     else
         failures+=("Input sources")

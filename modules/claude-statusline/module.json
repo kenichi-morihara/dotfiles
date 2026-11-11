@@ -1,0 +1,8 @@
+{
+  "name": "claude-statusline",
+  "description": "Claude の利用量・PR表示",
+  "platforms": [
+    "darwin",
+    "linux"
+  ]
+}

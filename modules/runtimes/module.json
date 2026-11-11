@@ -1,0 +1,8 @@
+{
+  "name": "runtimes",
+  "description": "mise の言語設定",
+  "platforms": [
+    "darwin",
+    "linux"
+  ]
+}

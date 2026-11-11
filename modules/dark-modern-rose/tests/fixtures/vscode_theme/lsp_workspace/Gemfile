@@ -1,0 +1,4 @@
+# frozen_string_literal: true
+
+# Empty bundle so ruby-lsp activates this workspace on startup (tests/vscode_theme/e2e.mjs).
+source "https://rubygems.org"

@@ -1,0 +1,9 @@
+{
+  "name": "dark-modern-rose",
+  "description": "VS Code テーマ・構文・検証",
+  "platforms": [
+    "darwin",
+    "linux",
+    "windows"
+  ]
+}

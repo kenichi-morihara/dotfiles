@@ -59,6 +59,43 @@ def resolve(name=None):
     return dict(config, name=name)
 
 
+def ask(prompt):
+    try:
+        return input(prompt).strip()
+    except EOFError:
+        raise ValueError('入力が中断されました')
+
+
+def create_machine(machine):
+    if not re.fullmatch(r'[a-zA-Z0-9][a-zA-Z0-9_-]*', machine) or machine == 'example':
+        raise ValueError(f'端末IDには英数字・ハイフン・アンダースコアを使ってください: {machine}')
+    target = ROOT / 'profiles/work' / (machine + '.toml')
+    if not target.exists():
+        shutil.copyfile(ROOT / 'profiles/work/example.toml', target)
+        print(f'作成: {target.relative_to(ROOT)}（追加パッケージ等は後で編集できます）')
+    return 'work/' + machine
+
+
+def choose_interactively():
+    machines = sorted(p.stem for p in (ROOT / 'profiles/work').glob('*.toml') if p.stem != 'example')
+    options = [('personal', '個人用'), ('work', '会社用（端末別の設定なし）')]
+    options += [('work/' + m, '会社用の端末設定') for m in machines]
+    print('profile を選んでください:')
+    for number, (name, label) in enumerate(options, 1):
+        print(f'  {number}) {name:<20} {label}')
+    print(f'  {len(options) + 1}) 会社用の端末設定を新しく作る')
+    answer = ask('番号: ')
+    if not answer.isdigit() or not 1 <= int(answer) <= len(options) + 1:
+        raise ValueError(f'番号で選んでください: {answer}')
+    if int(answer) <= len(options):
+        return options[int(answer) - 1][0]
+    return create_machine(ask('端末ID（例: primenumber-mac）: '))
+
+
+def interactive():
+    return sys.stdin.isatty() and sys.stdout.isatty()
+
+
 def merge(target, extra):
     for key, value in extra.items():
         if isinstance(value, dict) and isinstance(target.get(key), dict):
@@ -137,7 +174,16 @@ def main():
     args = parser.parse_args()
     try:
         if args.action == 'select' and not args.name:
-            raise ValueError('NAME を指定してください')
+            if not interactive():
+                raise ValueError('NAME を指定してください（例: NAME=work）')
+            args.name = choose_interactively()
+        if args.action == 'select' and args.name.startswith('work/'):
+            machine = args.name.split('/', 1)[1]
+            if machine != 'example' and not (ROOT / 'profiles/work' / (machine + '.toml')).exists():
+                if interactive() and ask(f'profiles/work/{machine}.toml がありません。作成しますか？ [Y/n] ').lower() in ('', 'y', 'yes'):
+                    create_machine(machine)
+                else:
+                    raise ValueError(f'profiles/work/{machine}.toml がありません。make profile-select で対話的に作成するか、NAME=work を使ってください')
         if args.name and args.action != 'select':
             raise ValueError('--name は select のみで使用できます。先に profile を選択してください')
         config = resolve(args.name)

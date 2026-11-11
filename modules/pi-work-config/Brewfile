@@ -1,0 +1,3 @@
+brew "node"
+brew "mise"
+cask "claude-code"

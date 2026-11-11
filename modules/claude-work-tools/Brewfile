@@ -1,0 +1,4 @@
+brew "python"
+brew "git"
+brew "docker"
+cask "claude-code"

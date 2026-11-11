@@ -1,0 +1,8 @@
+{
+  "name": "claude-work-tools",
+  "description": "Claude の仕事用コマンド変換",
+  "platforms": [
+    "darwin",
+    "linux"
+  ]
+}

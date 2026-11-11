@@ -1,0 +1,16 @@
+{
+  "scopeName": "dark-modern-rose.ruby.data.injection",
+  "injectionSelector": "L:source.ruby -comment -string -source.ruby.embedded",
+  "patterns": [
+    {
+      "begin": "^__END__$",
+      "beginCaptures": {
+        "0": {
+          "name": "keyword.other.program-block.ruby"
+        }
+      },
+      "end": "(?!)",
+      "contentName": "comment.block.data.ruby"
+    }
+  ]
+}

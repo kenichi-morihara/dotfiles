@@ -16,7 +16,7 @@ cd "$(ghq root)/github.com/kenichi-morihara/dotfiles"
 会社指定のアプリと重複しないよう `scripts/macos/.Brewfile` を確認してください。
 
 ```bash
-scripts/macos/init.sh
+modules/macos-preferences/scripts/macos/init.sh
 # Command Line Toolsのインストールが開始された場合は、完了後に再実行
 
 # HomebrewのPATHを現在のシェルに反映
@@ -72,25 +72,17 @@ Windowsへ移行する場合は既存設定を別途バックアップしてか�
 
 ## 設定の編集と更新
 
-```bash
-chezmoi edit ~/.config/zeno/config.yml
-chezmoi diff
-chezmoi apply
-# 配布先を直接編集した場合は、内容を確認してソースに取り込む
-chezmoi re-add ~/.config/zeno/config.yml
-```
-
-ソースを直接編集する場合は `home/dot_config/` 内を編集し、`chezmoi apply` します。
-`scripts/common/` のシェルモジュールは `.zshrc` のテンプレートからcheckout内のファイルを読み込みます。
-checkoutを移動した場合は、新しい場所で `chezmoi init --source "$PWD"` と `chezmoi apply` を実行します。
-秘密情報・端末固有のシェル設定は、従来どおり管理対象外の `~/.zshrc.local` に置けます。
+設定の正本は modules 内で編集します。例えば zeno は modules/shell-environment/modules/shell-environment/home/dot_config/zeno/config.yml です。
+ルートで make diff、make apply を実行して反映します。[モジュール構成](modules.md) に編集先と配布先を記載しています。
+シェルの読み込み先は checkout 内の各モジュールです。移動後は chezmoi init --source "$PWD" と make apply で参照先を更新します。
+端末固有・秘密のシェル設定は ~/.zshrc.local に置きます。
 
 ## 3. zshのセットアップ
 
 ### 方法1: 自動スクリプトを使用（推奨）
 
 ```bash
-./setup-zsh.sh
+./modules/shell-environment/setup-zsh.sh
 ```
 
 このスクリプトでは次を実行します。
@@ -154,7 +146,7 @@ curl https://mise.run | sh
   補完・検索ウィジェットはzenoを使い、zinitからfzfを重複取得しません。
 
 グローバルのNode・Python・Go・Deno・Lua・Ruby・Corepackは
-`home/dot_config/mise/config.toml` で管理します。設定配布後に `mise install` を実行します。
+`modules/runtimes/home/dot_config/mise/config.toml` で管理します。設定配布後に `mise install` を実行します。
 Corepackは現在のNode 25に対応する0.34.7を使用し、pnpm/Yarnのバージョンは
 各プロジェクトの `package.json` の `packageManager` に従います。
 プロジェクト固有のランタイムは、そのプロジェクトの `mise.toml` で指定します。
@@ -184,8 +176,8 @@ zenoはbootstrapを明示的に読み込み、初回のウィジェット利用�
 Cursor本体とterminal agentを冪等に確認し、必要なら認証します。
 
 ```bash
-scripts/common/setup-cursor-agent.sh
-scripts/common/setup-cursor-agent.sh --login
+modules/editor-configs/scripts/common/setup-cursor-agent.sh
+modules/editor-configs/scripts/common/setup-cursor-agent.sh --login
 ```
 
 認証後は任意のrepositoryで次のように利用できます。
@@ -199,7 +191,7 @@ cursor agent --workspace "$PWD" -p --trust "Run the project checks and report fa
 
 ## Linux
 
-Linux固有の設定は `scripts/linux/` と `home/dot_config/hypr/`・`home/dot_config/omarchy/` に配置されています：
+Linux固有の設定は `scripts/linux/` と `modules/omarchy-preferences/home/dot_config/hypr/`・`modules/omarchy-preferences/home/dot_config/omarchy/` に配置されています：
 
 - **yay.sh**: Arch Linuxのyayパッケージマネージャー用スクリプト
 - **hypr/hypridle.conf**: Omarchy の idle（スクリーンセーバー／自動ロック）を無効化
@@ -207,14 +199,14 @@ Linux固有の設定は `scripts/linux/` と `home/dot_config/hypr/`・`home/dot
 
 ## Windows
 
-Windows固有の設定は `scripts/windows/` と `home/dot_config/windows/` に配置されています。
+Windows固有の設定は `scripts/windows/` と `modules/windows-preferences/home/dot_config/windows/` に配置されています。
 
 - **gamedvr.dsc.yaml**: Xbox Game Bar / Game DVR を無効化（ゲーム起動時の `ms-gamingoverlay` ダイアログ対策）
 - **desired-state.json**: NVIDIA ゲーム内オーバーレイ無効化、Armoury Crate 常駐の停止
 - **configure.ps1**: 上記をこのマシンへ適用する
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File scripts/windows/configure.ps1
+powershell -ExecutionPolicy Bypass -File modules/windows-preferences/scripts/windows/configure.ps1
 ```
 
 HKCU のユーザー設定（Game DVR / NVIDIA Overlay）は管理者なしで入ります。Armoury Crate のサービス・タスク無効化と `AllowGameDVR` は管理者で再実行すると入ります。
@@ -223,7 +215,7 @@ Armoury Crate を止めると、ASUS の RGB / ファン制御 UI と ROG マウ
 
 ## Cursor
 
-- **User file rules**: `home/dot_cursor/rules/*.mdc` → `~/.cursor/rules/`（`alwaysApply: true` なら全チャットに載る）
+- **User file rules**: `modules/editor-configs/home/dot_cursor/rules/*.mdc` → `~/.cursor/rules/`（`alwaysApply: true` なら全チャットに載る）
 - 別端末: このリポジトリを clone して `chezmoi init --source "$PWD"`、`chezmoi apply` を実行
 - プロジェクト固有の置き場・テストコマンドは、各リポジトリの `.cursor/rules/` で上書き・補足する
 
@@ -235,7 +227,7 @@ Armoury Crate を止めると、ASUS の RGB / ファン制御 UI と ROG マウ
 2. OS固有のアプリ設定は、対象ディレクトリを `home/.chezmoiignore` のOS条件に追加します。
 3. 実行権限が必要なファイルは、ソース名に `executable_` を付けます。
 4. シェル処理は `scripts/common/`、OS固有処理は `scripts/macos/`・`scripts/linux/` に置き、共通Zshから読み込みます。
-5. Windowsのシステム設定は `home/dot_config/windows/` と `scripts/windows/configure.ps1` を更新します。
+5. Windowsのシステム設定は `modules/windows-preferences/home/dot_config/windows/` と `modules/windows-preferences/scripts/windows/configure.ps1` を更新します。
 
 アプリ設定の変更は `chezmoi apply`、キー割り当て・端末固有シェル設定の変更はCtrl+Rで
 反映します。プラグインとstarship・miseの初期化設定の変更は、新しいシェルで確認します。
@@ -254,5 +246,5 @@ Armoury Crate を止めると、ASUS の RGB / ファン制御 UI と ROG マウ
 ### zinitが読み込めない
 
 1. zinitがインストールされているか確認
-2. `scripts/common/zinit.zsh` のパス設定が正しいか確認
+2. `modules/shell-environment/scripts/common/zinit.zsh` のパス設定が正しいか確認
 3. OS別のパスが適切に設定されているか確認

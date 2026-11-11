@@ -1,0 +1,4 @@
+[data]
+{{ if hasKey . "keyboardLayout" -}}
+keyboardLayout = {{ .keyboardLayout | quote }}
+{{ end -}}

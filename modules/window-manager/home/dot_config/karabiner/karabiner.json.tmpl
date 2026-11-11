@@ -1,0 +1,409 @@
+{{- $layout := default "jis" (get . "keyboardLayout") -}}
+{{- if not (has $layout (list "jis" "us")) -}}
+{{- fail "keyboardLayout must be jis or us" -}}
+{{- end -}}
+{
+    "global": {
+        "show_in_menu_bar": false
+    },
+    "profiles": [
+        {
+            "name": "大西配列",
+            "simple_modifications": [
+                {
+                    "from": {
+                        "key_code": "a"
+                    },
+                    "to": [
+                        {
+                            "key_code": "e"
+                        }
+                    ]
+                },
+                {
+                    "from": {
+                        "key_code": "b"
+                    },
+                    "to": [
+                        {
+                            "key_code": "semicolon"
+                        }
+                    ]
+                },
+                {
+                    "from": {
+                        "key_code": "comma"
+                    },
+                    "to": [
+                        {
+                            "key_code": "m"
+                        }
+                    ]
+                },
+                {
+                    "from": {
+                        "key_code": "d"
+                    },
+                    "to": [
+                        {
+                            "key_code": "a"
+                        }
+                    ]
+                },
+                {
+                    "from": {
+                        "key_code": "e"
+                    },
+                    "to": [
+                        {
+                            "key_code": "u"
+                        }
+                    ]
+                },
+                {
+                    "from": {
+                        "key_code": "f"
+                    },
+                    "to": [
+                        {
+                            "key_code": "o"
+                        }
+                    ]
+                },
+                {
+                    "from": {
+                        "key_code": "g"
+                    },
+                    "to": [
+                        {
+                            "key_code": "hyphen"
+                        }
+                    ]
+                },
+                {
+                    "from": {
+                        "key_code": "h"
+                    },
+                    "to": [
+                        {
+                            "key_code": "k"
+                        }
+                    ]
+                },
+                {
+                    "from": {
+                        "key_code": "hyphen"
+                    },
+                    "to": [
+                        {
+                            "key_code": "slash"
+                        }
+                    ]
+                },
+                {
+                    "from": {
+                        "key_code": "i"
+                    },
+                    "to": [
+                        {
+                            "key_code": "r"
+                        }
+                    ]
+                },
+                {
+                    "from": {
+                        "key_code": "j"
+                    },
+                    "to": [
+                        {
+                            "key_code": "t"
+                        }
+                    ]
+                },
+                {
+                    "from": {
+                        "key_code": "k"
+                    },
+                    "to": [
+                        {
+                            "key_code": "n"
+                        }
+                    ]
+                },
+                {
+                    "from": {
+                        "key_code": "l"
+                    },
+                    "to": [
+                        {
+                            "key_code": "s"
+                        }
+                    ]
+                },
+                {
+                    "from": {
+                        "key_code": "m"
+                    },
+                    "to": [
+                        {
+                            "key_code": "d"
+                        }
+                    ]
+                },
+                {
+                    "from": {
+                        "key_code": "n"
+                    },
+                    "to": [
+                        {
+                            "key_code": "g"
+                        }
+                    ]
+                },
+                {
+                    "from": {
+                        "key_code": "o"
+                    },
+                    "to": [
+                        {
+                            "key_code": "y"
+                        }
+                    ]
+                },
+                {
+                    "from": {
+                        "key_code": "period"
+                    },
+                    "to": [
+                        {
+                            "key_code": "j"
+                        }
+                    ]
+                },
+                {
+                    "from": {
+                        "key_code": "r"
+                    },
+                    "to": [
+                        {
+                            "key_code": "comma"
+                        }
+                    ]
+                },
+                {
+                    "from": {
+                        "key_code": "s"
+                    },
+                    "to": [
+                        {
+                            "key_code": "i"
+                        }
+                    ]
+                },
+                {
+                    "from": {
+                        "key_code": "semicolon"
+                    },
+                    "to": [
+                        {
+                            "key_code": "h"
+                        }
+                    ]
+                },
+                {
+                    "from": {
+                        "key_code": "slash"
+                    },
+                    "to": [
+                        {
+                            "key_code": "b"
+                        }
+                    ]
+                },
+                {
+                    "from": {
+                        "key_code": "t"
+                    },
+                    "to": [
+                        {
+                            "key_code": "period"
+                        }
+                    ]
+                },
+                {
+                    "from": {
+                        "key_code": "u"
+                    },
+                    "to": [
+                        {
+                            "key_code": "w"
+                        }
+                    ]
+                },
+                {
+                    "from": {
+                        "key_code": "w"
+                    },
+                    "to": [
+                        {
+                            "key_code": "l"
+                        }
+                    ]
+                },
+                {
+                    "from": {
+                        "key_code": "y"
+                    },
+                    "to": [
+                        {
+                            "key_code": "f"
+                        }
+                    ]
+                }
+            ],
+            "virtual_hid_keyboard": {
+                "country_code": 0,
+                "keyboard_type_v2": "jis"
+            },
+            "complex_modifications": {
+                "rules": [
+                    {
+                        "description": "Raycast: Command+Shift+V opens Clipboard History",
+                        "manipulators": [
+                            {
+                                "type": "basic",
+                                "from": {
+                                    "key_code": "v",
+                                    "modifiers": {
+                                        "mandatory": [
+                                            "command",
+                                            "shift"
+                                        ]
+                                    }
+                                },
+                                "to": [
+                                    {
+                                        "shell_command": "/usr/bin/open -g 'raycast://extensions/raycast/clipboard-history/clipboard-history'"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "QWERTY JIS",
+            "selected": {{ eq $layout "jis" }},
+            "virtual_hid_keyboard": {
+                "country_code": 0,
+                "keyboard_type_v2": "jis"
+            },
+            "complex_modifications": {
+                "rules": [
+                    {
+                        "description": "Raycast: Command+Shift+V opens Clipboard History",
+                        "manipulators": [
+                            {
+                                "type": "basic",
+                                "from": {
+                                    "key_code": "v",
+                                    "modifiers": {
+                                        "mandatory": [
+                                            "command",
+                                            "shift"
+                                        ]
+                                    }
+                                },
+                                "to": [
+                                    {
+                                        "shell_command": "/usr/bin/open -g 'raycast://extensions/raycast/clipboard-history/clipboard-history'"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "QWERTY US",
+            "selected": {{ eq $layout "us" }},
+            "virtual_hid_keyboard": {
+                "country_code": 0,
+                "keyboard_type_v2": "ansi"
+            },
+            "complex_modifications": {
+                "rules": [
+                    {
+                        "description": "Raycast: Command+Shift+V opens Clipboard History",
+                        "manipulators": [
+                            {
+                                "type": "basic",
+                                "from": {
+                                    "key_code": "v",
+                                    "modifiers": {
+                                        "mandatory": [
+                                            "command",
+                                            "shift"
+                                        ]
+                                    }
+                                },
+                                "to": [
+                                    {
+                                        "shell_command": "/usr/bin/open -g 'raycast://extensions/raycast/clipboard-history/clipboard-history'"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+
+                    {
+                        "description": "Tap left Command for Eisuu, right Command for Kana; hold for Command",
+                        "manipulators": [
+                            {
+                                "type": "basic",
+                                "from": {
+                                    "key_code": "left_command",
+                                    "modifiers": {
+                                        "optional": [
+                                            "caps_lock"
+                                        ]
+                                    }
+                                },
+                                "to": [
+                                    {
+                                        "key_code": "left_command",
+                                        "lazy": true
+                                    }
+                                ],
+                                "to_if_alone": [
+                                    {
+                                        "key_code": "japanese_eisuu"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "basic",
+                                "from": {
+                                    "key_code": "right_command"
+                                },
+                                "to": [
+                                    {
+                                        "key_code": "right_command",
+                                        "lazy": true
+                                    }
+                                ],
+                                "to_if_alone": [
+                                    {
+                                        "key_code": "japanese_kana"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    ]
+}

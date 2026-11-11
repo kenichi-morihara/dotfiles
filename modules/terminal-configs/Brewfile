@@ -1,0 +1,3 @@
+cask "ghostty"
+cask "iterm2"
+cask "font-hackgen-nerd"
