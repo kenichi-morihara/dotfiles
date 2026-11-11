@@ -22,4 +22,9 @@ function Set-Service { throw 'Check attempted a service update' }
 function Stop-Service { throw 'Check attempted a service stop' }
 function Disable-ScheduledTask { throw 'Check attempted a task update' }
 function taskkill.exe { throw 'Check attempted a process stop' }
-& $script -Check
+try {
+    & $script -Check
+} catch {
+    Write-Host $_.ScriptStackTrace
+    throw
+}

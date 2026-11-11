@@ -111,9 +111,11 @@ function ConvertTo-ByteArray {
 function Test-ByteEqual {
     param($Left, $Right)
     if ($null -eq $Left -or $null -eq $Right) { return $false }
-    if ($Left.Length -ne $Right.Length) { return $false }
-    for ($i = 0; $i -lt $Left.Length; $i++) {
-        if ([byte]$Left[$i] -ne [byte]$Right[$i]) { return $false }
+    $leftValues = @($Left)
+    $rightValues = @($Right)
+    if ($leftValues.Count -ne $rightValues.Count) { return $false }
+    for ($i = 0; $i -lt $leftValues.Count; $i++) {
+        if ([byte]$leftValues[$i] -ne [byte]$rightValues[$i]) { return $false }
     }
     return $true
 }
