@@ -18,7 +18,12 @@ class RollbackTest(unittest.TestCase):
         self.home = self.root / 'home'
         self.home.mkdir()
         self.env = {**os.environ, 'HOME': str(self.home)}
-        self.chezmoi = self.script('chezmoi', '''
+        self.state_log = self.root / 'chezmoi-state.log'
+        self.chezmoi = self.script('chezmoi', f'''
+if [ "$1" = state ]; then
+    printf '%s\\n' "$*" >> '{self.state_log}'
+    exit "${{FAKE_STATE_STATUS:-0}}"
+fi
 printf '%s\\0' '.zshrc' '.config' '.config/with space' '.config/link'
 ''')
         self.make = self.script('make', '''
@@ -61,11 +66,22 @@ exit "${FAKE_MAKE_STATUS:-0}"
         self.assertEqual(self.zshrc.read_text(), 'applied')
         self.assertTrue((self.home / '.config/link').is_symlink())
 
-        self.run_tool('restore', '--run', session)
+        self.run_tool('restore', '--run', session, '--chezmoi', self.chezmoi)
         self.assertEqual(self.zshrc.read_text(), 'personal')
         self.assertEqual(stat.S_IMODE(self.zshrc.stat().st_mode), 0o600)
         self.assertFalse((self.home / '.config').exists())
-        self.assertIn('復元済み', self.run_tool('restore', '--run', session))
+        self.assertIn('復元済み', self.run_tool('restore', '--run', session, '--chezmoi', self.chezmoi))
+
+    def test_restore_makes_chezmoi_forget_restored_targets(self):
+        session = self.track()
+        self.run_tool('restore', '--run', session, '--chezmoi', self.chezmoi, '--target', '.zshrc')
+        # A later apply must not treat the restored file as a manual edit.
+        keys = {line.rsplit('--key=', 1)[1] for line in self.state_log.read_text().splitlines()}
+        self.assertEqual(keys, {str(self.home / '.zshrc'), str(self.home.resolve() / '.zshrc')})
+        self.env['FAKE_STATE_STATUS'] = '1'
+        output = self.run_tool('restore', '--run', session, '--chezmoi', self.chezmoi)
+        self.assertIn('chezmoi', output)
+        self.assertFalse((self.home / '.config').exists())
 
     def test_failure_is_recoverable_without_overwriting_later_edits(self):
         self.env['FAKE_MAKE_STATUS'] = '7'

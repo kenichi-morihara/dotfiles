@@ -109,7 +109,7 @@ rollback-plan: ## 指定した実行の復元予定を表示（RUN=実行ID、�
 	$(PYTHON) scripts/common/rollback.py plan --run "$$DOTFILES_ROLLBACK_RUN"
 
 rollback: ## 指定した実行で変更したファイルを復元（RUN=実行ID、TARGETで1件指定可）
-	$(PYTHON) scripts/common/rollback.py restore --run "$$DOTFILES_ROLLBACK_RUN" --target "$$DOTFILES_ROLLBACK_TARGET"
+	$(PYTHON) scripts/common/rollback.py restore --run "$$DOTFILES_ROLLBACK_RUN" --target "$$DOTFILES_ROLLBACK_TARGET" --chezmoi "$(CHEZMOI)"
 
 ##@ 用途・端末別profile
 .PHONY: profile-select profile-show setup-plan repos

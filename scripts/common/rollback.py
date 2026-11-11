@@ -197,7 +197,7 @@ def restore_file(path, desired, current):
             temp.replace(path)
 
 
-def rollback(home, record, apply=False, selected=None):
+def rollback(home, record, apply=False, selected=None, chezmoi='chezmoi'):
     if record['home'] != str(home) or 'after' not in record:
         raise ValueError('別の HOME または適用後の状態を記録できなかった実行です')
     before, after = record['before'], record['after']
@@ -211,12 +211,14 @@ def rollback(home, record, apply=False, selected=None):
                                    name))
     failed = False
     modes = []
+    restored = []
     for name in changes:
         try:
             path = target(home, name)
             current = file_state(path)
             if current == before[name]:
                 print(f'復元済み  {name}')
+                restored.append(name)
             elif current != after[name]:
                 print(f'競合      {name}')
                 failed = True
@@ -228,6 +230,7 @@ def rollback(home, record, apply=False, selected=None):
                 print(f'{"削除" if before[name] is None else "復元"}      {name}')
                 if apply:
                     mode = restore_file(path, before[name], current)
+                    restored.append(name)
                     if mode is not None:
                         modes.append((name, path, mode))
         except (OSError, ValueError) as error:
@@ -241,7 +244,29 @@ def rollback(home, record, apply=False, selected=None):
         except OSError as error:
             print(f'保留      {name}: {error}', file=sys.stderr)
             failed = True
+    if apply:
+        forget(home, restored, chezmoi)
     return int(failed)
+
+
+def forget(home, names, chezmoi):
+    """Drop chezmoi's last-written state so the next apply does not treat
+    restored targets as manual edits (prompting, or failing without a TTY)."""
+    # chezmoi keys entries by its destination path, which follows $HOME as given.
+    roots = dict.fromkeys([home, Path(os.environ.get('HOME') or home)])
+    for name in names:
+        for root in roots:
+            command = [chezmoi, 'state', 'delete', '--bucket=entryState', f'--key={root / name}']
+            try:
+                result = subprocess.run(command, capture_output=True, text=True)
+            except OSError as error:
+                result = None
+                reason = str(error)
+            else:
+                reason = result.stderr.strip()
+            if result is None or result.returncode != 0:
+                print(f'注意      chezmoi の記録を更新できません: {name}（次回の適用で確認が表示されます）{reason}')
+                break
 
 
 def inventory_entries(name, output):
@@ -322,7 +347,8 @@ def main():
         if args.command == 'plan':
             return report(home, json.loads(path.read_text()))
         with locked(directory):
-            return rollback(home, json.loads(path.read_text()), apply=True, selected=args.target or None)
+            return rollback(home, json.loads(path.read_text()), apply=True, selected=args.target or None,
+                            chezmoi=args.chezmoi)
     except (OSError, ValueError, subprocess.CalledProcessError) as error:
         print(f'rollback: {error}', file=sys.stderr)
         return 1
