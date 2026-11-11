@@ -132,7 +132,7 @@ function Set-DesiredBinary {
     }
 
     $existing = Get-ItemProperty -LiteralPath $ProviderPath -Name $Name -ErrorAction SilentlyContinue
-    if ($null -ne $existing -and (Test-ByteEqual $existing.$Name $Value)) {
+    if ($null -ne $existing -and (Test-ByteEqual -Left ($existing.$Name) -Right $Value)) {
         Write-Host "ok  $ProviderPath\$Name"
         return
     }
@@ -276,7 +276,7 @@ if ($Check) {
     foreach ($item in @($state.registryBinary)) {
         $path = ConvertTo-ProviderPath -KeyPath $item.keyPath
         $existing = Get-ItemProperty -LiteralPath $path -Name $item.valueName -ErrorAction SilentlyContinue
-        if ($null -eq $existing -or -not (Test-ByteEqual $existing.($item.valueName) (ConvertTo-ByteArray $item.value))) {
+        if ($null -eq $existing -or -not (Test-ByteEqual -Left ($existing.($item.valueName)) -Right (ConvertTo-ByteArray $item.value))) {
             Write-Host "DIFF $path\$($item.valueName)"
             $differences += 1
         }
