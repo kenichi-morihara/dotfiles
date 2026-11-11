@@ -1,0 +1,19 @@
+# Managed by chezmoi. Reload with Command+Shift+,.
+font-family = HackGen35 Console NF
+font-size = 12
+# 全角（かな・漢字・全角記号）もHackGenで描画し、半角:全角=3:5の等幅を保つ。
+font-codepoint-map = U+3000-U+30FF=HackGen35 Console NF
+font-codepoint-map = U+3400-U+4DBF=HackGen35 Console NF
+font-codepoint-map = U+4E00-U+9FFF=HackGen35 Console NF
+font-codepoint-map = U+FF00-U+FFEF=HackGen35 Console NF
+theme = Dracula
+
+# Command+Space: show/hide the regular Ghostty windows from any application.
+# macOS requires Accessibility permission for global shortcuts.
+keybind = global:cmd+space=toggle_visibility
+quick-terminal-position = top
+quick-terminal-size = 60%
+quick-terminal-screen = mouse
+quick-terminal-autohide = true
+quick-terminal-animation-duration = 0.1
+quick-terminal-space-behavior = move

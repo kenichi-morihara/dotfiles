@@ -1,0 +1,7 @@
+{
+  "name": "omarchy-preferences",
+  "description": "Omarchy・Hypridle 設定",
+  "platforms": [
+    "linux"
+  ]
+}

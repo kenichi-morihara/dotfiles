@@ -1,0 +1,7 @@
+{
+  "name": "windows-preferences",
+  "description": "Windows のオーバーレイ・常駐設定",
+  "platforms": [
+    "windows"
+  ]
+}

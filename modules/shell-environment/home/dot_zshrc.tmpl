@@ -1,0 +1,2 @@
+# Managed by chezmoi.
+source {{ joinPath (default (dir .chezmoi.sourceDir) (get . "moduleRoot")) "scripts/common/.zshrc" | shellQuote }}

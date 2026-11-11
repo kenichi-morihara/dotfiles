@@ -1,0 +1,9 @@
+{
+  "name": "editor-configs",
+  "description": "VS Code と Cursor のユーザー設定",
+  "platforms": [
+    "darwin",
+    "linux",
+    "windows"
+  ]
+}

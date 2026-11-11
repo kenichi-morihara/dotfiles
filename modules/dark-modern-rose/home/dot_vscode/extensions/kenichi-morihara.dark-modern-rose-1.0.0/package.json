@@ -1,0 +1,26 @@
+{
+  "name": "dark-modern-rose",
+  "displayName": "Dark Modern Rose",
+  "description": "Dark Modern color roles with a Dracula-inspired rose palette.",
+  "publisher": "kenichi-morihara",
+  "version": "1.0.0",
+  "engines": { "vscode": "^1.75.0" },
+  "categories": ["Themes"],
+  "contributes": {
+    "themes": [
+      { "label": "Dark Modern Rose", "uiTheme": "vs-dark", "path": "./themes/dark-modern-rose.json" }
+    ],
+    "grammars": [
+      {
+        "scopeName": "dark-modern-rose.ruby.injection",
+        "path": "./syntaxes/ruby-injection.json",
+        "injectTo": ["source.ruby", "text.html.erb"]
+      },
+      {
+        "scopeName": "dark-modern-rose.ruby.data.injection",
+        "path": "./syntaxes/ruby-data-injection.json",
+        "injectTo": ["source.ruby"]
+      }
+    ]
+  }
+}

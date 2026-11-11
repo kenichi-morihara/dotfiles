@@ -1,0 +1,140 @@
+{
+  "scopeName": "dark-modern-rose.ruby.injection",
+  "injectionSelector": "L:source.ruby -comment -string -constant.language.symbol -meta.type.signature.rbs -meta.embedded.block.c -meta.embedded.block.cpp -meta.embedded.block.css -meta.embedded.block.graphql -meta.embedded.block.haml -meta.embedded.block.html -meta.embedded.block.js -meta.embedded.block.lua -meta.embedded.block.shell -meta.embedded.block.slim -meta.embedded.block.sql -meta.embedded.block.xml -meta.embedded.block.yaml",
+  "patterns": [
+    {
+      "name": "comment.block.documentation.ruby",
+      "match": "(?<=^=end)[ \\t].*$"
+    },
+    {
+      "name": "keyword.control.end.ruby",
+      "match": "(?<![.\\w:@$])\\bend\\b(?![?!:]|\\s*\\()"
+    },
+    {
+      "begin": "(?<![.\\w:@$])\\b(def)[ \\t]+((?:self\\.)?[A-Za-z_]\\w*[?!]?)[ \\t]+(=)(?=[ \\t])",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.control.def.ruby"
+        },
+        "2": {
+          "name": "entity.name.function.ruby"
+        },
+        "3": {
+          "name": "keyword.operator.assignment.ruby"
+        }
+      },
+      "end": "$",
+      "name": "meta.function.method.endless.ruby",
+      "patterns": [
+        {
+          "include": "source.ruby"
+        }
+      ]
+    },
+    {
+      "match": "^[ \\t]*(?:(private|protected|public)[ \\t]+)?((?:with_options|validates|validate|validates_with|validates_each|scope|belongs_to|has_one|has_many|has_and_belongs_to_many|before_validation|after_validation|after_initialize|after_find|(?:before|after|around)_(?:save|create|update|destroy)|after_(?:commit|rollback)|include|extend|prepend|attr_reader|attr_writer|attr_accessor|normalizes|attribute|store_accessor|serialize|encrypts|has_secure_password|has_secure_token|class_attribute|default_scope|delegate|enum|broadcasts_to|helper_method|layout|queue_as|retry_on|discard_on|included|class_methods|private_constant|before_action|after_action|around_action|skip_before_action|rescue_from|has_one_attached|has_many_attached|accepts_nested_attributes_for|module_function|private_class_method|public_class_method)\\b(?![?!:]))(?=\\(|[ \\t]+(?![ \\t])[\\w:'\\\"{]|&(?![&\\s=])|->)",
+      "captures": {
+        "1": {
+          "name": "support.function.rails.dsl.ruby"
+        },
+        "2": {
+          "name": "support.function.rails.dsl.ruby"
+        }
+      }
+    },
+    {
+      "name": "support.function.rails.dsl.ruby",
+      "match": "(?<=^[ \\t]{0,40})(?:private|protected|public|module_function)\\b(?![?!:])(?=[ \\t]*(?:#|$)|[ \\t]+(?![ \\t])[\\w:'\\\"&]|\\()"
+    },
+    {
+      "comment": "Stabby lambda parameters ->(a, *b, c: 1) are declared like block/def parameters (no nested parens).",
+      "match": "(->)[ \\t]*(\\([^()]*\\))",
+      "captures": {
+        "1": {
+          "name": "keyword.other.lambda.ruby"
+        },
+        "2": {
+          "patterns": [
+            {
+              "match": "(?<=[(,])[ \\t]*(?:\\*\\*?|&)?([a-z_]\\w*)\\b(?![?!(])",
+              "captures": {
+                "1": {
+                  "name": "variable.parameter.lambda.ruby"
+                }
+              }
+            },
+            {
+              "include": "source.ruby"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "keyword.other.lambda.ruby",
+      "match": "->|(?<![.\\w:@$])\\b(?:lambda|proc)\\b(?=[ \\t]*(?:\\{|do\\b))"
+    },
+    {
+      "name": "support.function.kernel.conversion.ruby",
+      "match": "(?<![.\\w:@$])\\b(?:Array|Integer|Float|String|Hash|Rational|Complex)(?=\\()"
+    },
+    {
+      "name": "support.class.ruby",
+      "match": "(?<![.\\w@$])\\b[A-Z][a-z0-9]\\w*\\b(?![?!(]|:(?!:)|\\s*(?:[-+*/|&]{0,2}=(?![=~>])|,(?=(?:\\s*[*]?[@$]{0,2}[A-Za-z_][\\w:]*\\s*,)*\\s*[*]?[@$]{0,2}[A-Za-z_][\\w:]*\\s*=(?![=~>]))))"
+    },
+    {
+      "name": "variable.other.readwrite.numbered-parameter.ruby",
+      "match": "(?<![.\\w:@$])\\b_[1-9]\\b"
+    },
+    {
+      "name": "variable.language.ruby",
+      "match": "(?<![.\\w:@$])\\b__(?:method|dir|callee|ENCODING)__\\b"
+    },
+    {
+      "name": "keyword.control.logical.ruby",
+      "match": "(?<![.\\w:@$])\\b(?:and|or|not)\\b(?![?!:]|\\s*[=(])"
+    },
+    {
+      "comment": "Statements that leave the current scope (shown in pink).",
+      "name": "keyword.control.exit.ruby",
+      "match": "(?<![.\\w:@$])\\b(?:(?:return|raise|fail|next|break|redo|retry|throw|abort)\\b(?![?!:])|exit!|exit\\b(?![?!:]))(?!\\s*=[^=~>])"
+    },
+    {
+      "name": "support.function.rails.ruby",
+      "match": "(?<![.\\w:@$])\\b(?:render|head|form_with|form_for|fields_for|image_tag|content_for|javascript_include_tag|stylesheet_link_tag|render_to_string|send_data|send_file)\\b(?![?!:.\\[]|\\s*(?:=[^=~>]|[-+*/%<>|^]=?\\s|&&|\\|\\||\\?\\s))"
+    },
+    {
+      "match": "^([ \\t]*)(rescue)\\b([^#\\n]*?)(=>)[ \\t]*([a-z_]\\w*)\\b(?![?!(.:])(?=[ \\t]*(?:$|;|#|\\bthen\\b))",
+      "captures": {
+        "2": {
+          "name": "keyword.control.ruby"
+        },
+        "3": {
+          "patterns": [
+            {
+              "include": "source.ruby"
+            }
+          ]
+        },
+        "4": {
+          "name": "punctuation.separator.key-value.ruby"
+        },
+        "5": {
+          "name": "variable.other.readwrite.exception.ruby"
+        }
+      }
+    },
+    {
+      "name": "support.function.predicate.ruby",
+      "match": "(?<![\\w:@$])\\b(?!(?:defined|block_given|iterator)\\?)[a-z_]\\w*\\?(?![\\w?:])"
+    },
+    {
+      "name": "support.function.bang.ruby",
+      "match": "(?<![\\w:@$])\\b[a-z_]\\w*!(?![\\w!=:])"
+    },
+    {
+      "name": "support.function.rails.route-helper.ruby",
+      "match": "(?<![.\\w:@$])\\b[a-z_]\\w*_(?:path|url)\\b(?![?!:]|\\s*=[^=~>])"
+    }
+  ]
+}

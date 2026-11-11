@@ -38,7 +38,7 @@ PATH・fpath・フック・プラグイン登録・zenoサーバーが増えな�
 クリーンなmacOS VMまたは新しいMacで、次を確認してください。
 
 - 上記の準備からchezmoi適用まで順に実行できること
-- `home/dot_config/mise/config.toml` の指定どおり `mise install` と `mise current` が動くこと
+- `modules/runtimes/home/dot_config/mise/config.toml` の指定どおり `mise install` と `mise current` が動くこと
 - 新しいターミナルでエラーなく起動し、`command -v brew starship mise deno fzf ghq` が成功すること
 - 初回のプラグイン取得完了後、補完・上下キーの履歴検索・Ctrl+Gの移動・Ctrl+Rの再読込が動くこと
 - 通知とKarabinerのキー操作が、macOSの必要な権限を付与した後に動くこと
@@ -47,3 +47,13 @@ PATH・fpath・フック・プラグイン登録・zenoサーバーが増えな�
 `brew install/uninstall/tap/untap` の成功時には、対話シェルのラッパーが
 Brewfileを更新し、main/masterでは自動コミットとupstreamへのpushを試行します。
 実際の導入リハーサルでは `command brew ...` でラッパーを回避できます。
+
+## VS Code テーマの確認
+
+```sh
+make test-vscode
+make preview-vscode FILE=path/to/sample.rb
+```
+
+`test-vscode` は一時的に VS Code を起動して ruby-lsp と配色を確認します。
+`preview-vscode` は指定ファイルの配色をターミナルで表示し、保存時に再描画します。

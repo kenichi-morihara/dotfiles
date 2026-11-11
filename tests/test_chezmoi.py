@@ -127,10 +127,15 @@ class ChezmoiTests(unittest.TestCase):
     def test_checkout_path_is_quoted_in_shell_entrypoint(self):
         source = Path(self.temp.name) / 'checkout with $literal'
         shutil.copytree(ROOT / 'home', source / 'home')
+        shutil.copytree(ROOT / 'modules', source / 'modules')
         shutil.copy(ROOT / '.chezmoiroot', source / '.chezmoiroot')
-        module = source / 'scripts/common/.zshrc'
-        module.parent.mkdir(parents=True)
+        module = source / 'modules/shell-environment/scripts/common/.zshrc'
+        module.parent.mkdir(parents=True, exist_ok=True)
         module.write_text('DOTFILES_SOURCED=1\n')
+        for name in ('macos/brew.zsh', 'linux/yay.zsh'):
+            stub = source / 'scripts' / name
+            stub.parent.mkdir(parents=True, exist_ok=True)
+            stub.write_text('')
         subprocess.run(['chezmoi', '--source', str(source), '--destination', str(self.home), 'apply'],
                        env=self.env, check=True, capture_output=True)
         subprocess.run(['zsh', '-f', '-c', 'source "$HOME/.zshrc"; [[ $DOTFILES_SOURCED == 1 ]]'],

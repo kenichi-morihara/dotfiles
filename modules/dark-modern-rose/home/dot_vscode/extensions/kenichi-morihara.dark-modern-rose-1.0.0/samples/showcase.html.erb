@@ -1,0 +1,13 @@
+<%# 注文一覧 Foo end validates :x %>
+<% content_for :title, "Orders" %>
+<div class="orders <%= "is-empty" if @orders.empty? %>" data-count="<%= @orders.size %>">
+  <% @orders.each do |order| %>
+    <%= link_to order.code, order_path(order), class: "order-link" %>
+    <p>Total: <%= number_to_currency(order.total_with_tax) %> / <%= order.paid? ? "paid" : "unpaid" %></p>
+    <%= render "line_items", items: order.line_items, show_tax: true %>
+  <% end %>
+  <%= form_with model: Order.new, url: orders_path do |f| %>
+    <%= f.text_field :email, placeholder: "you@example.com", required: true %>
+    <%= f.submit "Create #{Order.model_name.human}" %>
+  <% end %>
+</div>

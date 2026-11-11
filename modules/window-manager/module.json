@@ -1,0 +1,7 @@
+{
+  "name": "window-manager",
+  "description": "ウィンドウ配置・キーボード操作",
+  "platforms": [
+    "darwin"
+  ]
+}

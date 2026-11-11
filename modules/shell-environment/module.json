@@ -1,0 +1,8 @@
+{
+  "name": "shell-environment",
+  "description": "Zsh・検索・履歴・プロンプト",
+  "platforms": [
+    "darwin",
+    "linux"
+  ]
+}

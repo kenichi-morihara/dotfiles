@@ -63,7 +63,7 @@ class SetupTests(unittest.TestCase):
 
     def test_mise_manages_language_runtimes(self):
         self.assertFalse((ROOT / '.tool-versions').exists())
-        config = (ROOT / 'home/dot_config/mise/config.toml').read_text()
+        config = (ROOT / 'modules/runtimes/home/dot_config/mise/config.toml').read_text()
         self.assertIn('node = "25.2.1"', config)
         self.assertIn('python = "3.14.2"', config)
         self.assertIn('deno = "2.9.7"', config)
@@ -72,7 +72,7 @@ class SetupTests(unittest.TestCase):
     def test_zeno_bindings_work_before_lazy_initialization(self):
         result = subprocess.run(['zsh', '-f', '-c',
                                  'unset ZENO_LOADED; ZENO_BOOTSTRAPPED=1; source "$1"; bindkey "^g"; bindkey "^i"',
-                                 'test', str(ROOT / 'scripts/common/zeno.zsh')],
+                                 'test', str(ROOT / 'modules/shell-environment/scripts/common/zeno.zsh')],
                                 text=True, capture_output=True, check=True)
         self.assertIn('zeno-ghq-cd', result.stdout)
         self.assertIn('zeno-completion', result.stdout)
@@ -81,7 +81,7 @@ class SetupTests(unittest.TestCase):
         scripts = [("bash", ROOT / "setup-zsh.sh")]
         scripts += [("bash", p) for p in (ROOT / "scripts").rglob("*.sh")]
         scripts += [("zsh", p) for p in (ROOT / "scripts").rglob("*.zsh")]
-        scripts.append(("zsh", ROOT / "scripts/common/.zshrc"))
+        scripts.append(("zsh", ROOT / "modules/shell-environment/scripts/common/.zshrc"))
         scripts += [("bash", p) for p in (ROOT / "tests/macos").glob("*.sh")]
         scripts += [("bash", p) for p in (ROOT / "tests").glob("*.sh")]
         scripts += [("zsh", p) for p in (ROOT / "tests/macos").glob("*.zsh")]
@@ -106,7 +106,7 @@ class SetupTests(unittest.TestCase):
             self.assertEqual((config / 'config.yml.backup').read_text(), 'original config')
             self.assertEqual((config / 'local.yml').read_text(), 'local settings')
             self.assertFalse((config / 'config.yml').is_symlink())
-            self.assertEqual((config / 'config.yml').read_text(), (ROOT / 'home/dot_config/zeno/config.yml').read_text())
+            self.assertEqual((config / 'config.yml').read_text(), (ROOT / 'modules/shell-environment/home/dot_config/zeno/config.yml').read_text())
             self.assertFalse((config / 'zeno').exists())
             self.assertFalse((home / '.config/windows').exists())
 
@@ -151,7 +151,7 @@ class SetupTests(unittest.TestCase):
                 path = Path(tmp) / name
                 path.write_text('#!/bin/sh\n' + body + '\n')
                 path.chmod(0o755)
-            result = subprocess.run(['bash', str(ROOT / 'scripts/macos/init.sh')],
+            result = subprocess.run(['bash', str(ROOT / 'modules/macos-preferences/scripts/macos/init.sh')],
                                     env=dict(os.environ, PATH=tmp + ':/usr/bin:/bin'),
                                     text=True, capture_output=True)
             self.assertEqual(result.returncode, 0, result.stderr)

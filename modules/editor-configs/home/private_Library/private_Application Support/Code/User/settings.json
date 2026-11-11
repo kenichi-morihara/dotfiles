@@ -1,0 +1,7 @@
+{
+  "editor.formatOnSave": true,
+  "editor.renderWhitespace": "all",
+  "extensions.autoUpdate": "off",
+  "security.workspace.trust.untrustedFiles": "open",
+  "workbench.colorTheme": "Dark Modern Rose",
+}

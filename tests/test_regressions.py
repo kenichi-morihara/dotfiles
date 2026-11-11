@@ -23,7 +23,7 @@ class LinkBackupTests(unittest.TestCase):
                                         XDG_DATA_HOME=tmp + '/.local/share', XDG_CACHE_HOME=tmp + '/.cache'),
                                check=True, capture_output=True)
             self.assertFalse((home / '.zshrc').is_symlink())
-            self.assertIn(str(ROOT / 'scripts/common/.zshrc'), (home / '.zshrc').read_text())
+            self.assertIn(str(ROOT / 'modules/shell-environment/scripts/common/.zshrc'), (home / '.zshrc').read_text())
             self.assertEqual((home / '.zshrc.backup').read_text(), 'first backup')
             self.assertEqual(os.readlink(home / '.zshrc.backup.1'), str(home / 'missing-backup'))
             self.assertEqual(os.readlink(home / '.zshrc.backup.2'), str(missing))

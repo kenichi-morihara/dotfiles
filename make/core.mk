@@ -41,6 +41,7 @@ apply-files: ## chezmoiのファイルだけを適用（競合時は停止）
 		printf '%s\n' "$$changes" | sed 's/^/    /'; \
 	fi
 	$(CHEZMOI) --source "$(ROOT)" --destination "$(HOME)" apply --error-on-conflict
+	$(PYTHON) modules/claude-statusline/scripts/settings.py
 
 apply-apps: ## インストール済みアプリの設定を適用（macOS）
 	@if [ "$$(uname -s)" = Darwin ]; then echo '==> Apps (macOS)'; PYTHON="$(PYTHON)" bash scripts/macos/apps.sh; fi
@@ -49,7 +50,7 @@ apply-system: ## Dock・日本語入力・電源などのシステム設定を�
 	bash scripts/macos/defaults.sh
 
 runtimes: ## mise管理の言語ランタイムを導入
-	mise install
+	$(MAKE) -C modules/runtimes install
 
 shell-setup: ## zshをログインシェルに設定
 	bash setup-zsh.sh
@@ -66,6 +67,7 @@ verify: ## chezmoiのファイルが宣言と一致するか確認
 		echo 'Review with make diff; apply with make apply-files.' >&2; \
 		exit $$result; \
 	}
+	$(PYTHON) modules/claude-statusline/scripts/settings.py --check
 
 check-apps: ## インストール済みアプリの設定を確認（変更なし、macOS）
 	@if [ "$$(uname -s)" = Darwin ]; then PYTHON="$(PYTHON)" bash scripts/macos/apps.sh --check; fi
@@ -78,8 +80,8 @@ dry-run: ## ファイル配布のプレビュー（変更なし）
 
 ##@ 用途・端末別profile
 .PHONY: profile-select profile-show setup-plan repos
-profile-select: ## 用途・端末のprofileを保存（NAME=personal または work/<端末ID>）
-	$(PROFILE_TOOL) select --name "$(NAME)"
+profile-select: ## 用途・端末のprofileを選択（NAME省略で対話的に選ぶ）
+	$(PROFILE_TOOL) select $(if $(NAME),--name "$(NAME)")
 
 profile-show: ## 選択中profileの実効設定を表示
 	$(PROFILE_TOOL) show

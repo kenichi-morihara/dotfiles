@@ -57,6 +57,17 @@ class ProfileTests(unittest.TestCase):
         self.assertEqual(before, after)
         self.assertEqual(state.read_text(), 'personal\n')
 
+    def test_interactive_select_creates_machine_profile(self):
+        answers = iter(['3', 'zz-test-mac'])
+        machine = profiles.ROOT / 'profiles/work/zz-test-mac.toml'
+        self.addCleanup(machine.unlink, missing_ok=True)
+        with patch.object(profiles, 'interactive', return_value=True), \
+                patch('builtins.input', lambda prompt='': next(answers)), \
+                patch.object(sys, 'argv', ['profiles.py', 'select']):
+            self.assertEqual(profiles.main(), 0)
+        self.assertEqual(profiles.selection_path().read_text(), 'work/zz-test-mac\n')
+        self.assertEqual(machine.read_text(), (profiles.ROOT / 'profiles/work/example.toml').read_text())
+
     def test_invalid_or_missing_selection_cannot_start_setup(self):
         for name in ('../personal', 'work/../../x', 'work/example', 'work/missing'):
             self.assertNotEqual(self.cli('select', '--name', name, check=False).returncode, 0)

@@ -1,0 +1,8 @@
+{
+  "name": "terminal-configs",
+  "description": "ターミナルの見た目・表示操作",
+  "platforms": [
+    "darwin",
+    "linux"
+  ]
+}

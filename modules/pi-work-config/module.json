@@ -1,0 +1,8 @@
+{
+  "name": "pi-work-config",
+  "description": "Pi と Claude CLI の接続",
+  "platforms": [
+    "darwin",
+    "linux"
+  ]
+}
