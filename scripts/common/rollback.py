@@ -180,10 +180,12 @@ def restore_file(path, desired, current):
             path.unlink()
     elif desired['kind'] == 'directory':
         if current is None:
-            path.mkdir(mode=desired['mode'])
+            # Keep it writable until its children are restored; the caller
+            # applies the recorded mode afterwards.
+            path.mkdir(mode=desired['mode'] | 0o700)
         elif current['kind'] != 'directory':
             raise ValueError(f'ディレクトリへの変換は手動で復元してください: {path}')
-        path.chmod(desired['mode'])
+        return desired['mode']
     else:
         with tempfile.TemporaryDirectory(dir=path.parent) as directory:
             temp = Path(directory) / 'restore'
@@ -208,6 +210,7 @@ def rollback(home, record, apply=False, selected=None):
                                    -len(Path(name).parts) if before[name] is None else len(Path(name).parts),
                                    name))
     failed = False
+    modes = []
     for name in changes:
         try:
             path = target(home, name)
@@ -224,8 +227,18 @@ def rollback(home, record, apply=False, selected=None):
                         raise ValueError('記録対象外のファイルが入っています')
                 print(f'{"削除" if before[name] is None else "復元"}      {name}')
                 if apply:
-                    restore_file(path, before[name], current)
+                    mode = restore_file(path, before[name], current)
+                    if mode is not None:
+                        modes.append((name, path, mode))
         except (OSError, ValueError) as error:
+            print(f'保留      {name}: {error}', file=sys.stderr)
+            failed = True
+    # Directory modes last and deepest first, so a read-only directory does not
+    # block restoring its own children.
+    for name, path, mode in sorted(modes, key=lambda item: -len(Path(item[0]).parts)):
+        try:
+            path.chmod(mode)
+        except OSError as error:
             print(f'保留      {name}: {error}', file=sys.stderr)
             failed = True
     return int(failed)

@@ -80,6 +80,22 @@ exit "${FAKE_MAKE_STATUS:-0}"
         self.assertEqual(self.zshrc.read_text(), 'edited after setup')
         self.assertEqual(unmanaged.read_text(), 'keep')
 
+    def test_read_only_directory_mode_is_restored_after_its_children(self):
+        config = self.home / '.config'
+        config.mkdir(mode=0o555)
+        config.chmod(0o555)
+        self.addCleanup(lambda: config.exists() and config.chmod(0o755))
+        # chezmoi makes a managed directory writable before adding new children.
+        self.make = self.script('make', '''
+chmod 755 "$HOME/.config"
+printf 'new' > "$HOME/.config/with space"
+''')
+        session = self.track()
+        self.run_tool('restore', '--run', session)
+        self.assertEqual(stat.S_IMODE(config.stat().st_mode), 0o555)
+        self.assertEqual(list(config.iterdir()), [])
+        self.assertIn('復元済み', self.run_tool('restore', '--run', session))
+
     def test_symlinked_parent_stops_before_setup(self):
         external = self.root / 'external'
         external.mkdir()
