@@ -106,3 +106,8 @@ setup-plan: ## 一括導入の予定を表示（変更なし）
 
 repos: ## 選択中profileのrepo取得・開発依存導入
 	$(PROFILE_TOOL) repos
+
+##@ 仕事用ツール（明示的に導入）
+.PHONY: rust-lsp-setup
+rust-lsp-setup: ## 会社用: rustup に rust-analyzer / rust-src を追加
+	bash work/rust/install.sh
