@@ -1,3 +1,4 @@
 package_profile = "core"
 keyboard_layout = "us"
 repos = []
+casks = ["claude", "github"] # Claude Desktop, GitHub Desktop
