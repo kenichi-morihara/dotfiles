@@ -134,7 +134,8 @@ touch "{marker}"''')
         self.assertEqual(log.read_text(), str((checkout / 'ai-tasks').resolve()) + ': exec -- npm ci\n')
 
     def test_setup_orders_stages_and_propagates_package_failure(self):
-        config = profiles.resolve('work')
+        # 実 profile の追加パッケージに左右されないよう、追加分は空にして段の順序だけを見る。
+        config = {**profiles.resolve('work'), 'packages': [], 'casks': []}
         with patch.object(profiles.platform, 'system', return_value='Darwin'), patch.object(profiles, 'run') as run:
             profiles.execute(config, 'setup')
             self.assertEqual([c.args[0] for c in run.call_args_list], [
