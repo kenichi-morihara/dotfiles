@@ -643,3 +643,7 @@ Linux は既存の OS 別パッケージ導入・設定配布・ランタイム�
 profile 選択中は Homebrew ラッパーによる共通 Brewfile の自動更新・コミット・push を停止します。
 追加したパッケージは profile の `packages` / `casks` に明示してください。
 未選択端末では従来の自動更新が継続します。
+
+会社端末で rust-analyzer（エディタ・Claude Code の Rust LSP）を使う場合は、
+`make rust-lsp-setup` で rustup に `rust-analyzer` と `rust-src` を追加します。
+`work` / `work/*` profile 専用で、rustup が未導入なら停止します。
